@@ -16,10 +16,17 @@ const sliderContent = [
     imagen: "https://frasesencanciones.com/wp-content/uploads/2023/11/mora-cantante-768x513.jpg",
   },
 ];
+
+const iniciarSesion = () => {
+  window.location.href = '/login'; // Ajusta la ruta según tu aplicación
+};
 </script>
 
 <template>
   <div class="novedades">
+    <div class="top-bar">
+      <button class="login-button" @click="iniciarSesion">Iniciar Sesión</button>
+    </div>
     <section class="slider">
       <div v-for="(slide, index) in sliderContent" :key="index" class="slide">
         <img :src="slide.imagen" :alt="slide.titulo" />
@@ -38,6 +45,34 @@ const sliderContent = [
   display: flex;
   flex-direction: column;
   gap: 2rem;
+  position: relative;
+}
+
+.top-bar {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+  padding: 1rem;
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.login-button {
+  background-color: #000000;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.3s;
+  margin-right: 1rem;
+  margin-top: -37px;
+}
+
+.login-button:hover {
+  background-color: #4b4b4b;
 }
 
 .slider {
@@ -71,5 +106,4 @@ const sliderContent = [
   color: white;
   border-radius: 0 0 8px 8px;
 }
-
 </style>
