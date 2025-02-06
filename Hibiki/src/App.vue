@@ -78,7 +78,7 @@ import { RouterView } from 'vue-router';
 
 .content {
   flex: 1;
-  background-color: #f8f8f8;
+  background-color: light dark;
   padding: 2rem;
   overflow-y: auto;
 }
