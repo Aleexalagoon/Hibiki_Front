@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import NovedadesView from "@/views/NovedadesView.vue";
 import LoginView from "@/views/LoginView.vue";
 import RegisterView from "@/views/RegisterView.vue";
+import PremiumView from "@/views/PremiumView.vue";
 import Hibiki from "@/views/Hibiki.vue";
 
 const router = createRouter({
@@ -22,6 +23,13 @@ const router = createRouter({
       name: "register",
       component: RegisterView,
     },
+
+    {
+      path: "/premium",
+      name: "premium",
+      component: PremiumView,
+    },
+
     {
       path: "/hibki",
       name: "hibki",
