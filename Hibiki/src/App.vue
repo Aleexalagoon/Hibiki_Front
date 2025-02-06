@@ -5,7 +5,7 @@ import { RouterView } from 'vue-router';
 <template>
   <div class="app">
     <aside class="sidebar">
-      <div class="logo">Music</div>
+      <div class="logo">HIBIKI</div>
       <nav class="menu">
         <router-link to="/" class="menu-item" active-class="active">Inicio</router-link>
         <router-link to="/novedades" class="menu-item" active-class="active">Novedades</router-link>

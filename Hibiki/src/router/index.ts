@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 import NovedadesView from "@/views/NovedadesView.vue";
+import LoginView from "@/views/LoginView.vue";
 import Hibiki from "@/views/Hibiki.vue";
 
 const router = createRouter({
@@ -9,6 +10,11 @@ const router = createRouter({
       path: "/novedades",
       name: "novedades",
       component: NovedadesView,
+    },
+    {
+      path: "/login",
+      name: "login",
+      component: LoginView,
     },
     {
       path: "/hibki",
