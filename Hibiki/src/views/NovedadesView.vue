@@ -38,12 +38,9 @@ const nuevosLanzamientos = [
 
 const iniciarSesion = () => {
   window.location.href = '/login'; 
-<<<<<<< HEAD
-=======
 };
 const registrar= () => {
   window.location.href = '/register'; 
->>>>>>> 481b433287f58135f1c886b7b7233f15707d5749
 };
 </script>
 

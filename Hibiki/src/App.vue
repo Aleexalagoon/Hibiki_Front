@@ -90,13 +90,10 @@ const search = () => {
 
 .content {
   flex: 1;
-<<<<<<< HEAD
   background-color: light dark;
   padding: 2rem;
-=======
   background-color: #ffffff;
   padding: 0rem;
->>>>>>> 481b433287f58135f1c886b7b7233f15707d5749
   overflow-y: auto;
 }
 
