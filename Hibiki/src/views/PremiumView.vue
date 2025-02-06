@@ -50,8 +50,6 @@
   
   <style scoped>
   * {
-    margin: 0;
-    padding: 0;
     box-sizing: border-box;
   }
   
@@ -67,7 +65,7 @@
     justify-content: center;
     align-items: center;
     height: 100vh;
-    background: linear-gradient(180deg, rgb(255, 255, 255) 0%, rgb(0, 0, 0) 100%);
+    background: linear-gradient(180deg, rgb(63, 62, 62) 0%, rgb(0, 0, 0) 100%);
     color: rgb(255, 255, 255);
     padding: 2rem;
   }

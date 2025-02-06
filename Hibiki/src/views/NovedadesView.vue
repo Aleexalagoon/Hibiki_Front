@@ -101,7 +101,6 @@ const registrar= () => {
   justify-content: flex-end;
   width: 100%;
   padding: 1rem;
-  position: absolute;
   top: 0;
   right: 0;
 }
@@ -177,7 +176,7 @@ const registrar= () => {
 }
 
 .album-item img {
-  width: 235px;
+  width: 248px;
   border-radius: 8px;
 }
 
@@ -193,7 +192,6 @@ const registrar= () => {
   align-items: center;
   gap: 1rem;
   background: #f5f5f5;
-  padding: 1rem;
   border-radius: 8px;
 }
 </style>

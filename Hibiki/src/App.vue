@@ -41,7 +41,7 @@ const search = () => {
 
 .sidebar {
   width: 250px;
-  background-color: #000;
+  background: linear-gradient(180deg, rgb(22, 22, 22) 0%, rgb(0, 0, 0) 100%);
   color: #ffffff;
   display: flex;
   flex-direction: column;
