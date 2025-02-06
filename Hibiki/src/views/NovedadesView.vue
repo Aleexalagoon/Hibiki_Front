@@ -20,6 +20,9 @@ const sliderContent = [
 const iniciarSesion = () => {
   window.location.href = '/login'; 
 };
+const registrar= () => {
+  window.location.href = '/register'; 
+};
 </script>
 
 <template>

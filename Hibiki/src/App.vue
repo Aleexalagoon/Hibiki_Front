@@ -20,6 +20,7 @@ const search = () => {
         </div>
         <router-link to="/" class="menu-item" active-class="active">Inicio</router-link>
         <router-link to="/novedades" class="menu-item" active-class="active">Novedades</router-link>
+        <router-link to="/premium" class="menu-item" active-class="active">Premium</router-link>
       </nav>
       <footer class="footer">
         <p>Abre en Música</p>
@@ -90,7 +91,7 @@ const search = () => {
 .content {
   flex: 1;
   background-color: #ffffff;
-  padding: 2rem;
+  padding: 0rem;
   overflow-y: auto;
 }
 
