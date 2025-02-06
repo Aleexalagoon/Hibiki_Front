@@ -6,7 +6,7 @@
         <input v-model="password" type="password" placeholder="Contraseña" required />
         <button type="submit" class="login-button">Iniciar sesión</button>
         <div class="link">
-        <a href="#" class="signup">¿No tienes cuenta? Suscríbete a Hibiki</a>
+        <a href="/register" class="signup">¿No tienes cuenta? Suscríbete a Hibiki</a>
     </div>
       </form>
     </div>
@@ -26,7 +26,7 @@
       login() {
         if (this.username === 'admin' && this.password === 'admin') {
           alert('Inicio de sesión exitoso');
-          this.$router.push('/home'); 
+          this.$router.push('/novedades'); 
         } else {
           alert('Usuario o contraseña incorrectos');
         }
