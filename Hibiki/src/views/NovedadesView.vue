@@ -190,8 +190,44 @@ const registrar= () => {
 .cancion-item {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  background: #f5f5f5;
+  gap: 0.5rem; 
+  background: white;
   border-radius: 8px;
+  padding: 0.5rem; 
+  position: relative;
+}
+
+.cancion-item img {
+  width: 50px; 
+  height: 50px; 
+  border-radius: 5px; 
+}
+
+.cancion-item h3 {
+  font-size: 0.75rem; 
+  margin-bottom: 0.1rem; 
+}
+
+.cancion-item p {
+  font-size: 0.65rem; 
+  margin: 0; 
+}
+
+.cancion-item::before,
+.cancion-item::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 1px; 
+  background-color:rgb(62, 62, 62); 
+}
+
+.cancion-item::before {
+  top: 0;
+}
+
+.cancion-item::after {
+  bottom: 0;
 }
 </style>
