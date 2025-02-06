@@ -18,13 +18,14 @@ const sliderContent = [
 ];
 
 const iniciarSesion = () => {
-  window.location.href = '/login'; // Ajusta la ruta según tu aplicación
+  window.location.href = '/login'; 
 };
 </script>
 
 <template>
   <div class="novedades">
     <div class="top-bar">
+      <button class="register-button" @click="registrar">Registrarse</button>
       <button class="login-button" @click="iniciarSesion">Iniciar Sesión</button>
     </div>
     <section class="slider">
@@ -41,6 +42,7 @@ const iniciarSesion = () => {
 
 <style scoped>
 .novedades {
+  background-color: white;
   padding: 2rem;
   display: flex;
   flex-direction: column;
@@ -59,7 +61,7 @@ const iniciarSesion = () => {
 }
 
 .login-button {
-  background-color: #000000;
+  background-color: #ff5100;
   color: white;
   border: none;
   padding: 0.75rem 1.5rem;
@@ -72,7 +74,23 @@ const iniciarSesion = () => {
 }
 
 .login-button:hover {
-  background-color: #4b4b4b;
+  background-color: #ca3900;
+}
+.register-button {
+  background-color: white;
+  color: #ff5100;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.3s;
+  margin-right: 1rem;
+  margin-top: -37px;
+}
+
+.login-button:hover {
+  background-color: #ca3900;
 }
 
 .slider {

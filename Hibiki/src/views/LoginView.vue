@@ -67,7 +67,7 @@
   }
   
   .login-button {
-    background-color: #000000;
+    background-color: #ff5100;
     color: white;
     font-size: 16px;
     padding: 10px;
@@ -78,7 +78,7 @@
   }
   
   .login-button:hover {
-    background-color: #4b4b4b;
+    background-color: #ca3900;
   }
 
   .link {

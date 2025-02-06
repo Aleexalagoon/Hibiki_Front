@@ -1,5 +1,12 @@
 <script setup lang="ts">
+import { ref } from 'vue';
 import { RouterView } from 'vue-router';
+
+const searchQuery = ref('');
+
+const search = () => {
+  console.log('Buscando:', searchQuery.value);
+};
 </script>
 
 <template>
@@ -7,6 +14,10 @@ import { RouterView } from 'vue-router';
     <aside class="sidebar">
       <div class="logo">HIBIKI</div>
       <nav class="menu">
+        <div class="menu-search">
+          <input type="text" placeholder="Buscar..." v-model="searchQuery" />
+          <button @click="search">Buscar</button>
+        </div>
         <router-link to="/" class="menu-item" active-class="active">Inicio</router-link>
         <router-link to="/novedades" class="menu-item" active-class="active">Novedades</router-link>
       </nav>
@@ -30,7 +41,7 @@ import { RouterView } from 'vue-router';
 .sidebar {
   width: 250px;
   background-color: #000;
-  color: #fff;
+  color: #ffffff;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -69,7 +80,7 @@ import { RouterView } from 'vue-router';
 }
 
 .beta-link {
-  color: #00aaff;
+  color: #ff5100;
   text-decoration: none;
 }
 .beta-link:hover {
@@ -78,8 +89,34 @@ import { RouterView } from 'vue-router';
 
 .content {
   flex: 1;
-  background-color: #f8f8f8;
+  background-color: #ffffff;
   padding: 2rem;
   overflow-y: auto;
+}
+
+.menu-search {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem; 
+}
+
+.menu-search input {
+  padding: 5px;
+  margin-right: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.menu-search button {
+  padding: 5px 10px;
+  background-color: #ff5100;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.menu-search button:hover {
+  background-color: #ca3900;
 }
 </style>
