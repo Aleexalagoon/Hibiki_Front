@@ -4,6 +4,10 @@ import LoginView from "@/views/LoginView.vue";
 import RegisterView from "@/views/RegisterView.vue";
 import PremiumView from "@/views/PremiumView.vue";
 import Hibiki from "@/views/Hibiki.vue";
+import PoliticaView from "@/views/PoliticaView.vue";
+import TerminosView from "@/views/TerminosView.vue";
+import CookiesView from "@/views/CookiesView.vue";
+import InfoAnunciosView from "@/views/InfoAnunciosView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -34,7 +38,31 @@ const router = createRouter({
       path: "/hibki",
       name: "hibki",
       component: Hibiki,
+    },
+
+    {
+      path: "/politica",
+      name: "politica",
+      component: PoliticaView,
+    },
+    {
+      path: "/terminos",
+      name: "terminos",
+      component: TerminosView,
+    },
+
+    {
+      path: "/cookies",
+      name: "cookies",
+      component: CookiesView,
+    },
+
+    {
+      path: "/infoanuncios",
+      name: "infoanuncios",
+      component: InfoAnunciosView,
     }
+
   ],
 });
 

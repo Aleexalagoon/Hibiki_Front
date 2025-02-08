@@ -22,10 +22,6 @@ const search = () => {
         <router-link to="/novedades" class="menu-item" active-class="active">Novedades</router-link>
         <router-link to="/premium" class="menu-item" active-class="active">Premium</router-link>
       </nav>
-      <footer class="footer">
-        <p>Abre en Música</p>
-        <a href="#" class="beta-link">Probar la versión beta</a>
-      </footer>
     </aside>
     <main class="content">
       <RouterView />
@@ -122,4 +118,5 @@ const search = () => {
 .menu-search button:hover {
   background-color: #ca3900;
 }
+
 </style>

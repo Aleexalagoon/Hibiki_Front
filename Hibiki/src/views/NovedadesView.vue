@@ -84,6 +84,21 @@ const registrar= () => {
       </div>
     </section>
   </div>
+
+    <footer class="footer">
+    <div class="footer-content">
+      <p class="footer-text">
+        © 2025 Hibiki. Todos los derechos reservados.
+      </p>
+      <div class="footer-links">
+        <a href="/politica" class="footer-link">Política de Privacidad</a>
+        <a href="/terminos" class="footer-link">Términos y Condiciones</a>
+        <a href="/cookies" class="footer-link">Política de Cookies</a>
+        <a href="/infoanuncios" class="footer-link">Información de anuncios</a>
+      </div>
+    </div>
+  </footer>
+
 </template>
 
 <style scoped>
@@ -180,7 +195,6 @@ const registrar= () => {
   border-radius: 8px;
 }
 
-/* Estilos para las canciones en dos columnas */
 .canciones-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -229,5 +243,40 @@ const registrar= () => {
 
 .cancion-item::after {
   bottom: 0;
+}
+
+.footer {
+  background-color: white;
+  color: #ff5100;
+  padding: 20px;
+  text-align: center;
+  margin-top: 40px;
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.footer-text {
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.footer-links {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.footer-link {
+  color: black;
+  text-decoration: none;
+  font-size: 14px;
+  transition: color 0.3s ease;
+}
+
+.footer-link:hover {
+  color: #ff5100; 
 }
 </style>
