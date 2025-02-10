@@ -74,22 +74,21 @@ const registrar= () => {
     </section>
 
     <section class="nuevos-lanzamientos">
-      <h2>Nuevos lanzamientos</h2>
-      <div class="album-grid">
-        <div v-for="(album, index) in nuevosLanzamientos" :key="index" class="album-item">
-          <img :src="album.imagen" :alt="album.titulo" />
-          <h3>{{ album.titulo }}</h3>
-          <p>{{ album.artista }}</p>
-        </div>
-      </div>
-    </section>
+  <h2 class="section-title">Nuevos lanzamientos</h2>
+  <div class="album-grid">
+    <div v-for="(album, index) in nuevosLanzamientos" :key="index" class="album-item">
+      <img :src="album.imagen" :alt="album.titulo" class="album-img" />
+      <h3 class="album-title">{{ album.titulo }}</h3>
+      <p class="album-artist">{{ album.artista }}</p>
+    </div>
+  </div>
+</section>
+
   </div>
 
-    <footer class="footer">
+  <footer class="footer">
     <div class="footer-content">
-      <p class="footer-text">
-        © 2025 Hibiki. Todos los derechos reservados.
-      </p>
+      <p class="footer-text">© 2025 Hibiki. Todos los derechos reservados.</p>
       <div class="footer-links">
         <a href="/politica" class="footer-link">Política de Privacidad</a>
         <a href="/terminos" class="footer-link">Términos y Condiciones</a>
@@ -98,8 +97,8 @@ const registrar= () => {
       </div>
     </div>
   </footer>
-
 </template>
+
 
 <style scoped>
 .novedades {
@@ -108,7 +107,6 @@ const registrar= () => {
   display: flex;
   flex-direction: column;
   gap: 2rem;
-  position: relative;
 }
 
 .top-bar {
@@ -186,8 +184,10 @@ const registrar= () => {
 }
 
 .album-grid {
-  display: flex;
-  gap: 5rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 1rem;
+  justify-items: center;
 }
 
 .album-item img {
@@ -195,20 +195,69 @@ const registrar= () => {
   border-radius: 8px;
 }
 
+.album-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  background-color: #f9f9f9;
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.album-item:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.album-img {
+  width: 100%;
+  max-width: 120px;
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+}
+
+.album-content h3 {
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.album-content p {
+  font-size: 0.875rem;
+  color: #777;
+}
+
+.album-title {
+  font-size: 1rem;
+  margin: 0.5rem 0 0.25rem;
+  color: #333;
+}
+
+.album-artist {
+  font-size: 0.875rem;
+  color: #777;
+  margin: 0;
+}
+
 .canciones-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
+  display: grid
+;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
 }
 
 .cancion-item {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem; 
-  background: white;
-  border-radius: 8px;
-  padding: 0.5rem; 
-  position: relative;
+    display: flex
+;
+    align-items: center;
+    gap: 0.5rem;
+    background: white;
+    border-radius: 8px;
+    padding: 0.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .cancion-item img {
@@ -278,5 +327,16 @@ const registrar= () => {
 
 .footer-link:hover {
   color: #ff5100; 
+}
+
+.nuevos-lanzamientos {
+  background-color: white;
+  padding: 2rem 1rem;
+}
+
+.section-title {
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  color: #333;
 }
 </style>
