@@ -10,6 +10,7 @@ import CookiesView from "@/views/CookiesView.vue";
 import InfoAnunciosView from "@/views/InfoAnunciosView.vue";
 import InicioView from "@/views/InicioView.vue";
 import AlbumView from "@/views/AlbumView.vue";
+import PlaylistView from "@/views/PlaylistView.vue";
 
 
 const router = createRouter({
@@ -76,8 +77,13 @@ const router = createRouter({
       path: "/album",
       name: "album",
       component: AlbumView,
-    }
+    },
 
+    {
+      path: "/playlist",
+      name: "playlist",
+      component: PlaylistView,
+    }
 
   ],
 });
