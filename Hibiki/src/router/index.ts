@@ -9,6 +9,7 @@ import TerminosView from "@/views/TerminosView.vue";
 import CookiesView from "@/views/CookiesView.vue";
 import InfoAnunciosView from "@/views/InfoAnunciosView.vue";
 import InicioView from "@/views/InicioView.vue";
+import AlbumView from "@/views/AlbumView.vue";
 
 
 const router = createRouter({
@@ -69,7 +70,14 @@ const router = createRouter({
       path: "/inicio",
       name: "inicio",
       component: InicioView,
+    },
+
+    {
+      path: "/album",
+      name: "album",
+      component: AlbumView,
     }
+
 
   ],
 });
