@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 
 const sliderContent = [
   {
@@ -216,6 +216,50 @@ onUnmounted(() => {
   stopSlideInterval();
 });
 
+const tracks = [
+  {
+    titulo: "Cry For Me",
+    artista: "The Weeknd",
+    imagen:
+      "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/3d/0d/06/3d0d06e6-cfd4-8f69-4a42-52b7cf33fb24/25UMGIM09490.rgb.jpg/88x88bb.jpg",
+  },
+  {
+    titulo: "M.A.P.S.",
+    artista: "Amaia",
+    imagen:
+      "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/c5/d3/82/c5d38265-9bd7-88aa-3bb3-9500eceed9d6/24UM1IM01951.rgb.jpg/88x88bb.jpg",
+  },
+  {
+    titulo: "KAIMAN",
+    artista: "Rigoberta Bandini",
+    imagen:
+      "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/79/10/e8/7910e8d8-caa9-9d20-9e30-f8e363af03e7/199066494011.jpg/88x88bb.jpg",
+  },
+];
+
+const currentTrackIndex = ref(0);
+const isPlaying = ref(false);
+const volume = ref(0.5);
+
+const currentTrack = computed(() => tracks[currentTrackIndex.value]);
+
+const togglePlayPause = () => {
+  isPlaying.value = !isPlaying.value;
+};
+
+const nextTrack = () => {
+  currentTrackIndex.value = (currentTrackIndex.value + 1) % tracks.length;
+};
+
+const prevTrack = () => {
+  currentTrackIndex.value =
+    (currentTrackIndex.value - 1 + tracks.length) % tracks.length;
+};
+
+const updateVolume = () => {
+  console.log("Volumen actualizado a: ", volume.value);
+};
+
 </script>
 
 <template>
@@ -279,6 +323,35 @@ onUnmounted(() => {
     </section>
   </div>
 
+  <div class="music-player">
+    <div class="player-controls">
+      <button @click="prevTrack" class="control-btn">⏮</button>
+      <button @click="togglePlayPause" class="control-btn">
+        {{ isPlaying ? "⏸" : "▶️" }}
+      </button>
+      <button @click="nextTrack" class="control-btn">⏭</button>
+    </div>
+    <div class="track-info">
+      <img :src="currentTrack.imagen" alt="Album cover" class="album-cover" />
+      <div>
+        <h3 class="track-title">{{ currentTrack.titulo }}</h3>
+        <p class="track-artist">{{ currentTrack.artista }}</p>
+      </div>
+    </div>
+    <div class="volume-slider">
+      <label for="volume">🔊</label>
+      <input
+        id="volume"
+        type="range"
+        min="0"
+        max="1"
+        step="0.1"
+        v-model="volume"
+        @input="updateVolume"
+      />
+    </div>
+  </div>
+
   <footer class="footer">
     <div class="footer-content">
       <p class="footer-text">© 2025 Hibiki. Todos los derechos reservados.</p>
@@ -293,6 +366,69 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
+
+.music-player {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #333;
+  color: white;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.player-controls {
+  display: flex;
+  gap: 1rem;
+}
+
+.control-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.control-btn:hover {
+  transform: scale(1.1);
+}
+
+.track-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.album-cover {
+  width: 50px;
+  height: 50px;
+  border-radius: 8px;
+}
+
+.track-title {
+  font-size: 1rem;
+  margin: 0;
+}
+
+.track-artist {
+  font-size: 0.875rem;
+  color: #bbb;
+  margin: 0;
+}
+
+.volume-slider {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+input[type="range"] {
+  width: 100px;
+}
+
 .novedades {
   background-color: white;
   padding: 2rem;
