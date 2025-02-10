@@ -8,6 +8,8 @@ import PoliticaView from "@/views/PoliticaView.vue";
 import TerminosView from "@/views/TerminosView.vue";
 import CookiesView from "@/views/CookiesView.vue";
 import InfoAnunciosView from "@/views/InfoAnunciosView.vue";
+import InicioView from "@/views/InicioView.vue";
+
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -61,6 +63,12 @@ const router = createRouter({
       path: "/infoanuncios",
       name: "infoanuncios",
       component: InfoAnunciosView,
+    },
+
+    {
+      path: "/inicio",
+      name: "inicio",
+      component: InicioView,
     }
 
   ],

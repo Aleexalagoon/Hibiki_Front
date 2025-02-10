@@ -18,7 +18,7 @@ const search = () => {
           <input type="text" placeholder="Buscar..." v-model="searchQuery" />
           <button @click="search">Buscar</button>
         </div>
-        <router-link to="/" class="menu-item" active-class="active">Inicio</router-link>
+        <router-link to="/inicio" class="menu-item" active-class="active">Inicio</router-link>
         <router-link to="/novedades" class="menu-item" active-class="active">Novedades</router-link>
         <router-link to="/premium" class="menu-item" active-class="active">Premium</router-link>
       </nav>
