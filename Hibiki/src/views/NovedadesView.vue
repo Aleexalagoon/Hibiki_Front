@@ -1,4 +1,5 @@
 <script setup>
+
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 
 const sliderContent = [
@@ -265,8 +266,15 @@ const updateVolume = () => {
 <template>
   <div class="novedades">
     <div class="top-bar">
-      <button class="register-button" @click="registrar">Registrarse</button>
-      <button class="login-button" @click="iniciarSesion">Iniciar Sesión</button>
+        <div>
+    <router-link to="/register">
+      <button class="register-button">Registrarse</button>
+    </router-link>
+    
+    <router-link to="/login">
+      <button class="login-button">Iniciar Sesión</button>
+    </router-link>
+  </div>
     </div>
 
     <section class="slider">

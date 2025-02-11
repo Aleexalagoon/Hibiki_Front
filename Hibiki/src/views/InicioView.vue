@@ -31,7 +31,7 @@
 .subtitle {
   font-size: 5rem;
   font-weight: bold;
-  margin-top:2rem;
+  margin-top: 2rem;
   text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
 }
 .icon {
