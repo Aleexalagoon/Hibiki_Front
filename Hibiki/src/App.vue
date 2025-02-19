@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, watchEffect } from 'vue';
+import { ref, onMounted, nextTick } from 'vue';
 import { RouterView, useRouter } from 'vue-router';
 
 const searchQuery = ref('');
@@ -22,17 +22,18 @@ window.addEventListener('storage', () => {
 
 
 const login = () => {
-  localStorage.setItem('isAuthenticated', 'true');
-  isAuthenticated.value = true;
-  window.dispatchEvent(new Event("storage")); 
+  nextTick(() => {
+    window.dispatchEvent(new Event("storage"));
+    router.push('/login'); 
+  });
 };
 
 
 const logout = () => {
   localStorage.removeItem('isAuthenticated');
   isAuthenticated.value = false;
-  window.dispatchEvent(new Event("storage")); 
-  router.push('/login'); 
+  window.dispatchEvent(new Event("storage"));
+  router.push('/login');
 };
 </script>
 

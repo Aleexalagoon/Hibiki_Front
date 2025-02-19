@@ -25,11 +25,14 @@ export default {
     login() {
       if (this.username === 'admin' && this.password === 'admin') {
         alert('Inicio de sesión exitoso');
-        
-        // Guardar sesión en localStorage
+
+   
         localStorage.setItem('isAuthenticated', 'true');
 
-        // Redirigir
+        
+        window.dispatchEvent(new Event("storage"));
+
+        
         this.$router.push('/novedades');
       } else {
         alert('Usuario o contraseña incorrectos');
