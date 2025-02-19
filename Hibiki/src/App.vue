@@ -1,11 +1,38 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import { RouterView } from 'vue-router';
+import { ref, onMounted, watchEffect } from 'vue';
+import { RouterView, useRouter } from 'vue-router';
 
 const searchQuery = ref('');
+const isAuthenticated = ref(localStorage.getItem('isAuthenticated') === 'true');
+const router = useRouter();
 
 const search = () => {
   console.log('Buscando:', searchQuery.value);
+};
+
+
+onMounted(() => {
+  isAuthenticated.value = localStorage.getItem('isAuthenticated') === 'true';
+});
+
+
+window.addEventListener('storage', () => {
+  isAuthenticated.value = localStorage.getItem('isAuthenticated') === 'true';
+});
+
+
+const login = () => {
+  localStorage.setItem('isAuthenticated', 'true');
+  isAuthenticated.value = true;
+  window.dispatchEvent(new Event("storage")); 
+};
+
+
+const logout = () => {
+  localStorage.removeItem('isAuthenticated');
+  isAuthenticated.value = false;
+  window.dispatchEvent(new Event("storage")); 
+  router.push('/login'); 
 };
 </script>
 
@@ -21,8 +48,21 @@ const search = () => {
         <router-link to="/inicio" class="menu-item" active-class="active">Inicio</router-link>
         <router-link to="/novedades" class="menu-item" active-class="active">Novedades</router-link>
         <router-link to="/premium" class="menu-item" active-class="active">Premium</router-link>
+
+        
+        <div v-if="isAuthenticated">
+          <router-link to="/artista" class="menu-item" active-class="active">Artistas</router-link>
+          <router-link to="/playlist" class="menu-item" active-class="active">Playlists</router-link>
+          <router-link to="/album" class="menu-item" active-class="active">Álbumes</router-link>
+        </div>
       </nav>
+
+      <div class="auth-buttons">
+        <button v-if="!isAuthenticated" @click="login" class="login-button">Iniciar sesión</button>
+        <button v-if="isAuthenticated" @click="logout" class="logout-button">Cerrar sesión</button>
+      </div>
     </aside>
+
     <main class="content">
       <RouterView />
     </main>
@@ -70,33 +110,16 @@ const search = () => {
   border-radius: 8px;
 }
 
-.footer {
-  font-size: 0.875rem;
-  color: #aaa;
-  text-align: center;
-}
-
-.beta-link {
-  color: #ff5100;
-  text-decoration: none;
-}
-.beta-link:hover {
-  text-decoration: underline;
-}
-
 .content {
   flex: 1;
-  background-color: light dark;
-  padding: 2rem;
   background-color: #ffffff;
-  padding: 0rem;
   overflow-y: auto;
 }
 
 .menu-search {
   display: flex;
   align-items: center;
-  margin-bottom: 1rem; 
+  margin-bottom: 1rem;
 }
 
 .menu-search input {
@@ -119,4 +142,26 @@ const search = () => {
   background-color: #ca3900;
 }
 
+.auth-buttons {
+  text-align: center;
+  padding: 1rem 0;
+}
+
+.login-button,
+.logout-button {
+  background-color: #ff5100;
+  color: white;
+  font-size: 16px;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 100%;
+  transition: background-color 0.3s;
+}
+
+.logout-button:hover,
+.login-button:hover {
+  background-color: #ca3900;
+}
 </style>
