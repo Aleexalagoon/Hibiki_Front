@@ -22,11 +22,9 @@ export const useArtistaStore = defineStore('artista', {
         }
 
         const data = await response.json();
-
-        // Asignamos los datos a la variable 'artista'
         this.artista = {
           name: data.nombre,
-          verified: true, // Aquí podrías verificar el campo según tu modelo
+          verified: true,
           monthlyListeners: data.oyentesMensuales,
         };
       } catch (err) {

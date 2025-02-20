@@ -1,129 +1,107 @@
 <template>
-    <div class="album-view">
-      <div class="album-header">
-        <img src="https://i.scdn.co/image/ab67616d0000b273851222dc5c5681bd4c3119d3" alt="Album Cover" class="album-cover" />
+  <div class="albums-container">
+    <div v-if="loading" class="loading">Cargando álbumes...</div>
+    <div v-else-if="error" class="error">{{ error }}</div>
+    <div v-else>
+      <div class="album-card" v-for="album in albums" :key="album.albumId">
+        <img :src="album.image" alt="Album Cover" class="album-cover" />
         <div class="album-info">
-          <h1>MICRODOSIS</h1>
-          <h2>Mora</h2>
-          <p>Hacía tiempo que esperábamos noticias de Mora...</p>
-          <button class="preview-btn">▶ Previsualizar</button>
+          <h2>{{ album.name }}</h2>
+          <h3> {{ album.artist }}</h3>
+          <p>Fecha de lanzamiento: {{ formatDate(album.releaseDate) }}</p>
+          <router-link :to="`/album/${album.albumId}`" class="preview-btn">
+            ▶ Ver Álbum
+          </router-link>
         </div>
-      </div>
-      <div class="tracklist">
-        <div class="track" v-for="(track, index) in tracks" :key="index">
-          <span class="track-number">{{ index + 1 }}</span>
-          <span class="track-title">{{ track.title }}</span>
-          <span class="track-duration">{{ track.duration }}</span>
-        </div>
-      </div>
-      <div class="album-details">
-        <p>Fecha de lanzamiento: 1 de Abril de 2022</p>
-        <p>15 canciones, 44 Minutos</p>
-        <p>Rimas Music</p>
       </div>
     </div>
-  </template>
-  
-  <script>
-  export default {
-    data() {
-      return {
-        tracks: [
-          { title: "badtrip :(", duration: "3:11" },
-          { title: "2010", duration: "2:51" },
-          { title: "MEMORIAS", duration: "3:48" },
-          { title: "ROBERT DE NIRO", duration: "2:54" },
-          { title: "PECADO", duration: "2:51" },
-          { title: "LINDOR", duration: "2:24" },
-          { title: "TUS LÁGRIMAS", duration: "2:54" },
-          { title: "ESCALOFRÍOS", duration: "2:18" },
-          { title: "PLAYA PRIVADA", duration: "2:37" },
-          { title: "CALENTÓN", duration: "2:43" },
-          { title: "MODELITO", duration: "3:02" },
-          { title: "VOLANDO BAJITO", duration: "2:59" },
-          { title: "DONDE SE APRENDE A QUERER?", duration: "3:25" },
-          { title: "EN BAJITA", duration: "3:08" },
-          { title: "COMO HAS ESTADO?", duration: "3:14" }
-        ]
-      };
+  </div>
+</template>
+
+<script>
+import { useAlbumStore } from '@/stores/albumStore';
+import { mapState, mapActions } from 'pinia';
+
+export default {
+  computed: {
+    ...mapState(useAlbumStore, ['albums', 'loading', 'error']),
+  },
+  methods: {
+    ...mapActions(useAlbumStore, ['fetchAlbums']),
+    formatDate(date) {
+      return new Date(date).toLocaleDateString('es-ES', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
     }
-  };
-  </script>
-  
-  <style scoped>
-  .album-view {
-    margin: auto;
-    padding: 20px;
-    font-family: Arial, sans-serif;
-    background: linear-gradient(33deg, black, #ff5100);
-    color: white;
+  },
+  async created() {
+    await this.fetchAlbums();
   }
-  .album-header {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    padding: 20px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 10px;
-  }
-  .album-cover {
-    width: 160px;
-    height: 160px;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-  }
-  .album-info h1, h2 {
-    margin: 0;
-  }
-  .preview-btn {
-    background: #ff5100;
-    color: white;
-    border: none;
-    padding: 12px 18px;
-    cursor: pointer;
-    font-weight: bold;
-    border-radius: 5px;
-    transition: 0.3s;
-  }
-  .preview-btn:hover {
-    background: #ca3900;
-  }
-  .tracklist {
-    margin-top: 20px;
-    padding: 10px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 10px;
-  }
-  .track {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-    transition: 0.3s;
-  }
-  .track:hover {
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 5px;
-  }
-  .track-number {
-    font-weight: bold;
-    color: #ff5100;
-  }
-  .track-title {
-    flex-grow: 1;
-    padding-left: 10px;
-    font-weight: bold;
-  }
-  .track-duration {
-    text-align: right;
-    font-style: italic;
-  }
-  .album-details {
-    margin-top: 20px;
-    padding-top: 10px;
-    text-align: left;
-    border-top: 1px solid rgba(255, 255, 255, 0.2);
-  }
-  </style>
-  
+};
+</script>
+
+<style scoped>
+.albums-container {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 20px;
+  padding: 20px;
+  background: linear-gradient(33deg, black, #ff5100);
+  color: white;
+  min-height: 100vh;
+  justify-content: flex-start; 
+  overflow-x: auto; 
+}
+
+.loading, .error {
+  text-align: center;
+  font-size: 1.2em;
+  font-weight: bold;
+  padding: 20px;
+}
+
+.album-card {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 15px;
+  border-radius: 10px;
+  text-align: center;
+  transition: 0.3s;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  min-width: 220px; 
+  flex-shrink: 0; 
+}
+
+.album-card:hover {
+  transform: scale(1.05);
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.album-cover {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.album-info h2, .album-info h3 {
+  margin: 10px 0 5px 0;
+}
+
+.preview-btn {
+  display: inline-block;
+  background: #ff5100;
+  color: white;
+  text-decoration: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+.preview-btn:hover {
+  background: #ca3900;
+}
+</style>
+
