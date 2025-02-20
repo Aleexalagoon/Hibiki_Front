@@ -1,13 +1,26 @@
 <template>
   <div class="artist-page">
+    <!-- Cabecera de la página -->
     <div class="header">
       <img class="background-image" src="https://i0.wp.com/urbanroosters.news/wp-content/uploads/2023/08/mora.png?fit=1250%2C550&ssl=1" alt="Artist Background" />
       <div class="artist-info">
-        <p class="verified">✔ Artista verificado</p>
-        <h1 class="artist-name">Mora</h1>
-        <p class="monthly-listeners">18,754,747 oyentes mensuales</p>
+        <p class="verified" v-if="artistInfo.verified">✔ Artista verificado</p>
+        <h1 class="artist-name">{{ artistInfo.name }}</h1>
+        <p class="monthly-listeners">{{ artistInfo.monthlyListeners }} oyentes mensuales</p>
       </div>
     </div>
+
+    <!-- Sección de Artistas -->
+    <div class="artists-list">
+      <h2>Artistas</h2>
+      <div v-for="(artist, index) in allArtists" :key="index" class="artist-card" @click="fetchArtistData(artist.cantanteId)">
+        <h3>{{ artist.nombre }}</h3>
+        <p>{{ artist.descripcion }}</p>
+        <p>{{ artist.oyentesMensuales }} oyentes mensuales</p>
+      </div>
+    </div>
+
+    <!-- Sección de Canciones Populares -->
     <div class="popular-tracks">
       <h2>Populares</h2>
       <div class="track" v-for="(track, index) in tracks" :key="index">
@@ -18,6 +31,8 @@
         <span class="track-duration">{{ track.duration }}</span>
       </div>
     </div>
+
+    <!-- Sección de Discografía -->
     <div class="discography">
       <h2>Discografía</h2>
       <div class="albums">
@@ -35,22 +50,66 @@
 export default {
   data() {
     return {
-      tracks: [
-        { title: "IA", plays: "74,763,704", duration: "4:00", image: "https://i.scdn.co/image/ab67616d0000b273851222dc5c5681bd4c3119d3" },
-        { title: "LA INOCENTE", plays: "888,209,406", duration: "3:22", image: "https://i.scdn.co/image/ab67616d0000b273851222dc5c5681bd4c3119d3" },
-        { title: "Tuyo", plays: "150,017,142", duration: "4:29", image: "https://i.scdn.co/image/ab67616d0000b273851222dc5c5681bd4c3119d3" },
-        { title: "Una Vez", plays: "632,481,996", duration: "3:52", image: "https://i.scdn.co/image/ab67616d0000b273851222dc5c5681bd4c3119d3" },
-        { title: "Volando - Remix", plays: "763,480,150", duration: "4:33", image: "https://i.scdn.co/image/ab67616d0000b273851222dc5c5681bd4c3119d3" }
-      ],
-      albums: [
-        { title: "MICRODOSIS", year: "2022 - Álbum", cover: "https://i.scdn.co/image/ab67616d0000b273851222dc5c5681bd4c3119d3" },
-        { title: "Primer Día de Clases", year: "2022 - Álbum", cover: "https://i.scdn.co/image/ab67616d0000b273851222dc5c5681bd4c3119d3" },
-        { title: "ESTRELLA", year: "2023 - Álbum", cover: "https://i.scdn.co/image/ab67616d0000b273851222dc5c5681bd4c3119d3" },
-        { title: "PARAÍSO", year: "2022 - Álbum", cover: "https://i.scdn.co/image/ab67616d0000b273851222dc5c5681bd4c3119d3" },
-        { title: "PARAÍSO", year: "2022 - Álbum", cover: "https://i.scdn.co/image/ab67616d0000b273851222dc5c5681bd4c3119d3" },
-        { title: "PARAÍSO", year: "2022 - Álbum", cover: "https://i.scdn.co/image/ab67616d0000b273851222dc5c5681bd4c3119d3" },
-      ]
+      tracks: [],  // Array de las canciones populares
+      albums: [],  // Array de los álbumes
+      allArtists: [],  // Array de todos los artistas
+      artistInfo: {
+        name: '',  // Nombre del artista seleccionado
+        verified: false,  // Estado de verificación
+        monthlyListeners: ''  // Oyentes mensuales del artista seleccionado
+      }
     };
+  },
+  mounted() {
+    this.fetchAllArtists();  // Al montar el componente, obtener todos los artistas
+  },
+  methods: {
+    // Función para obtener todos los artistas desde la API
+    async fetchAllArtists() {
+      try {
+        const response = await fetch('https://localhost:7295/api/Artista');  // URL de la API
+        if (response.ok) {
+          const data = await response.json();  // Convertir la respuesta a JSON
+          this.allArtists = data;  // Asignar la lista de artistas al array
+        } else {
+          console.error("Error al obtener los artistas");
+        }
+      } catch (error) {
+        console.error("Error de red o servidor:", error);
+      }
+    },
+
+    // Función para obtener los detalles de un artista seleccionado
+    async fetchArtistData(artistId) {
+      try {
+        const response = await fetch(`https://localhost:7295/api/Artista/${artistId}`);  // URL para obtener los detalles de un artista específico
+        if (response.ok) {
+          const data = await response.json();  // Convertir la respuesta a JSON
+          
+          // Asignar la información del artista
+          this.artistInfo = {
+            name: data.nombre,
+            verified: true,  // Marcar al artista como verificado
+            monthlyListeners: data.oyentesMensuales
+          };
+
+          // Asignar las canciones populares del artista
+          if (data.tracks) {
+            this.tracks = data.tracks;
+          }
+          
+          // Asignar los álbumes del artista
+          if (data.albums) {
+            this.albums = data.albums;
+          }
+          
+        } else {
+          console.error("Error al obtener el artista");
+        }
+      } catch (error) {
+        console.error("Error de red o servidor:", error);
+      }
+    }
   }
 };
 </script>
@@ -62,19 +121,23 @@ export default {
   background: linear-gradient(30deg, black 80%, rgba(255, 81, 0, 0.8) 90%, #ff5100 100%);
   padding: 20px;
 }
+
 .header {
   position: relative;
 }
+
 .background-image {
   width: 100%;
   height: 400px;
   object-fit: cover;
 }
+
 .artist-info {
   position: absolute;
   bottom: 20px;
   left: 20px;
 }
+
 .verified {
   font-size: 14px;
   margin-bottom: 2px;
@@ -90,40 +153,75 @@ export default {
   margin-top: 2px;
 }
 
+/* Sección de Artistas */
+.artists-list {
+  margin-top: 20px;
+}
+
+.artist-card {
+  background: #333;
+  padding: 10px;
+  border-radius: 8px;
+  margin: 10px 0;
+  cursor: pointer;
+}
+
+.artist-card:hover {
+  background: #444;
+}
+
+.artist-card h3 {
+  color: #ff5100;
+}
+
+.artist-card p {
+  color: white;
+  margin: 5px 0;
+}
+
+/* Sección de Canciones Populares */
 .popular-tracks {
   margin-top: 20px;
 }
+
 .track {
   display: flex;
   align-items: center;
   padding: 10px;
   border-bottom: 1px solid #333;
 }
+
 .track-number {
   width: 20px;
   font-weight: bold;
   color: #ff5100;
-;
 }
+
 .track-image {
   width: 50px;
   border-radius: 10px;
   height: 50px;
   margin-right: 10px;
 }
+
 .track-title {
   flex-grow: 1;
 }
+
 .track-plays {
   margin-right: 20px;
 }
+
 .track-duration {
   text-align: right;
   opacity: 0.8;
 }
+
+/* Sección de Discografía */
 .discography {
   margin-top: 20px;
 }
+
 .albums {
   display: flex;
   overflow-x: auto;
@@ -141,7 +239,7 @@ export default {
   width: 240px; 
   height: 250px;
   border-radius: 10px;
-  object-fit: cover; 
+  object-fit: cover;
   background: rgba(0, 0, 0, 0.6);
 }
 
