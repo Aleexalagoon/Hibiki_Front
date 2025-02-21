@@ -16,17 +16,23 @@
           <h1>{{ selectedArtist.name }}</h1>
           <p>{{ selectedArtist.monthlyListeners }} oyentes mensuales</p>
           <h2>Álbumes</h2>
-          <div class="albums">
+          <!-- Comprobamos si 'albums' tiene elementos antes de mostrar -->
+          <div v-if="albums.length > 0" class="albums">
             <div v-for="album in albums" :key="album.albumId" class="album-card" @click="selectAlbum(album.albumId)">
-              <img :src="album.cover" alt="Album Cover" class="album-cover" />
-              <p>{{ album.title }}</p>
+              <img :src="album.image" alt="Album Cover" class="album-cover" />
+              <p>{{ album.name }}</p>
+              <p>{{ new Date(album.releaseDate).toLocaleDateString() }}</p> <!-- Fecha de lanzamiento -->
             </div>
+          </div>
+          <!-- Si no hay álbumes, mostramos un mensaje -->
+          <div v-else>
+            <p>No hay álbumes disponibles para este artista.</p>
           </div>
         </div>
 
         <!-- Sección de Canciones -->
         <div v-if="selectedAlbum">
-          <h2>Canciones de {{ selectedAlbum.title }}</h2>
+          <h2>Canciones de {{ selectedAlbum.name }}</h2>
           <ul>
             <li v-for="song in songs" :key="song.songId">{{ song.title }}</li>
           </ul>
@@ -39,11 +45,13 @@
 <script>
 import { defineComponent, computed, onMounted } from 'vue';
 import { useArtistaStore } from '@/stores/artistaStore';
+import { useAlbumStore } from '@/stores/albumStore';
 
 export default defineComponent({
   setup() {
     const artistaStore = useArtistaStore();
-    
+    const albumStore = useAlbumStore(); // Usamos albumStore para los álbumes
+
     onMounted(() => {
       artistaStore.fetchAllArtists();
     });
@@ -51,11 +59,11 @@ export default defineComponent({
     return {
       allArtists: computed(() => artistaStore.allArtists),
       selectedArtist: computed(() => artistaStore.selectedArtist),
-      albums: computed(() => artistaStore.albums),
-      selectedAlbum: computed(() => artistaStore.selectedAlbum),
-      songs: computed(() => artistaStore.songs),
+      albums: computed(() => albumStore.albums), // Accedemos a los álbumes desde el store
+      selectedAlbum: computed(() => albumStore.selectedAlbum),
+      songs: computed(() => albumStore.songs),
       selectArtist: artistaStore.fetchArtistData,
-      selectAlbum: artistaStore.fetchAlbumSongs
+      selectAlbum: albumStore.fetchAlbumSongs
     };
   }
 });
@@ -106,10 +114,12 @@ export default defineComponent({
 .albums {
   display: flex;
   gap: 10px;
+  flex-wrap: wrap;
 }
 
 .album-card {
   cursor: pointer;
+  text-align: center;
 }
 
 .album-cover {

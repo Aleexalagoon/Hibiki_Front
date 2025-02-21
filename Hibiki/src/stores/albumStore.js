@@ -31,13 +31,15 @@ export const useAlbumStore = defineStore('albumStore', {
     async fetchAlbumsByArtist(artistId) {
       this.loading = true;
       this.error = null;
-
+   
       try {
         const response = await fetch(`https://localhost:7295/api/Album/ByArtist/${artistId}`);
         if (!response.ok) {
           throw new Error(`Error en la API: ${response.statusText}`);
         }
-        this.albums = await response.json();
+        const data = await response.json();
+        console.log(data);  // Verifica qué datos llegan
+        this.albums = data;  // Asigna los datos a albums
       } catch (error) {
         console.error('Error en la API:', error);
         this.error = 'No se pudieron cargar los álbumes del artista';
