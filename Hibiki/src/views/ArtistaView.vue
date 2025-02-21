@@ -15,6 +15,7 @@
         <div v-if="selectedArtist">
           <h1>{{ selectedArtist.name }}</h1>
           <p>{{ selectedArtist.monthlyListeners }} oyentes mensuales</p>
+          <p v-if="selectedArtist.description">{{ selectedArtist.description }}</p> <!-- Descripción del artista -->
           <h2>Álbumes</h2>
           <!-- Comprobamos si 'albums' tiene elementos antes de mostrar -->
           <div v-if="albums.length > 0" class="albums">

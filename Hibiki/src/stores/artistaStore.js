@@ -39,10 +39,12 @@ export const useArtistaStore = defineStore('artistaStore', {
         }
         const data = await response.json();
 
+        // Aquí se incluye la descripción
         this.selectedArtist = {
           name: data.nombre,
           verified: true,
           monthlyListeners: data.oyentesMensuales,
+          description: data.descripcion, // Agregamos la descripción
         };
 
         // Llamar a albumStore para cargar los álbumes del artista seleccionado
