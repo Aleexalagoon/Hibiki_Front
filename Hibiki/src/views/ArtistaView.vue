@@ -15,28 +15,44 @@
         <div v-if="selectedArtist">
           <h1>{{ selectedArtist.name }}</h1>
           <p>{{ selectedArtist.monthlyListeners }} oyentes mensuales</p>
-          <p v-if="selectedArtist.description">{{ selectedArtist.description }}</p> <!-- Descripción del artista -->
+          <p v-if="selectedArtist.description">{{ selectedArtist.description }}</p>
+
           <h2>Álbumes</h2>
-          <!-- Comprobamos si 'albums' tiene elementos antes de mostrar -->
           <div v-if="albums.length > 0" class="albums">
             <div v-for="album in albums" :key="album.albumId" class="album-card" @click="selectAlbum(album.albumId)">
               <img :src="album.image" alt="Album Cover" class="album-cover" />
               <p>{{ album.name }}</p>
-              <p>{{ new Date(album.releaseDate).toLocaleDateString() }}</p> <!-- Fecha de lanzamiento -->
+              <p>{{ new Date(album.releaseDate).toLocaleDateString() }}</p>
             </div>
           </div>
-          <!-- Si no hay álbumes, mostramos un mensaje -->
           <div v-else>
             <p>No hay álbumes disponibles para este artista.</p>
           </div>
         </div>
 
-        <!-- Sección de Canciones -->
+        <!-- Sección de Canciones cuando se selecciona un álbum -->
         <div v-if="selectedAlbum">
           <h2>Canciones de {{ selectedAlbum.name }}</h2>
-          <ul>
-            <li v-for="song in songs" :key="song.songId">{{ song.title }}</li>
+
+          <!-- Estado de carga -->
+          <p v-if="loading">Cargando canciones...</p>
+
+          <!-- Estado de error -->
+          <p v-if="error">{{ error }}</p>
+
+          <!-- Mostrar canciones si existen -->
+          <ul v-if="songs.length > 0">
+            <li v-for="song in songs" :key="song.cancionId" class="song-card">
+              <img :src="song.image" alt="Song Image" class="song-image" />
+              <div class="song-info">
+                <span class="song-title">{{ song.nombre }}</span>
+                <span class="song-duration">{{ formatDuration(song.duracion) }}</span>
+              </div>
+            </li>
           </ul>
+
+          <!-- Mensaje si no hay canciones -->
+          <p v-else>No hay canciones disponibles en este álbum.</p>
         </div>
       </div>
     </div>
@@ -51,7 +67,24 @@ import { useAlbumStore } from '@/stores/albumStore';
 export default defineComponent({
   setup() {
     const artistaStore = useArtistaStore();
-    const albumStore = useAlbumStore(); // Usamos albumStore para los álbumes
+    const albumStore = useAlbumStore();
+
+    // Función para formatear la duración
+    const formatDuration = (duration) => {
+      const [hours, minutes, seconds] = duration.split(':').map(Number);
+
+      if (hours > 0) {
+        return `${hours}h ${minutes}m ${seconds}s`;
+      } else {
+        return `${minutes}m ${seconds}s`;
+      }
+    };
+
+    // Limpiar las canciones al cambiar de artista
+    const selectArtist = (artistId) => {
+      artistaStore.fetchArtistData(artistId);
+      albumStore.clearSongs(); // Limpiar canciones anteriores
+    };
 
     onMounted(() => {
       artistaStore.fetchAllArtists();
@@ -60,11 +93,14 @@ export default defineComponent({
     return {
       allArtists: computed(() => artistaStore.allArtists),
       selectedArtist: computed(() => artistaStore.selectedArtist),
-      albums: computed(() => albumStore.albums), // Accedemos a los álbumes desde el store
+      albums: computed(() => albumStore.albums),
       selectedAlbum: computed(() => albumStore.selectedAlbum),
-      songs: computed(() => albumStore.songs),
-      selectArtist: artistaStore.fetchArtistData,
-      selectAlbum: albumStore.fetchAlbumSongs
+      songs: computed(() => albumStore.songs), // Accedemos a las canciones desde el store
+      error: computed(() => albumStore.error),
+      loading: computed(() => albumStore.loading),
+      selectArtist,
+      selectAlbum: albumStore.fetchAlbumSongs, // Llamamos a la función de Pinia para obtener las canciones del álbum seleccionado
+      formatDuration,
     };
   }
 });
@@ -127,5 +163,35 @@ export default defineComponent({
   width: 100px;
   height: 100px;
   border-radius: 10px;
+}
+
+/* Estilo para las canciones */
+.song-card {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid #333;
+}
+
+.song-image {
+  width: 50px;
+  height: 50px;
+  border-radius: 10px;
+  margin-right: 10px;
+  margin-top: 10px; /* Desplaza la imagen hacia abajo */
+}
+
+.song-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.song-title {
+  font-weight: bold;
+}
+
+.song-duration {
+  opacity: 0.8;
 }
 </style>
