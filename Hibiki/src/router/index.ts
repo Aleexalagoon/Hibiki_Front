@@ -9,7 +9,6 @@ import TerminosView from "@/views/TerminosView.vue";
 import CookiesView from "@/views/CookiesView.vue";
 import InfoAnunciosView from "@/views/InfoAnunciosView.vue";
 import InicioView from "@/views/InicioView.vue";
-import AlbumView from "@/views/AlbumView.vue";
 import PlaylistView from "@/views/PlaylistView.vue";
 import ArtistaView from "@/views/ArtistaView.vue";
 import CancionesView from "@/views/CancionesView.vue";
@@ -75,11 +74,6 @@ const router = createRouter({
       component: InicioView,
     },
 
-    {
-      path: "/album",
-      name: "album",
-      component: AlbumView,
-    },
 
     {
       path: "/playlist",
