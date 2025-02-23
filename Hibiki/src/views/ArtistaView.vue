@@ -60,7 +60,6 @@ ArtistaView.vue: <template>
           <!-- Mensaje si no hay canciones -->
           <p v-else>No hay canciones disponibles en este álbum.</p>
         </div>
-        <p v-if="selectedArtist.description" class="artist-description">{{ selectedArtist.description }}</p>
 
         <!-- Reproductor de música -->
         <MusicPlayer :song="selectedSong" />
