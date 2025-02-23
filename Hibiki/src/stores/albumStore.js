@@ -55,6 +55,12 @@ export const useAlbumStore = defineStore('albumStore', {
     clearSongs() {
       this.songs = [];
       this.selectedAlbum = null;
-    }
+    },
+
+      setSelectedSong(song) {
+        this.selectedSong = song;
+      }
+    
+    
   }
 });
