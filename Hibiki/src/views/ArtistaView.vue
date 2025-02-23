@@ -1,7 +1,6 @@
 ArtistaView.vue: <template>
   <div class="artist-page">
     <div class="main-container">
-      <!-- Sección de Artistas (Izquierda) -->
       <div class="artists-list">
         <h2>Artistas</h2>
         <div
@@ -15,12 +14,10 @@ ArtistaView.vue: <template>
         </div>
       </div>
 
-      <!-- Sección de Detalles (Derecha) -->
       <div class="details-container">
         <div v-if="selectedArtist">
-          <h1>{{ selectedArtist.nombre }}</h1>
+           <h1 class="artist-name">{{ selectedArtist.name }}</h1>
           <p>{{ selectedArtist.monthlyListeners }} oyentes mensuales</p>
-          <p v-if="selectedArtist.description">{{ selectedArtist.description }}</p>
 
           <h2>Álbumes</h2>
           <div v-if="albums.length > 0" class="albums">
@@ -32,25 +29,16 @@ ArtistaView.vue: <template>
             >
               <img :src="album.image" alt="Album Cover" class="album-cover" />
               <p>{{ album.name }}</p>
-              <p>{{ new Date(album.releaseDate).toLocaleDateString() }}</p>
             </div>
           </div>
           <div v-else>
             <p>No hay álbumes disponibles para este artista.</p>
           </div>
         </div>
-
-        <!-- Sección de Canciones cuando se selecciona un álbum -->
         <div v-if="selectedAlbum">
           <h2>Canciones de {{ selectedAlbum.name }}</h2>
-
-          <!-- Estado de carga -->
           <p v-if="loading">Cargando canciones...</p>
-
-          <!-- Estado de error -->
           <p v-if="error">{{ error }}</p>
-
-          <!-- Mostrar canciones si existen -->
           <ul v-if="songs.length > 0">
             <li
               v-for="song in songs"
@@ -58,17 +46,21 @@ ArtistaView.vue: <template>
               class="song-card"
               @click="selectSong(song)"
             >
-              <img :src="song.image" alt="Song Image" class="song-image" />
-              <div class="song-info">
-                <span class="song-title">{{ song.nombre }}</span>
-                <span class="song-duration">{{ formatDuration(song.duracion) }}</span>
+                  <div class="song-info-container">
+                <img :src="song.image" alt="Song Image" class="song-image" />
+                <div class="song-info">
+                  <span class="song-title">{{ song.nombre }}</span>
+                  <span class="song-artist">{{ selectedArtist.name }}</span>
+                </div>
               </div>
+              <span class="song-duration">{{ formatDuration(song.duracion) }}</span>
             </li>
           </ul>
 
           <!-- Mensaje si no hay canciones -->
           <p v-else>No hay canciones disponibles en este álbum.</p>
         </div>
+        <p v-if="selectedArtist.description" class="artist-description">{{ selectedArtist.description }}</p>
 
         <!-- Reproductor de música -->
         <MusicPlayer :song="selectedSong" />
@@ -182,6 +174,34 @@ export default defineComponent({
   padding: 20px;
 }
 
+.artists-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.artists-list::-webkit-scrollbar-track {
+  background: #222;
+}
+
+.artists-list::-webkit-scrollbar-thumb {
+  background: #555;
+  border-radius: 10px;
+}
+
+.artist-card {
+  padding: 20px;
+}
+
+.artist-name {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.artist-description {
+  margin-top: 20px;
+  font-size: 14px;
+  color: gray;
+}
+
 .albums {
   display: flex;
   gap: 10px;
@@ -196,23 +216,30 @@ export default defineComponent({
 .album-cover {
   width: 100px;
   height: 100px;
+  width: 200px;
+  height: 200px;
   border-radius: 10px;
 }
 
-/* Estilo para las canciones */
 .song-card {
   display: flex;
   align-items: center;
   padding: 10px;
   border-bottom: 1px solid #333;
+  justify-content: space-between;
+}
+
+.song-info-container {
+  display: flex;
+  align-items: center;
 }
 
 .song-image {
-  width: 50px;
-  height: 50px;
+  width: 60px;
+  height: 60px;
   border-radius: 10px;
   margin-right: 10px;
-  margin-top: 10px; /* Desplaza la imagen hacia abajo */
+  margin-left: -50px;
 }
 
 .song-info {
@@ -223,6 +250,13 @@ export default defineComponent({
 
 .song-title {
   font-weight: bold;
+}
+
+.song-artist {
+  font-size: 13px;
+  opacity: 0.5;
+  margin-top: 8px;
+
 }
 
 .song-duration {
