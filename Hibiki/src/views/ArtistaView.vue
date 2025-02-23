@@ -1,4 +1,4 @@
-ArtistaView.vue: <template>
+<template>
   <div class="artist-page">
     <div class="main-container">
       <div class="artists-list">
@@ -16,7 +16,7 @@ ArtistaView.vue: <template>
 
       <div class="details-container">
         <div v-if="selectedArtist">
-           <h1 class="artist-name">{{ selectedArtist.name }}</h1>
+          <h1 class="artist-name">{{ selectedArtist.name }}</h1>
           <p>{{ selectedArtist.monthlyListeners }} oyentes mensuales</p>
 
           <h2>Álbumes</h2>
@@ -35,6 +35,7 @@ ArtistaView.vue: <template>
             <p>No hay álbumes disponibles para este artista.</p>
           </div>
         </div>
+
         <div v-if="selectedAlbum">
           <h2>Canciones de {{ selectedAlbum.name }}</h2>
           <p v-if="loading">Cargando canciones...</p>
@@ -46,7 +47,7 @@ ArtistaView.vue: <template>
               class="song-card"
               @click="selectSong(song)"
             >
-                  <div class="song-info-container">
+              <div class="song-info-container">
                 <img :src="song.image" alt="Song Image" class="song-image" />
                 <div class="song-info">
                   <span class="song-title">{{ song.nombre }}</span>
@@ -61,8 +62,8 @@ ArtistaView.vue: <template>
           <p v-else>No hay canciones disponibles en este álbum.</p>
         </div>
 
-        <!-- Reproductor de música -->
-        <MusicPlayer :song="selectedSong" />
+        <!-- Reproductor de música, pasando todas las canciones -->
+        <MusicPlayer :song="selectedSong" :songs="songs" />
       </div>
     </div>
   </div>
@@ -130,6 +131,7 @@ export default defineComponent({
   },
 });
 </script>
+
 
 <style scoped>
 .artist-page {

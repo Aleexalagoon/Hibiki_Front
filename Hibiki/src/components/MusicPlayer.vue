@@ -1,11 +1,10 @@
 <template>
-  <div v-if="song" class="music-player">
-    <h3>{{ song.nombre }}</h3>
+  <div class="music-player">
+    <h3>{{ currentSong?.nombre || 'Selecciona una canción' }}</h3>
 
-    <!-- Reproductor de MP3 -->
     <audio
       ref="audioPlayer"
-      :src="song.ruta"
+      :src="currentSong?.ruta"
       @loadedmetadata="onMetadataLoaded"
       @ended="onAudioEnded"
       controls
@@ -14,9 +13,12 @@
     </audio>
 
     <div class="controls">
+      <button @click="previousSong">⏪ Anterior</button>
       <button @click="togglePlay">
         {{ isPlaying ? '⏸️ Pausar' : '▶️ Reproducir' }}
       </button>
+      <button @click="nextSong">⏩ Siguiente</button>
+      <button @click="randomSong">🔀 Aleatorio</button>
     </div>
   </div>
 </template>
@@ -26,15 +28,28 @@ import { ref, watch, onMounted } from "vue";
 
 export default {
   props: {
-    song: Object,
+    song: Object, // Recibimos la canción seleccionada
+    songs: Array, // Recibimos todas las canciones
   },
   setup(props) {
-    const audioPlayer = ref(null); // Referencia al reproductor de audio
+    const audioPlayer = ref(null);
     const isPlaying = ref(false);
+    const currentSong = ref(props.song); // Inicializamos con la canción seleccionada
+    const isRandom = ref(false);
 
-    // Función para pausar/reproducir
+    // Observamos los cambios en la canción seleccionada
+    watch(() => props.song, (newSong) => {
+      if (newSong) {
+        currentSong.value = newSong;
+        audioPlayer.value.src = newSong.ruta;
+        audioPlayer.value.load();
+        audioPlayer.value.play();
+        isPlaying.value = true;
+      }
+    });
+
     const togglePlay = () => {
-      if (!audioPlayer.value) return;
+      if (!audioPlayer.value || !currentSong.value) return;
 
       if (isPlaying.value) {
         audioPlayer.value.pause();
@@ -44,52 +59,71 @@ export default {
       isPlaying.value = !isPlaying.value;
     };
 
-    // Se ejecuta cuando los metadatos del audio (como la duración) se cargan
-    const onMetadataLoaded = () => {
-      // Se puede realizar alguna acción con los metadatos si es necesario
-    };
-
-    // Cuando el audio termina, se puede manejar el fin de la canción
-    const onAudioEnded = () => {
-      isPlaying.value = false; // Actualiza el estado cuando la canción termina
-    };
-
-    // Cuando cambia la canción, cargar el nuevo archivo MP3
-    watch(() => props.song, (newSong) => {
-      if (newSong && audioPlayer.value) {
-        audioPlayer.value.src = newSong.ruta;
-        audioPlayer.value.play();
-        isPlaying.value = true;
+    const previousSong = () => {
+      // Lógica para canción anterior
+      const currentIndex = props.songs.indexOf(currentSong.value);
+      if (currentIndex === 0) {
+        // Si estamos en la primera canción, ir a la última
+        currentSong.value = props.songs[props.songs.length - 1];
+      } else {
+        // Si no, ir a la anterior
+        currentSong.value = props.songs[currentIndex - 1];
       }
-    });
+      audioPlayer.value.src = currentSong.value.ruta;
+      audioPlayer.value.load();
+      audioPlayer.value.play();
+    };
 
-    // Control inicial del reproductor cuando el componente se monta
+    const nextSong = () => {
+      // Lógica para canción siguiente
+      const currentIndex = props.songs.indexOf(currentSong.value);
+      if (currentIndex === props.songs.length - 1) {
+        // Si estamos en la última canción, ir a la primera
+        currentSong.value = props.songs[0];
+      } else {
+        // Si no, ir a la siguiente
+        currentSong.value = props.songs[currentIndex + 1];
+      }
+      audioPlayer.value.src = currentSong.value.ruta;
+      audioPlayer.value.load();
+      audioPlayer.value.play();
+    };
+
+    const randomSong = () => {
+      // Seleccionar canción aleatoria
+      const randomIndex = Math.floor(Math.random() * props.songs.length);
+      currentSong.value = props.songs[randomIndex];
+      audioPlayer.value.src = currentSong.value.ruta;
+      audioPlayer.value.load();
+      audioPlayer.value.play();
+    };
+
+    const onMetadataLoaded = () => {};
+
+    const onAudioEnded = () => {
+      isPlaying.value = false;
+      nextSong();
+    };
+
     onMounted(() => {
-      if (props.song && audioPlayer.value) {
-        audioPlayer.value.src = props.song.ruta;
+      // Establecer canción inicial si no hay canción seleccionada
+      if (!currentSong.value && props.songs.length > 0) {
+        currentSong.value = props.songs[0]; // Primer canción por defecto
       }
     });
 
     return {
       audioPlayer,
       isPlaying,
+      currentSong,
+      isRandom,
       togglePlay,
+      previousSong,
+      nextSong,
+      randomSong,
       onMetadataLoaded,
       onAudioEnded,
     };
   },
 };
 </script>
-
-<style scoped>
-.music-player {
-  text-align: center;
-  margin-top: 20px;
-}
-
-.controls {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-}
-</style>
