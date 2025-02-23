@@ -177,8 +177,8 @@ export default defineComponent({
 }
 
 .album-cover {
-  width: 100px;
-  height: 100px;
+  width: 200px;
+  height: 200px;
   border-radius: 10px;
 }
 
