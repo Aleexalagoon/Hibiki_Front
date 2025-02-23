@@ -54,7 +54,6 @@ const logout = () => {
         <div v-if="isAuthenticated">
           <router-link to="/artista" class="menu-item" active-class="active">Artistas</router-link>
           <router-link to="/playlist" class="menu-item" active-class="active">Playlists</router-link>
-          <router-link to="/album" class="menu-item" active-class="active">Álbumes</router-link>
         </div>
       </nav>
     </aside>
