@@ -19,7 +19,7 @@
             <div v-for="album in albums" :key="album.albumId" class="album-card" @click="selectAlbum(album.albumId)">
               <img :src="album.image" alt="Album Cover" class="album-cover" />
               <p>{{ album.name }}</p>
-              <p>{{ new Date(album.releaseDate).toLocaleDateString() }}</p>
+
             </div>
           </div>
           <div v-else>
