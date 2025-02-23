@@ -1,6 +1,31 @@
 <script setup>
 
 import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { useAuthStore } from '@/stores/auth';
+
+const authStore = useAuthStore();
+const menuOpen = ref(false);
+
+// Cargar el usuario cuando se monta el componente
+onMounted(() => {
+  authStore.loadUserFromStorage();
+});
+
+// Función para obtener la inicial del usuario
+const getInitial = (name) => {
+  return name ? name.charAt(0).toUpperCase() : '?';
+};
+
+// Alternar menú de usuario
+const toggleMenu = () => {
+  menuOpen.value = !menuOpen.value;
+};
+
+// Cerrar sesión
+const logout = () => {
+  authStore.logout();
+  menuOpen.value = false;
+};
 
 const sliderContent = [
   {
@@ -261,21 +286,35 @@ const updateVolume = () => {
   console.log("Volumen actualizado a: ", volume.value);
 };
 
+
+
 </script>
 
 <template>
   <div class="novedades">
     <div class="top-bar">
-        <div>
-    <router-link to="/register">
-      <button class="register-button">Registrarse</button>
-    </router-link>
-    
-    <router-link to="/login">
-      <button class="login-button">Iniciar Sesión</button>
-    </router-link>
-  </div>
+    <!-- Si NO está autenticado, mostrar botones -->
+    <div v-if="!authStore.isAuthenticated">
+      <router-link to="/register">
+        <button class="register-button">Registrarse</button>
+      </router-link>
+
+      <router-link to="/login">
+        <button class="login-button">Iniciar Sesión</button>
+      </router-link>
     </div>
+
+    <!-- Si está autenticado, mostrar icono con la inicial -->
+    <div v-else class="user-icon">
+      <div class="icon-circle" @click="toggleMenu">
+        {{ getInitial(authStore.user?.name) }}
+      </div>
+      <div v-if="menuOpen" class="dropdown">
+        <router-link to="/perfil">Perfil</router-link>
+        <button @click="logout">Cerrar Sesión</button>
+      </div>
+    </div>
+  </div>
 
     <section class="slider">
       <div class="carousel-container">
@@ -374,6 +413,85 @@ const updateVolume = () => {
 </template>
 
 <style scoped>
+
+/* Estilos para el icono del usuario */
+.user-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+/* Círculo del icono del usuario */
+.icon-circle {
+  width: 45px;
+  height: 45px;
+  background: linear-gradient(135deg, #4a90e2, #3164c7); /* Degradado azul */
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Efecto al pasar el cursor */
+.icon-circle:hover {
+  transform: scale(1.1);
+  box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Estilo del menú desplegable */
+.dropdown {
+  position: absolute;
+  top: 50px;
+  right: 0;
+  background: #222; /* Color oscuro */
+  color: white;
+  border-radius: 10px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+  width: 200px;
+  display: flex;
+  flex-direction: column;
+  z-index: 10;
+  overflow: hidden;
+}
+
+/* Opciones del menú */
+.dropdown a, .dropdown button {
+  padding: 12px 15px;
+  text-align: left;
+  font-size: 14px;
+  color: white;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  border: none;
+  background: none;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  width: 100%;
+}
+
+/* Separadores entre opciones */
+.dropdown a:not(:last-child),
+.dropdown button:not(:last-child) {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Efecto al pasar el cursor */
+.dropdown a:hover, .dropdown button:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Espaciado extra en la opción de cerrar sesión */
+.dropdown button:last-child {
+  color: #ff4b4b;
+  font-weight: bold;
+}
 
 .music-player {
   display: flex;

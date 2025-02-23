@@ -57,11 +57,6 @@ const logout = () => {
           <router-link to="/album" class="menu-item" active-class="active">Álbumes</router-link>
         </div>
       </nav>
-
-      <div class="auth-buttons">
-        <button v-if="!isAuthenticated" @click="login" class="login-button">Iniciar sesión</button>
-        <button v-if="isAuthenticated" @click="logout" class="logout-button">Cerrar sesión</button>
-      </div>
     </aside>
 
     <main class="content">

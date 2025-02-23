@@ -1,46 +1,39 @@
 <template>
   <div class="login-container">
-    <form @submit.prevent="login">
+    <form @submit.prevent="loginUser">
       <h1 class="login-title">INICIAR SESIÓN EN HIBIKI</h1>
-      <input v-model="username" type="text" placeholder="Usuario" required />
+      <input v-model="email" type="email" placeholder="Correo electrónico" required />
       <input v-model="password" type="password" placeholder="Contraseña" required />
       <button type="submit" class="login-button">Iniciar sesión</button>
       <div class="link">
-        <a href="/register" class="signup">¿No tienes cuenta? Suscríbete a Hibiki</a>
+        <a href="/register" class="signup">¿No tienes cuenta? Regístrate en Hibiki</a>
       </div>
     </form>
   </div>
 </template>
 
-<script>
-export default {
-  name: 'LoginView',
-  data() {
-    return {
-      username: '',
-      password: ''
-    };
-  },
-  methods: {
-    login() {
-      if (this.username === 'admin' && this.password === 'admin') {
-        alert('Inicio de sesión exitoso');
+<script setup>
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { useAuthStore } from '@/stores/auth';
 
-   
-        localStorage.setItem('isAuthenticated', 'true');
+const email = ref('');
+const password = ref('');
+const router = useRouter();
+const authStore = useAuthStore();
 
-        
-        window.dispatchEvent(new Event("storage"));
-
-        
-        this.$router.push('/novedades');
-      } else {
-        alert('Usuario o contraseña incorrectos');
-      }
-    }
+const loginUser = async () => {
+  try {
+    await authStore.loginUser(email.value, password.value);
+    alert('Inicio de sesión exitoso');
+    router.push('/novedades');
+  } catch (error) {
+    alert('Credenciales inválidas');
+    console.error(error);
   }
 };
 </script>
+
 
 <style scoped>
 .login-title {

@@ -26,23 +26,45 @@ export default {
     };
   },
   methods: {
-    register() {
+    async register() {
       if (this.password !== this.confirmPassword) {
         alert('Las contraseñas no coinciden');
         return;
       }
 
-      alert('Registro exitoso');
+      try {
+        const response = await fetch('http://localhost:5149/api/Usuario', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    name: this.username,
+    email: this.email,
+    password: this.password,
+    isPremium: false,
+    fecha_Registro: new Date().toISOString()
+  })
+});
 
-      // Guardar sesión en localStorage
-      localStorage.setItem('isAuthenticated', 'true');
 
-      // Redirigir
-      this.$router.push('/novedades');
+        if (!response.ok) {
+          throw new Error('Error al registrar el usuario');
+        }
+
+        const data = await response.json();
+        alert('Registro exitoso');
+        localStorage.setItem('isAuthenticated', 'true');
+        this.$router.push('/novedades');
+      } catch (error) {
+        alert('Error en el registro');
+        console.error(error);
+      }
     }
   }
 };
 </script>
+
 
 <style scoped>
 .register-title {
