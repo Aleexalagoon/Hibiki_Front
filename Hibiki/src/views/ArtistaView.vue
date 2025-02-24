@@ -136,13 +136,14 @@ export default defineComponent({
 <style scoped>
 .artist-page {
   display: flex;
-  height: 100vh;
+  min-height: 100vh;
   background: #121212;
   color: white;
 }
 
 .main-container {
   display: flex;
+  flex: 1;
   width: 100%;
 }
 
@@ -151,6 +152,7 @@ export default defineComponent({
   padding: 20px;
   background: #181818;
   overflow-y: auto;
+  max-height: 110vh;
 }
 
 .artist-card {
@@ -215,8 +217,6 @@ export default defineComponent({
 }
 
 .album-cover {
-  width: 100px;
-  height: 100px;
   width: 200px;
   height: 200px;
   border-radius: 10px;
@@ -240,7 +240,6 @@ export default defineComponent({
   height: 60px;
   border-radius: 10px;
   margin-right: 10px;
-  margin-left: -50px;
 }
 
 .song-info {
@@ -257,7 +256,6 @@ export default defineComponent({
   font-size: 13px;
   opacity: 0.5;
   margin-top: 8px;
-
 }
 
 .song-duration {
