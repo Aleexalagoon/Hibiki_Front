@@ -33,7 +33,7 @@ export default {
       }
 
       try {
-        const response = await fetch('http://localhost:5149/api/Usuario', {
+        const response = await fetch('https://localhost:7295/api/Usuario', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json'

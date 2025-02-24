@@ -13,7 +13,7 @@ export const useAuthStore = defineStore('auth', {
       try {
         const userEmail = email || `${username}@example.com`;
 
-        const response = await fetch('http://localhost:5149/api/Usuario', {
+        const response = await fetch('https://localhost:7295/api/Usuario', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -60,7 +60,7 @@ export const useAuthStore = defineStore('auth', {
 
     async loginUser(email: string, password: string) {
       try {
-        const url = `http://localhost:5149/api/Usuario/login?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`;
+        const url = `https://localhost:7295/api/Usuario/login?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`;
         const response = await fetch(url, { method: 'GET' });
 
         if (!response.ok) {

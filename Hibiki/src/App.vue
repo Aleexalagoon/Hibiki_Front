@@ -1,40 +1,28 @@
 <script setup lang="ts">
-import { ref, onMounted, nextTick } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { RouterView, useRouter } from 'vue-router';
+import { useAuthStore } from '@/stores/auth';
 
 const searchQuery = ref('');
-const isAuthenticated = ref(localStorage.getItem('isAuthenticated') === 'true');
+const authStore = useAuthStore();
 const router = useRouter();
+
+// 🔹 Comprobar si el usuario está autenticado
+const isAuthenticated = computed(() => authStore.isAuthenticated);
 
 const search = () => {
   console.log('Buscando:', searchQuery.value);
 };
 
-
-onMounted(() => {
-  isAuthenticated.value = localStorage.getItem('isAuthenticated') === 'true';
-});
-
-
-window.addEventListener('storage', () => {
-  isAuthenticated.value = localStorage.getItem('isAuthenticated') === 'true';
-});
-
-
-const login = () => {
-  nextTick(() => {
-    window.dispatchEvent(new Event("storage"));
-    router.push('/login'); 
-  });
-};
-
-
+// 🔹 Función para cerrar sesión
 const logout = () => {
-  localStorage.removeItem('isAuthenticated');
-  isAuthenticated.value = false;
-  window.dispatchEvent(new Event("storage"));
+  authStore.logout();
   router.push('/login');
 };
+
+onMounted(() => {
+  authStore.loadUserFromStorage(); // Cargar usuario de localStorage
+});
 </script>
 
 <template>
@@ -46,16 +34,22 @@ const logout = () => {
           <input type="text" placeholder="Buscar..." v-model="searchQuery" />
           <button @click="search">Buscar</button>
         </div>
+
         <router-link to="/inicio" class="menu-item" active-class="active">Inicio</router-link>
         <router-link to="/novedades" class="menu-item" active-class="active">Novedades</router-link>
         <router-link to="/premium" class="menu-item" active-class="active">Premium</router-link>
 
-        
+        <!-- 🔹 MOSTRAR ARTISTAS Y PLAYLIST SOLO SI EL USUARIO ESTÁ AUTENTICADO -->
         <div v-if="isAuthenticated">
           <router-link to="/artista" class="menu-item" active-class="active">Artistas</router-link>
           <router-link to="/playlist" class="menu-item" active-class="active">Playlists</router-link>
         </div>
       </nav>
+
+      <!-- 🔹 MOSTRAR BOTÓN DE CERRAR SESIÓN SI EL USUARIO ESTÁ LOGUEADO -->
+      <div v-if="isAuthenticated" class="auth-buttons">
+        <button class="logout-button" @click="logout">Cerrar Sesión</button>
+      </div>
     </aside>
 
     <main class="content">
@@ -142,7 +136,6 @@ const logout = () => {
   padding: 1rem 0;
 }
 
-.login-button,
 .logout-button {
   background-color: #ff5100;
   color: white;
@@ -155,8 +148,7 @@ const logout = () => {
   transition: background-color 0.3s;
 }
 
-.logout-button:hover,
-.login-button:hover {
+.logout-button:hover {
   background-color: #ca3900;
 }
 </style>
