@@ -68,19 +68,6 @@ export default {
       <button class="plan-button" @click="startSubscription">Seleccionar</button>
     </section>
 
-      <section class="plan-card">
-      <div class="plan-card-title">Duo</div>
-      <p class="plan-price">14,99€<span>/mes</span></p>
-      <p class="plan-description">Ideal para disfrutar de la mejor música con un familiar o un amigo.</p>
-      <button class="plan-button" @click="startSubscription">Seleccionar</button>
-    </section>
-
-      <section class="plan-card">
-      <div class="plan-card-title">Familiar</div>
-      <p class="plan-price">19,99€<span>/mes</span></p>
-      <p class="plan-description">Ideal para disfrutar de la mejor música con los miembros de tu familia.</p>
-      <button class="plan-button" @click="startSubscription">Seleccionar</button>
-    </section>
 </div>
     </section>
       <section class="content-cards">

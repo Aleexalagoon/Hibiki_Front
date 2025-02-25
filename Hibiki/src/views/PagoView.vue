@@ -20,7 +20,10 @@
             <input type="text" placeholder="Fecha de expiración (MM/AA)" class="input-field" />
             <input type="text" placeholder="CVC" class="input-field" />
           </div>
-          <button type="submit" class="boton-pago">Pagar</button>
+          <router-link to="/novedades">
+            <button type="button" class="boton-pago">Pagar</button>
+          </router-link>
+
         </form>
       </div>
     </div>
