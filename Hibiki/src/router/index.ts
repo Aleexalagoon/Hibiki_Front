@@ -12,6 +12,7 @@ import InicioView from "@/views/InicioView.vue";
 import PlaylistView from "@/views/PlaylistView.vue";
 import ArtistaView from "@/views/ArtistaView.vue";
 import CancionesView from "@/views/CancionesView.vue";
+import PagoView from "@/views/PagoView.vue";
 
 
 const router = createRouter({
@@ -91,6 +92,12 @@ const router = createRouter({
       path: "/canciones",
       name: "canciones",
       component: CancionesView,
+    },
+
+    {
+      path: "/pago",
+      name: "pago",
+      component: PagoView,
     }
 
   ],

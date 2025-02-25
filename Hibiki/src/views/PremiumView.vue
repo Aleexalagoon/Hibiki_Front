@@ -2,7 +2,7 @@
 export default {
   methods: {
     startSubscription() {
-      this.$router.push('/register'); 
+      this.$router.push('/pago'); 
     },
   },
 };
