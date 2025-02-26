@@ -8,7 +8,7 @@
     <p class="description">
       Obtén playlists y álbumes inspirados en los artistas y géneros que escuchas. 1 mes gratis y luego, 10,99 € al mes.
     </p>
-    <a href="/premium" class="button">Probar gratis</a>
+    <a href="/login" class="button">Probar gratis</a>
   </div>
 </template>
 
