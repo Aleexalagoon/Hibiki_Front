@@ -62,8 +62,8 @@
           <p v-else>No hay canciones disponibles en este álbum.</p>
         </div>
 
-        <!-- Reproductor de música, pasando todas las canciones -->
-        <MusicPlayer :song="selectedSong" :songs="songs" />
+       
+        
       </div>
     </div>
   </div>

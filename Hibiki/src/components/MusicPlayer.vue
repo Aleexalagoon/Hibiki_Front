@@ -1,195 +1,126 @@
 <template>
-  <div v-if="currentSong" class="music-player">
-    <div class="player-info">
-      <img :src="currentSong?.image || 'default-cover.jpg'" alt="Cover" class="song-cover" />
-      <div class="song-details">
-        <h3>{{ formatDuration(currentTime) }} / {{ formatDuration(duration) }} - {{ currentSong?.nombre || 'Selecciona una canción' }}</h3>
-        <p>{{ getArtistaDisplay() }}</p>
+  <div v-if="playerStore.currentSong" class="music-player" :class="{ 'minimized': isMinimized }">
+    <div class="player-content">
+      <div class="player-info">
+        <img :src="playerStore.currentSong?.image || 'default-cover.jpg'" alt="Cover" class="song-cover" />
+        <div class="song-details">
+          <h3 class="song-title">{{ playerStore.currentSong?.nombre || 'Selecciona una canción' }}</h3>
+          <p class="song-artist">{{ playerStore.getArtistaDisplay }}</p>
+          <p class="song-time">{{ playerStore.formatDuration(playerStore.currentTime) }} / {{ playerStore.formatDuration(playerStore.duration) }}</p>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button @click="previousSong" aria-label="Canción anterior">⏪</button>
+        <button @click="togglePlay" :aria-label="playerStore.isPlaying ? 'Pausar' : 'Reproducir'" 
+                class="play-button">{{ playerStore.isPlaying ? '⏸️' : '▶️' }}</button>
+        <button @click="nextSong" aria-label="Siguiente canción">⏩</button>
+        <button @click="randomSong" aria-label="Reproducir aleatoriamente">🔀</button>
+      </div>
+
+      <div class="progress-container">
+        <input
+          type="range"
+          :value="playerStore.currentTime"
+          @input="seek"
+          min="0"
+          :max="playerStore.duration"
+          class="progress-bar"
+        />
       </div>
     </div>
 
-    <audio
-      ref="audioPlayer"
-      :src="currentSong?.ruta"
-      @loadedmetadata="onMetadataLoaded"
-      @timeupdate="updateTime"
-      @ended="onAudioEnded"
-    ></audio>
-
-    <div class="controls">
-      <button @click="previousSong">⏪</button>
-      <button @click="togglePlay">{{ isPlaying ? '⏸️' : '▶️' }}</button>
-      <button @click="nextSong">⏩</button>
-      <button @click="randomSong">🔀</button>
-    </div>
-
-    <div class="progress-bar-container">
-      <input
-        type="range"
-        v-model="currentTime"
-        @input="seek"
-        min="0"
-        :max="duration"
-        class="progress-bar"
-      />
-    </div>
+    <button @click="isMinimized = !isMinimized" class="minimize-button">
+      {{ isMinimized ? '▲' : '▼' }}
+    </button>
   </div>
 </template>
 
 <script>
-import { ref, watch, onMounted, nextTick } from "vue";
+import { usePlayerStore } from '@/stores/player';
+import { ref, watch, onMounted } from "vue";
 
 export default {
   props: {
-    song: Object,
-    songs: Array,
+    song: {
+      type: Object,
+      default: () => null,
+    },
+    songs: {
+      type: Array,
+      default: () => [],
+    },
     cantantes: {
       type: Array,
-      default: () => []
-    }
+      default: () => [],
+    },
   },
   setup(props) {
-    const audioPlayer = ref(null);
-    const isPlaying = ref(false);
-    const currentSong = ref(null);
-    const currentTime = ref(0);
-    const duration = ref(0);
+    const playerStore = usePlayerStore();
+    const isMinimized = ref(false);
 
-    // Función simplificada para obtener el nombre del artista
-    const getArtistaDisplay = () => {
-      if (!currentSong.value) return "Seleccione una canción";
-      
-      // Si existe la propiedad 'artista', usar esa
-      if (currentSong.value.artista) {
-        return currentSong.value.artista;
-      }
+    // Watch for song prop change
+    watch(
+      () => props.song,
+      (newSong) => {
+        if (newSong) playerStore.setSong(newSong);
+      },
+      { deep: true }
+    );
 
-      // Si no hay artista, mostrar un mensaje genérico
-      return "Artista desconocido";
-    };
+    // Watch for songs list change and set the first song if not set
+    watch(
+      () => props.songs,
+      (newSongs) => {
+        if (!playerStore.currentSong && newSongs?.length) {
+          playerStore.setSong(newSongs[0]);
+        }
+      },
+      { deep: true }
+    );
 
-    // Inicializar currentSong con props.song o el primer elemento de props.songs
+    // If a song is provided as a prop, set it
     onMounted(() => {
       if (props.song) {
-        currentSong.value = { ...props.song };
-      } else if (props.songs && props.songs.length > 0) {
-        currentSong.value = { ...props.songs[0] };
+        playerStore.setSong(props.song);
+      } else if (props.songs?.length && !playerStore.currentSong) {
+        playerStore.setSong(props.songs[0]);
       }
     });
 
-    // Observar cambios en song y songs props
-    watch(() => props.song, (newSong) => {
-      if (newSong) {
-        currentSong.value = { ...newSong };
-        nextTick(() => playSong());
-      }
-    }, { deep: true });
-
-    watch(() => props.songs, (newSongs) => {
-      if (!currentSong.value && newSongs && newSongs.length > 0) {
-        currentSong.value = { ...newSongs[0] };
-      }
-    }, { deep: true });
-
-    const playSong = async () => {
-      if (!audioPlayer.value || !currentSong.value?.ruta) return;
-      
-      audioPlayer.value.pause();
-      audioPlayer.value.src = currentSong.value.ruta;
-      await nextTick();
-      
-      audioPlayer.value.load();
-      audioPlayer.value.play().then(() => {
-        isPlaying.value = true;
-      }).catch(err => console.error("Error al reproducir audio:", err));
-    };
-
+    // Toggle play/pause
     const togglePlay = () => {
-      if (!audioPlayer.value) return;
-      if (isPlaying.value) {
-        audioPlayer.value.pause();
-      } else {
-        audioPlayer.value.play().catch(err => console.error("Error al reproducir:", err));
-      }
-      isPlaying.value = !isPlaying.value;
+      playerStore.togglePlay();
     };
 
+    // Change the song (next/previous)
     const previousSong = () => {
-      if (!props.songs || props.songs.length === 0) return;
-      const currentIndex = props.songs.findIndex(song => song.nombre === currentSong.value?.nombre);
-      const newIndex = currentIndex <= 0 ? props.songs.length - 1 : currentIndex - 1;
-      // Hacer una copia completa del objeto canción
-      currentSong.value = { ...props.songs[newIndex] };
-      nextTick(() => playSong());
+      playerStore.previousSong(props.songs);
     };
 
     const nextSong = () => {
-      if (!props.songs || props.songs.length === 0) return;
-      const currentIndex = props.songs.findIndex(song => song.nombre === currentSong.value?.nombre);
-      const newIndex = currentIndex >= props.songs.length - 1 ? 0 : currentIndex + 1;
-      // Hacer una copia completa del objeto canción
-      currentSong.value = { ...props.songs[newIndex] };
-      nextTick(() => playSong());
+      playerStore.nextSong(props.songs);
     };
 
+    // Play a random song
     const randomSong = () => {
-      if (!props.songs || props.songs.length <= 1) return;
-      let randomIndex;
-      do {
-        randomIndex = Math.floor(Math.random() * props.songs.length);
-      } while (props.songs[randomIndex].nombre === currentSong.value?.nombre && props.songs.length > 1);
-      
-      // Hacer una copia completa del objeto canción
-      currentSong.value = { ...props.songs[randomIndex] };
-      nextTick(() => playSong());
+      playerStore.randomSong(props.songs);
     };
 
-    const seek = () => {
-      if (audioPlayer.value) {
-        audioPlayer.value.currentTime = currentTime.value;
-      }
-    };
-
-    const updateTime = () => {
-      if (audioPlayer.value) {
-        currentTime.value = audioPlayer.value.currentTime;
-      }
-    };
-
-    const onMetadataLoaded = () => {
-      if (audioPlayer.value) {
-        duration.value = audioPlayer.value.duration;
-      }
-    };
-
-    const onAudioEnded = () => {
-      isPlaying.value = false;
-      nextSong();
-    };
-
-    const formatDuration = (seconds) => {
-      if (!seconds || isNaN(seconds)) return "0:00";
-      const minutes = Math.floor(seconds / 60);
-      const secs = Math.floor(seconds % 60);
-      return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+    // Seek to a specific time in the song
+    const seek = (event) => {
+      const time = parseFloat(event.target.value);
+      playerStore.seek(time);
     };
 
     return {
-      audioPlayer,
-      isPlaying,
-      currentSong,
-      currentTime,
-      duration,
+      playerStore,
       togglePlay,
       previousSong,
       nextSong,
       randomSong,
       seek,
-      updateTime,
-      onMetadataLoaded,
-      onAudioEnded,
-      formatDuration,
-      getArtistaDisplay,
+      isMinimized
     };
   },
 };
@@ -197,47 +128,112 @@ export default {
 
 <style scoped>
 .music-player {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
   background: #181818;
   color: white;
-  padding: 20px;
-  border-radius: 12px;
+  padding: 8px 15px;
   display: flex;
   flex-direction: column;
-  max-width: 600px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  transition: all 0.3s ease;
+  max-height: 70px; 
+}
+
+.music-player.minimized {
+  max-height: 30px;
+  padding: 5px 15px;
+}
+
+.player-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.minimized .player-content {
+  justify-content: center;
 }
 
 .player-info {
   display: flex;
   align-items: center;
-  margin-bottom: 15px;
+  flex: 1;
+}
+
+.minimized .player-info {
+  display: none;
 }
 
 .song-cover {
-  width: 80px;
-  height: 80px;
-  border-radius: 10px;
+  width: 50px;
+  height: 50px;
+  border-radius: 6px;
   margin-right: 15px;
 }
 
 .song-details {
   text-align: left;
+  max-width: 200px;
+  overflow: hidden;
+}
+
+.song-title {
+  margin: 0;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.song-artist {
+  margin: 3px 0;
+  font-size: 0.8rem;
+  opacity: 0.8;
+}
+
+.song-time {
+  margin: 0;
+  font-size: 0.7rem;
+  opacity: 0.7;
 }
 
 .controls {
   display: flex;
   gap: 15px;
   justify-content: center;
-  margin: 10px 0;
+  flex: 1;
+}
+
+.progress-container {
+  flex: 1;
+  margin-left: 15px;
+  display: flex;
+  align-items: center;
+}
+
+.minimized .progress-container {
+  display: none;
 }
 
 button {
   background: none;
   border: none;
   color: white;
-  font-size: 24px;
+  font-size: 18px;  /* Reduced from 24px */
   cursor: pointer;
   transition: transform 0.2s ease;
+  padding: 0;
+  margin: 0;
+  line-height: 1;
+}
+
+.play-button {
+  font-size: 22px;
 }
 
 button:hover {
@@ -245,14 +241,9 @@ button:hover {
   color: #1db954;
 }
 
-.progress-bar-container {
-  width: 100%;
-  margin: 10px 0;
-}
-
 .progress-bar {
   width: 100%;
-  height: 6px;
+  height: 4px;
   cursor: pointer;
   -webkit-appearance: none;
   appearance: none;
@@ -264,17 +255,33 @@ button:hover {
 .progress-bar::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 12px;
-  height: 12px;
+  width: 10px;
+  height: 10px;
   background: #1db954;
   border-radius: 50%;
 }
 
 .progress-bar::-moz-range-thumb {
-  width: 12px;
-  height: 12px;
+  width: 10px;
+  height: 10px;
   background: #1db954;
   border-radius: 50%;
   border: none;
+}
+
+.minimize-button {
+  position: absolute;
+  top: -15px;
+  right: 20px;
+  background: #181818;
+  border-radius: 4px 4px 0 0;
+  padding: 2px 10px;
+  font-size: 12px;
+  transform: none !important;
+}
+
+.minimize-button:hover {
+  color: #1db954;
+  transform: none !important;
 }
 </style>
