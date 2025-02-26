@@ -1,160 +1,422 @@
 <template>
-    <div class="premium-view">
-      <div class="tarjeta-premium">
-        <h2>Premium Individual</h2>
-        <p class="precio">0,00 €</p>
-        <p class="subtitulo">Durante 2 meses</p>
-        <p class="detalle">Inicio de los meses gratis: <strong>Hoy</strong></p>
-        <p class="detalle">Inicio de la facturación: <strong>25 abr 2025</strong></p>
-        <p class="detalle">Solo 10,99 € al mes al terminar la prueba de 2 meses</p>
-        <p class="detalle">Tu cuenta es gratis hasta el <strong>25 abr 2025</strong></p>
-        <p class="detalle">Puedes cancelar cuando quieras. Rigen las condiciones de la oferta.</p>
-        <p class="detalle">Te enviaremos un recordatorio 7 días antes del cobro.</p>
-      </div>
-      
-      <div class="metodo-pago">
-        <h3>Método de pago</h3>
-        <form>
-          <input type="text" placeholder="Número de tarjeta" class="input-field" />
-          <div class="input-row">
-            <input type="text" placeholder="Fecha de expiración (MM/AA)" class="input-field" />
-            <input type="text" placeholder="CVC" class="input-field" />
+  <div class="payment-form">
+    <div class="header">
+    </div>
+    <div class="plan-info">
+      <div class="plan-header">
+        <div class="plan-icon-title">
+          <div class="plan-icon">
+            <div class="icon-inner"></div>
           </div>
-          <router-link to="/novedades">
-            <button type="button" class="boton-pago">Pagar</button>
-          </router-link>
-
-        </form>
+          <div>
+            <h2>Premium Individual</h2>
+            <p class="subtitle">1 cuenta Premium</p>
+          </div>
+        </div>
+        <div class="plan-price">
+          <p class="price">0,00 €</p>
+          <p class="subtitle">Por 1 mes</p>
+        </div>
+      </div>
+      <div class="plan-details">
+        <p>• Hoy: 1 mes por 0,00 €</p>
+        <p>• A partir del 10 abr 2025: 10,99 €/mes</p>
+        <p>• Te enviaremos un recordatorio 7 días antes del cobro.</p>
+        <p>• Cancela cuando quieras online. <a href="/politica" class="orange-link">Consulta las condiciones</a></p>
+      </div>
+    </div>  
+    <div class="section">
+      <h2>Forma de pago</h2>
+      <div class="payment-options">
+        <div class="payment-option selected">
+          <div class="option-header">
+            <label class="radio-container">
+              <input type="radio" name="payment" checked>
+              <span class="radio-checkmark"></span>
+              <span class="payment-label">Tarjeta de crédito o débito</span>
+            </label>
+          </div>
+          <div class="card-icons">
+            <img src="https://1000logos.net/wp-content/uploads/2021/11/VISA-logo.png" alt="Visa" class="card-icon">
+            <img src="https://cdn.cdnlogo.com/logos/m/33/mastercard.svg" alt="Mastercard" class="card-icon">
+            <img src="https://support.apple.com/content/dam/edam/applecare/images/en_US/psp/psp_heroes/mini-hero-applepay.png" alt="Amex" class="card-icon">
+          </div>
+          <div class="card-form">
+            <div class="form-group">
+              <label for="cardNumber">Número de tarjeta</label>
+              <input type="text" id="cardNumber" placeholder="0000 0000 0000 0000" class="form-control">
+            </div>
+            <div class="form-row">
+              <div class="form-group half">
+                <label for="expiryDate">Fecha de caducidad</label>
+                <input type="text" id="expiryDate" placeholder="MM/AA" class="form-control">
+              </div>
+              <div class="form-group half">
+                <label for="securityCode">Código de seguridad</label>
+                <div class="security-code-wrapper">
+                  <input type="text" id="securityCode" class="form-control">
+                  <div class="help-icon">?</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-  </template>
+    <div class="section summary-section">
+      <h2>Resumen</h2>
+      <div class="summary-content">
+        <div class="summary-header">Artículos</div>
+        <div class="summary-item">
+          <div class="item-info">
+            <div class="item-icon"></div>
+            <span class="item-name">Premium Individual</span>
+          </div>
+          <span class="item-price">0,00 €</span>
+        </div>
+        
+        <div class="summary-details">
+          <p>• Hoy: 1 mes por 0,00 €</p>
+          <p>• A partir del 10 abr 2025: 10,99 €/mes</p>
+        </div>
+        
+        <div class="summary-total">
+          <span>Total ahora</span>
+          <span class="total-price">0,00 €</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="payment-button-section">
+      <a href="/novedades" class="payment-button">Pagar ahora</a>
+    </div>
+  </div>
+</template>
 
-  <style scoped>
-  * {
-    box-sizing: border-box;
-  }
-  
-  html, body {
-    height: 100%;
-    width: 100%;
-    margin: 0;
-    padding: 0;
-  }
-  
-  .premium-view {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    background: linear-gradient(180deg, rgba(63, 62, 62, 0.9) 0%, rgba(0, 0, 0, 1) 100%);
-    color: rgb(255, 255, 255);
-    padding: 2rem;
-  }
-  
-  .tarjeta-premium {
-    background-color: #1c1c1c;
-    padding: 30px;
-    border-radius: 15px;
-    margin-bottom: 40px;
-    width: 100%;
-    max-width: 700px;
-    transition: transform 0.3s ease;
-  }
-  
-  .tarjeta-premium h2 {
-    color: #ff5100;
-    font-size: 28px;
-    font-weight: bold;
-    text-align: center;
-    letter-spacing: 1px;
-  }
-  
-  .precio {
-    font-size: 36px;
-    font-weight: bold;
-    color: #ff5100;
-    text-align: center;
-    margin: 10px 0;
-  }
-  
-  .subtitulo {
-    font-size: 20px;
-    text-align: center;
-    font-weight: normal;
-    color: #ddd;
-  }
-  
-  .detalle {
-    font-size: 16px;
-    text-align: center;
-    color: #ffffff;
-    margin-bottom: 10px;
-  }
-  
-  .metodo-pago {
-    background-color: #2c2c2c;
-    padding: 30px;
-    border-radius: 10px;
-    width: 100%;
-    max-width: 700px;
-  }
-  
-  .metodo-pago h3 {
-    font-size: 22px;
-    margin-bottom: 25px;
-    text-align: center;
-    color: #ffffff;
-  }
-  
-  .input-field {
-    width: 100%;
-    padding: 15px;
-    margin: 12px 0;
-    border: 2px solid #444;
-    border-radius: 10px;
-    font-size: 16px;
-    background-color: #333;
-    color: white;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-    transition: border-color 0.3s ease;
-  }
-  
-  .input-field::placeholder {
-    color: #bbb;
-  }
-  
-  .input-field:focus {
-    border-color: #ff5100;
-    outline: none;
-  }
-  
-  .input-row {
-    display: flex;
-    gap: 20px;
-  }
-  
-  .boton-pago {
-    width: 100%;
-    padding: 15px;
-    background-color: #ff5100;
-    color: white;
-    font-size: 20px;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-  }
-  
-  form {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  form input::placeholder {
-    color: #bbb;
-  }
-  </style>
-  
-  
+<style scoped>
+.payment-form {
+  margin: 0 auto;
+  padding: 1rem;
+  color: #ffffff;
+  background-color: #000000;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+h1 {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin: 0;
+}
+
+h2 {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin: 0 0 1rem 0;
+}
+
+.change-plan:hover {
+  color: #ff5500;
+}
+
+.plan-info {
+  margin-bottom: 2rem;
+}
+
+.plan-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.plan-icon-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.plan-icon {
+  width: 2rem;
+  height: 2rem;
+  background-color: #000000;
+  border: 1px solid #333;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-inner {
+  width: 1rem;
+  height: 1rem;
+  background-color: #ccc;
+  border-radius: 50%;
+}
+
+.subtitle {
+  color: #a0a0a0;
+  font-size: 0.875rem;
+  margin: 0.25rem 0;
+}
+
+.price {
+  font-weight: bold;
+  margin: 0;
+  text-align: right;
+}
+
+.plan-details {
+  margin-left: 2.75rem;
+  font-size: 0.875rem;
+  color: #d0d0d0;
+}
+
+.plan-details p {
+  margin: 0.5rem 0;
+}
+
+.orange-link {
+  color: #ff5500;
+  text-decoration: none;
+}
+
+.section {
+  padding-top: 1.5rem;
+  margin-bottom: 1.5rem;
+  border-top: 1px solid #333;
+}
+
+.payment-options {
+  background-color: #111;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.payment-option {
+  padding: 1rem;
+  border-bottom: 1px solid #222;
+}
+
+.payment-option.selected {
+  border-left: 2px solid #ff5500;
+}
+
+.radio-container {
+  display: flex;
+  align-items: center;
+  position: relative;
+  cursor: pointer;
+  font-size: 1rem;
+  user-select: none;
+}
+
+.radio-container input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.radio-checkmark {
+  height: 1.25rem;
+  width: 1.25rem;
+  background-color: transparent;
+  border: 2px solid #666;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 0.75rem;
+}
+
+.radio-container input:checked ~ .radio-checkmark {
+  border-color: #ff5500;
+}
+
+.payment-label {
+  font-weight: 500;
+}
+
+.card-icons {
+  display: flex;
+  align-items: center;
+  margin: 1rem 0;
+  padding-left: 2rem;
+}
+
+.card-icon {
+  height: 1.5rem;
+  margin-right: 0.5rem;
+}
+
+.lock-icon {
+  margin-left: auto;
+  color: #666;
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.card-form {
+  padding-left: 2rem;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-row {
+  display: flex;
+  gap: 1rem;
+}
+
+.half {
+  flex: 1;
+}
+
+label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  color: #a0a0a0;
+}
+
+.form-control {
+  width: 100%;
+  padding: 0.75rem;
+  box-sizing: border-box;
+  border: 1px solid #444;
+  border-radius: 0.25rem;
+  background-color: transparent;
+  color: white;
+  font-size: 1rem;
+}
+
+.form-control::placeholder {
+  color: #666;
+}
+
+.security-code-wrapper {
+  position: relative;
+}
+
+.help-icon {
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 50%;
+  background-color: #444;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  color: white;
+}
+
+.checkbox-container {
+  display: flex;
+  align-items: flex-start;
+  position: relative;
+  cursor: pointer;
+  font-size: 0.875rem;
+  user-select: none;
+}
+
+.checkbox-container input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.checkbox-checkmark {
+  height: 1rem;
+  width: 1rem;
+  background-color: transparent;
+  border: 1px solid #666;
+  border-radius: 0.25rem;
+  display: inline-block;
+  margin-right: 0.5rem;
+  margin-top: 0.125rem;
+}
+
+.summary-section {
+  margin-top: 2rem;
+}
+
+.summary-content {
+  background-color: #222;
+  border-radius: 0.5rem;
+  padding: 1rem;
+}
+
+.summary-header {
+  font-weight: bold;
+  margin-bottom: 1rem;
+  color: #a0a0a0;
+  font-size: 0.875rem;
+}
+
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.item-info {
+  display: flex;
+  align-items: center;
+}
+
+.item-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  background-color: #333;
+  border-radius: 0.25rem;
+  margin-right: 0.5rem;
+}
+
+.item-name {
+  font-weight: 500;
+}
+
+.summary-details {
+  margin-left: 2rem;
+  font-size: 0.875rem;
+  color: #a0a0a0;
+  margin-bottom: 1rem;
+}
+
+.summary-details p {
+  margin: 0.25rem 0;
+}
+
+.summary-total {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 1rem;
+  border-top: 1px solid #333;
+  font-weight: bold;
+}
+
+.total-price {
+  font-size: 1.125rem;
+}
+
+.payment-button {
+  display: block;
+  width: 10%;
+  padding: 1rem;
+  background-color: #ff5500;
+  color: white;
+  text-align: center;
+  text-decoration: none;
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+}
+</style>
