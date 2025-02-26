@@ -62,9 +62,6 @@ export default {
       
 <div class="plan-cards-container">
   <section class="plan-card">
-      <div class="plan-card-title">Individual</div>
-      <p class="plan-price">10,99€<span>/mes</span></p>
-      <p class="plan-description">Ideal para disfrutar de la mejor música de forma individual, sin distracciones.</p>
       <button class="plan-button" @click="startSubscription">Seleccionar</button>
     </section>
 

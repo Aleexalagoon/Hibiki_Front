@@ -220,7 +220,7 @@ export default {
   background-color: #ff5100; 
   color: white;
   border: none;
-  border-radius: 20px;
+  border-radius: 5px;
   padding: 8px 16px;
   font-size: 14px;
   cursor: pointer;
