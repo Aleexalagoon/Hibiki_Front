@@ -62,8 +62,7 @@
           <p v-else>No hay canciones disponibles en este álbum.</p>
         </div>
 
-        <!-- Reproductor de música, pasando todas las canciones -->
-        <MusicPlayer :song="selectedSong" :songs="songs" />
+        <!-- Reproductor de música eliminado para evitar duplicidad -->
       </div>
     </div>
   </div>
@@ -73,18 +72,18 @@
 import { defineComponent, computed, onMounted } from 'vue';
 import { useArtistaStore } from '@/stores/artistaStore';
 import { useAlbumStore } from '@/stores/albumStore';
-import MusicPlayer from '@/components/MusicPlayer.vue';
+import { usePlayerStore } from '@/stores/player';
 
 export default defineComponent({
-  components: {
-    MusicPlayer,
-  },
   setup() {
     const artistaStore = useArtistaStore();
     const albumStore = useAlbumStore();
+    const playerStore = usePlayerStore();
 
     // Función para formatear la duración
     const formatDuration = (duration) => {
+      if (!duration) return '0m 0s';
+      
       const [hours, minutes, seconds] = duration.split(':').map(Number);
 
       if (hours > 0) {
@@ -100,8 +99,10 @@ export default defineComponent({
       albumStore.clearSongs(); // Limpiar canciones anteriores
     };
 
-    // Seleccionar una canción
+    // Seleccionar una canción (ahora usando playerStore directamente)
     const selectSong = (song) => {
+      playerStore.setSong(song);
+      // Opcionalmente, actualizar también el album store para mantener la referencia
       albumStore.setSelectedSong(song);
     };
 
@@ -131,7 +132,6 @@ export default defineComponent({
   },
 });
 </script>
-
 
 <style scoped>
 .artist-page {
