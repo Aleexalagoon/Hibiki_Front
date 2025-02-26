@@ -44,6 +44,17 @@
       </div>
     </div>
   </div>
+  <footer class="footer">
+    <div class="footer-content">
+      <p class="footer-text">© 2025 Hibiki. Todos los derechos reservados.</p>
+      <div class="footer-links">
+        <a href="/politica" class="footer-link">Política de Privacidad</a>
+        <a href="/terminos" class="footer-link">Términos y Condiciones</a>
+        <a href="/cookies" class="footer-link">Política de Cookies</a>
+        <a href="/infoanuncios" class="footer-link">Información de anuncios</a>
+      </div>
+    </div>
+  </footer>
 </template>
 
 <script>
@@ -315,6 +326,55 @@ export default {
 
 .album-item:hover .album-image {
   transform: scale(1.05);
+}
+
+.footer {
+  background-color: #181818;
+  padding: 20px 0;
+  border-top: 1px solid #ff5100;
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.footer-text {
+  color: white;
+  font-size: 14px;
+  margin-bottom: 15px;
+}
+
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+}
+
+.footer-link {
+  color: #ff5100; 
+  font-size: 14px;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.footer-link:hover {
+  color: white;
+  text-decoration: underline;
+}
+
+/* Responsive */
+@media (max-width: 576px) {
+  .footer-links {
+    flex-direction: column;
+    gap: 10px;
+  }
 }
 
 /* Responsive */
