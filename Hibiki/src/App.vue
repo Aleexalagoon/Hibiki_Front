@@ -12,34 +12,28 @@ const playerStore = usePlayerStore();
 const cancionesStore = useCancionesStore(); 
 const router = useRouter();
 
-
 const isAuthenticated = computed(() => authStore.isAuthenticated);
-
 
 const search = () => {
   console.log('Buscando:', searchQuery.value);
 };
-
 
 const logout = () => {
   authStore.logout();
   router.push('/login');
 };
 
-
 const allSongs = computed(() => {
-  
   if (cancionesStore.canciones && cancionesStore.canciones.length > 0) {
     
     return cancionesStore.canciones.map(song => ({
       ...song,
       nombre: song.nombre || song.title || 'Unknown',
-      artista: song.artista || song.artist || 'Unknown Artist',
+      artista: song.artista || song.artist || (song.cantante?.nombre) || 'Unknown Artist',
       ruta: song.ruta || song.path || `/music/${song.cancionId}.mp3`,
       image: song.image || song.coverImage || '/images/default-cover.jpg'
     }));
   }
-  
   
   return [
     {
@@ -65,18 +59,13 @@ const allSongs = computed(() => {
 
 onMounted(async () => {
   authStore.loadUserFromStorage(); 
-  
-
   await cancionesStore.fetchCanciones();
-  
-  
   console.log('Canciones cargadas:', cancionesStore.canciones);
 });
 
-
 watchEffect(() => {
   if (playerStore.currentSong) {
-  
+    
   } else {
     document.body.style.paddingBottom = '0';
   }

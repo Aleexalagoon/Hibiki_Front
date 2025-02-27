@@ -5,7 +5,6 @@
         <img :src="playerStore.currentSong?.image || 'default-cover.jpg'" alt="Cover" class="song-cover" />
         <div class="song-details">
           <h3 class="song-title">{{ playerStore.currentSong?.nombre || 'Selecciona una canción' }}</h3>
-          <p class="song-artist">{{ playerStore.getArtistaDisplay }}</p>
           <p class="song-time">{{ playerStore.formatDuration(playerStore.currentTime) }} / {{ playerStore.formatDuration(playerStore.duration) }}</p>
         </div>
       </div>
@@ -251,14 +250,8 @@ export default {
   text-overflow: ellipsis;
 }
 
-.song-artist {
-  margin: 3px 0;
-  font-size: 0.8rem;
-  opacity: 0.8;
-}
-
 .song-time {
-  margin: 0;
+  margin: 3px 0;
   font-size: 0.7rem;
   opacity: 0.7;
 }
