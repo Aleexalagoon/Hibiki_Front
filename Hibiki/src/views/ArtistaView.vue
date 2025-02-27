@@ -65,7 +65,7 @@
     </div>
     
     <!-- Add the music player component with songs passed as prop -->
-    <MusicPlayer :songs="songs" />
+    
   </div>
 </template>
 
