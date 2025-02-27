@@ -64,16 +64,25 @@
   background-color: rgb(255, 255, 255);
   color: black;
 }
-.logo-line {
-  transition: stroke 0.1s ease;
+.logo-group {
+  transition: transform 0.4s ease-out, stroke 0.2s ease, fill 0.2s ease;
+  transform-origin: center;
 }
-.logo-dot {
-  transition: fill 0.1s ease;
+
+.logo-group:hover {
+  transform: scale(1.5) rotate(10deg);
 }
+
 .logo-group:hover .logo-line {
   stroke: #000000;
+  transition: stroke 0.5s ease-in-out;
 }
+
 .logo-group:hover .logo-dot {
   fill: #000000;
+  transition: fill 0.5s ease-in-out;
 }
+
+
+
 </style>
