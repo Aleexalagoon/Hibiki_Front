@@ -24,7 +24,7 @@
           :value="playerStore.currentTime"
           @input="seek"
           min="0"
-          :max="playerStore.duration"
+          :max="playerStore.duration || 1"
           class="progress-bar"
         />
       </div>
@@ -34,11 +34,15 @@
       {{ isMinimized ? '▲' : '▼' }}
     </button>
   </div>
+  <div v-else-if="!playerStore.isUserInteracted" class="music-player-placeholder" @click="handleFirstInteraction">
+    <p>Haz clic aquí para activar el reproductor de música</p>
+  </div>
 </template>
 
 <script>
 import { usePlayerStore } from '@/stores/player';
-import { ref, watch, onMounted } from "vue";
+import { useAlbumStore } from '@/stores/albumStore';
+import { ref, watch, onMounted, computed } from "vue";
 
 export default {
   props: {
@@ -57,13 +61,36 @@ export default {
   },
   setup(props) {
     const playerStore = usePlayerStore();
+    const albumStore = useAlbumStore();
     const isMinimized = ref(false);
+
+    // Computed property to get songs from both props and albumStore
+    const availableSongs = computed(() => {
+      // First try to use songs from props
+      if (props.songs && props.songs.length > 0) {
+        return props.songs;
+      }
+      // If not available, try to get from albumStore
+      if (albumStore.songs && albumStore.songs.length > 0) {
+        return albumStore.songs;
+      }
+      // Fallback to empty array
+      return [];
+    });
+
+    // Función para manejar la primera interacción del usuario
+    const handleFirstInteraction = () => {
+      // Solo configurar la canción si hay canciones disponibles
+      if (availableSongs.value.length > 0 && !playerStore.currentSong) {
+        playerStore.setSong(availableSongs.value[0], false);
+      }
+    };
 
     // Watch for song prop change
     watch(
       () => props.song,
       (newSong) => {
-        if (newSong) playerStore.setSong(newSong);
+        if (newSong) playerStore.setSong(newSong, playerStore.isUserInteracted);
       },
       { deep: true }
     );
@@ -72,8 +99,19 @@ export default {
     watch(
       () => props.songs,
       (newSongs) => {
-        if (!playerStore.currentSong && newSongs?.length) {
-          playerStore.setSong(newSongs[0]);
+        if (!playerStore.currentSong && newSongs?.length && playerStore.isUserInteracted) {
+          playerStore.setSong(newSongs[0], false);
+        }
+      },
+      { deep: true }
+    );
+
+    // Watch for album songs change
+    watch(
+      () => albumStore.songs,
+      (newSongs) => {
+        if (!playerStore.currentSong && newSongs?.length && playerStore.isUserInteracted) {
+          playerStore.setSong(newSongs[0], false);
         }
       },
       { deep: true }
@@ -81,10 +119,12 @@ export default {
 
     // If a song is provided as a prop, set it
     onMounted(() => {
-      if (props.song) {
-        playerStore.setSong(props.song);
-      } else if (props.songs?.length && !playerStore.currentSong) {
-        playerStore.setSong(props.songs[0]);
+      if (props.song && playerStore.isUserInteracted) {
+        playerStore.setSong(props.song, false);
+      } else if (props.songs?.length && !playerStore.currentSong && playerStore.isUserInteracted) {
+        playerStore.setSong(props.songs[0], false);
+      } else if (albumStore.songs?.length && !playerStore.currentSong && playerStore.isUserInteracted) {
+        playerStore.setSong(albumStore.songs[0], false);
       }
     });
 
@@ -95,16 +135,16 @@ export default {
 
     // Change the song (next/previous)
     const previousSong = () => {
-      playerStore.previousSong(props.songs);
+      playerStore.previousSong(availableSongs.value);
     };
 
     const nextSong = () => {
-      playerStore.nextSong(props.songs);
+      playerStore.nextSong(availableSongs.value);
     };
 
     // Play a random song
     const randomSong = () => {
-      playerStore.randomSong(props.songs);
+      playerStore.randomSong(availableSongs.value);
     };
 
     // Seek to a specific time in the song
@@ -115,12 +155,15 @@ export default {
 
     return {
       playerStore,
+      albumStore,
       togglePlay,
       previousSong,
       nextSong,
       randomSong,
       seek,
-      isMinimized
+      isMinimized,
+      availableSongs,
+      handleFirstInteraction
     };
   },
 };
@@ -141,6 +184,24 @@ export default {
   z-index: 1000;
   transition: all 0.3s ease;
   max-height: 70px; 
+}
+
+.music-player-placeholder {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #181818;
+  color: white;
+  padding: 15px;
+  text-align: center;
+  cursor: pointer;
+  z-index: 1000;
+  transition: all 0.3s ease;
+}
+
+.music-player-placeholder:hover {
+  background: #2a2a2a;
 }
 
 .music-player.minimized {

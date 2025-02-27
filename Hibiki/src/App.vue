@@ -3,64 +3,80 @@ import { ref, onMounted, computed, watchEffect } from 'vue';
 import { RouterView, useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 import { usePlayerStore, type Song } from '@/stores/player';
+import { useCancionesStore } from '@/stores/cancionesStore'; 
 import MusicPlayer from '@/components/MusicPlayer.vue'; 
 
 const searchQuery = ref('');
 const authStore = useAuthStore();
 const playerStore = usePlayerStore();
+const cancionesStore = useCancionesStore(); 
 const router = useRouter();
-const allSongs = ref<Song[]>([]);
 
-//  Comprobar si el usuario está autenticado
+
 const isAuthenticated = computed(() => authStore.isAuthenticated);
+
 
 const search = () => {
   console.log('Buscando:', searchQuery.value);
 };
 
-//  Función para cerrar sesión
+
 const logout = () => {
   authStore.logout();
   router.push('/login');
 };
 
-// Cargar canciones desde la API o una fuente de datos
-const loadSongs = async () => {
-  try {
 
-    allSongs.value = [
-      {
-        nombre: 'Canción de ejemplo 1',
-        artista: 'Artista 1',
-        ruta: '/music/cancion1.mp3',
-        image: '/images/cover1.jpg'
-      },
-      {
-        nombre: 'Canción de ejemplo 2',
-        artista: 'Artista 2',
-        ruta: '/music/cancion2.mp3',
-        image: '/images/cover2.jpg'
-      },
-      {
-        nombre: 'Canción de ejemplo 3',
-        artista: 'Artista 3',
-        ruta: '/music/cancion3.mp3',
-        image: '/images/cover3.jpg'
-      }
-    ];
-  } catch (error) {
-    console.error('Error al cargar canciones:', error);
+const allSongs = computed(() => {
+  
+  if (cancionesStore.canciones && cancionesStore.canciones.length > 0) {
+    
+    return cancionesStore.canciones.map(song => ({
+      ...song,
+      nombre: song.nombre || song.title || 'Unknown',
+      artista: song.artista || song.artist || 'Unknown Artist',
+      ruta: song.ruta || song.path || `/music/${song.cancionId}.mp3`,
+      image: song.image || song.coverImage || '/images/default-cover.jpg'
+    }));
   }
-};
-
-onMounted(() => {
-  authStore.loadUserFromStorage(); // Cargar usuario de localStorage
-  loadSongs(); // Cargar las canciones
+  
+  
+  return [
+    {
+      nombre: 'Canción de ejemplo 1',
+      artista: 'Artista 1',
+      ruta: '/music/cancion1.mp3',
+      image: '/images/cover1.jpg'
+    },
+    {
+      nombre: 'Canción de ejemplo 2',
+      artista: 'Artista 2',
+      ruta: '/music/cancion2.mp3',
+      image: '/images/cover2.jpg'
+    },
+    {
+      nombre: 'Canción de ejemplo 3',
+      artista: 'Artista 3',
+      ruta: '/music/cancion3.mp3',
+      image: '/images/cover3.jpg'
+    }
+  ];
 });
 
-// Adaptación para evitar que el reproductor cubra el contenido
+onMounted(async () => {
+  authStore.loadUserFromStorage(); 
+  
+
+  await cancionesStore.fetchCanciones();
+  
+  
+  console.log('Canciones cargadas:', cancionesStore.canciones);
+});
+
+
 watchEffect(() => {
   if (playerStore.currentSong) {
+  
   } else {
     document.body.style.paddingBottom = '0';
   }
@@ -100,7 +116,7 @@ watchEffect(() => {
       </main>
     </div>
     
-    <!-- Reproductor de música fuera del contenido principal para que persista entre rutas -->
+    <!-- Pass the computed allSongs property to the MusicPlayer -->
     <MusicPlayer :songs="allSongs" />
   </div>
 </template>
@@ -155,8 +171,6 @@ watchEffect(() => {
   background-color: #444;
   border-radius: 8px;
 }
-
-
 
 .content {
   flex: 1;
