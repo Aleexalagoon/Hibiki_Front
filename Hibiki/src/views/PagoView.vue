@@ -1,3 +1,43 @@
+<script setup>
+import { useAuthStore } from '@/stores/auth';
+import { useRouter } from 'vue-router';
+
+const authStore = useAuthStore();
+const router = useRouter();
+
+const handlePayment = async () => {
+  try {
+    // Lógica de pago aquí
+    // Si el pago es exitoso:
+    
+    // Actualizamos el estado de usuario a premium
+    authStore.setUser({
+      ...authStore.user,
+      isPremium: true,
+    });
+
+    // Navegamos a la página premium
+    router.push('/premium');
+    
+    // Alerta de éxito
+    Swal.fire({
+      title: "¡Pago exitoso!",
+      text: "Ahora eres un usuario Premium.",
+      icon: "success",
+      confirmButtonColor: "#4a90e2",
+    });
+  } catch (error) {
+    // Si el pago falla
+    Swal.fire({
+      title: "Error",
+      text: "Hubo un error al procesar tu pago. Intenta nuevamente.",
+      icon: "error",
+      confirmButtonColor: "#ff4b4b",
+    });
+  }
+};
+</script>
+
 <template>
   <div class="payment-form">
     <div class="header">
@@ -87,9 +127,8 @@
       </div>
     </div>
     
-    <div class="payment-button-section">
-      <a href="/novedades" class="payment-button">Pagar ahora</a>
-    </div>
+    div class="payment-button-section">
+    <a href="/novedades" class="payment-button" @click="handlePayment">Pagar ahora</a>
   </div>
 </template>
 

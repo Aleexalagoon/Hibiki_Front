@@ -3,8 +3,9 @@ import Swal from 'sweetalert2';
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
-    user: JSON.parse(localStorage.getItem('user')) || null,
+    user: JSON.parse(localStorage.getItem('user') || 'null'),
     isAuthenticated: !!localStorage.getItem('user'),
+    isPremium: JSON.parse(localStorage.getItem('user') || '{}')?.isPremium || false,
     error: null as unknown,
   }),
 
@@ -15,26 +16,21 @@ export const useAuthStore = defineStore('auth', {
 
         const response = await fetch('https://localhost:7295/api/Usuario', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             name: username,
             email: userEmail,
             password: password,
-            isPremium: false,
+            isPremium: false, 
             fecha_Registro: new Date().toISOString(),
           }),
         });
 
-        if (!response.ok) {
-          throw new Error('Error al registrar el usuario');
-        }
+        if (!response.ok) throw new Error('Error al registrar el usuario');
 
         const data = await response.json();
-        this.setUser(data); // Guardar usuario en estado y localStorage
+        this.setUser(data);
 
-        // ✅ ALERTA DE ÉXITO AL REGISTRAR ✅
         Swal.fire({
           title: "¡Registro exitoso!",
           text: `Bienvenido, ${data.name}!`,
@@ -45,15 +41,12 @@ export const useAuthStore = defineStore('auth', {
         return data;
       } catch (error) {
         this.error = error;
-
-        // 🚨 ALERTA DE ERROR AL REGISTRAR 🚨
         Swal.fire({
           icon: "error",
           title: "Error en el registro",
           text: "No se pudo registrar el usuario. Inténtalo de nuevo.",
           confirmButtonColor: "#ff4b4b",
         });
-
         throw error;
       }
     },
@@ -63,17 +56,14 @@ export const useAuthStore = defineStore('auth', {
         const url = `https://localhost:7295/api/Usuario/login?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`;
         const response = await fetch(url, { method: 'GET' });
 
-        if (!response.ok) {
-          throw new Error('Credenciales inválidas');
-        }
+        if (!response.ok) throw new Error('Credenciales inválidas');
 
         const data = await response.json();
-        this.setUser(data); // Guardar usuario en estado y localStorage
+        this.setUser(data);
 
-        // ✅ ALERTA DE ÉXITO AL INICIAR SESIÓN ✅
         Swal.fire({
           title: "¡Inicio de sesión exitoso!",
-          text: `Hola, ${data.name}! Has iniciado sesión correctamente.`,
+          text: `Hola, ${data.name}!`,
           icon: "success",
           confirmButtonColor: "#4a90e2",
         });
@@ -81,15 +71,12 @@ export const useAuthStore = defineStore('auth', {
         return data;
       } catch (error) {
         this.error = error;
-
-        // 🚨 ALERTA DE ERROR AL INICIAR SESIÓN 🚨
         Swal.fire({
           icon: "error",
           title: "Oops...",
           text: "Usuario o contraseña incorrectos.",
           confirmButtonColor: "#ff4b4b",
         });
-
         throw error;
       }
     },
@@ -97,15 +84,28 @@ export const useAuthStore = defineStore('auth', {
     setUser(user) {
       this.user = user;
       this.isAuthenticated = true;
-      localStorage.setItem('user', JSON.stringify(user)); // Guardar en localStorage
+      this.isPremium = user.isPremium || false;
+      localStorage.setItem('user', JSON.stringify(this.user));
+    },
+
+    async actualizarDatosUsuario() {
+      try {
+        const response = await fetch(`https://localhost:7295/api/Usuario/${this.user.id}`);
+        if (!response.ok) throw new Error('Error al obtener datos del usuario');
+
+        const userData = await response.json();
+        this.setUser(userData);
+      } catch (error) {
+        console.error("Error actualizando usuario:", error);
+      }
     },
 
     logout() {
       this.user = null;
       this.isAuthenticated = false;
+      this.isPremium = false;
       localStorage.removeItem('user');
 
-      // ✅ ALERTA AL CERRAR SESIÓN ✅
       Swal.fire({
         title: "¡Sesión cerrada!",
         text: "Has cerrado sesión correctamente.",
@@ -117,8 +117,10 @@ export const useAuthStore = defineStore('auth', {
     loadUserFromStorage() {
       const savedUser = localStorage.getItem('user');
       if (savedUser) {
-        this.user = JSON.parse(savedUser);
+        const user = JSON.parse(savedUser);
+        this.user = user;
         this.isAuthenticated = true;
+        this.isPremium = user.isPremium;
       }
     },
   },

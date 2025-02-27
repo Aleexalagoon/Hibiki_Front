@@ -1,18 +1,20 @@
 <script setup lang="ts">
-import { ref, onMounted, computed, watchEffect } from 'vue';
-import { RouterView, useRouter } from 'vue-router';
+import { ref, computed, watchEffect, onMounted, onUnmounted } from 'vue';
+import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
-import { usePlayerStore, type Song } from '@/stores/player';
-import { useCancionesStore } from '@/stores/cancionesStore'; 
-import MusicPlayer from '@/components/MusicPlayer.vue'; 
+import { usePlayerStore } from '@/stores/player';
+import { useCancionesStore } from '@/stores/cancionesStore';
+import MusicPlayer from '@/components/MusicPlayer.vue';
+import Swal from 'sweetalert2';
 
 const searchQuery = ref('');
 const authStore = useAuthStore();
 const playerStore = usePlayerStore();
-const cancionesStore = useCancionesStore(); 
+const cancionesStore = useCancionesStore();
 const router = useRouter();
 
 const isAuthenticated = computed(() => authStore.isAuthenticated);
+const isPremium = computed(() => authStore.isPremium); 
 
 const search = () => {
   console.log('Buscando:', searchQuery.value);
@@ -23,51 +25,44 @@ const logout = () => {
   router.push('/login');
 };
 
-const allSongs = computed(() => {
-  if (cancionesStore.canciones && cancionesStore.canciones.length > 0) {
-    
-    return cancionesStore.canciones.map(song => ({
-      ...song,
-      nombre: song.nombre || song.title || 'Unknown',
-      artista: song.artista || song.artist || (song.cantante?.nombre) || 'Unknown Artist',
-      ruta: song.ruta || song.path || `/music/${song.cancionId}.mp3`,
-      image: song.image || song.coverImage || '/images/default-cover.jpg'
-    }));
-  }
-  
-  return [
-    {
-      nombre: 'Canción de ejemplo 1',
-      artista: 'Artista 1',
-      ruta: '/music/cancion1.mp3',
-      image: '/images/cover1.jpg'
-    },
-    {
-      nombre: 'Canción de ejemplo 2',
-      artista: 'Artista 2',
-      ruta: '/music/cancion2.mp3',
-      image: '/images/cover2.jpg'
-    },
-    {
-      nombre: 'Canción de ejemplo 3',
-      artista: 'Artista 3',
-      ruta: '/music/cancion3.mp3',
-      image: '/images/cover3.jpg'
-    }
-  ];
-});
+const allSongs = computed(() => cancionesStore.canciones || []);
+
+let adInterval: any = null;
 
 onMounted(async () => {
-  authStore.loadUserFromStorage(); 
+  authStore.loadUserFromStorage();
   await cancionesStore.fetchCanciones();
-  console.log('Canciones cargadas:', cancionesStore.canciones);
+
+  if (!isPremium.value) {
+    adInterval = setInterval(() => {
+      Swal.fire({
+        title: "🎵 ¡Hazte Premium!",
+        text: "Disfruta de música sin anuncios y accede a contenido exclusivo.",
+        icon: "info",
+        confirmButtonText: "Ver planes",
+        confirmButtonColor: "#ff5100",
+        showCancelButton: true,
+        cancelButtonText: "Cerrar",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          router.push('/premium');
+        }
+      });
+    }, 60000);
+  }
 });
 
+// 🔥 Verifica si el usuario se volvió premium para detener anuncios
 watchEffect(() => {
-  if (playerStore.currentSong) {
-    
-  } else {
-    document.body.style.paddingBottom = '0';
+  if (authStore.isPremium && adInterval) {
+    clearInterval(adInterval);
+    console.log("🚀 Usuario es premium. Anuncios desactivados.");
+  }
+});
+
+onUnmounted(() => {
+  if (adInterval) {
+    clearInterval(adInterval);
   }
 });
 </script>
@@ -87,14 +82,12 @@ watchEffect(() => {
           <router-link to="/novedades" class="menu-item" active-class="active">Novedades</router-link>
           <router-link to="/premium" class="menu-item" active-class="active">Premium</router-link>
           
-          <!--  MOSTRAR ARTISTAS Y PLAYLIST SOLO SI EL USUARIO ESTÁ AUTENTICADO -->
           <div v-if="isAuthenticated">
             <router-link to="/artista" class="menu-item" active-class="active">Artistas</router-link>
             <router-link to="/playlist" class="menu-item" active-class="active">Playlists</router-link>
           </div>
         </nav>
         
-        <!--  MOSTRAR BOTÓN DE CERRAR SESIÓN SI EL USUARIO ESTÁ LOGUEADO -->
         <div v-if="isAuthenticated" class="auth-buttons">
           <button class="logout-button" @click="logout">Cerrar Sesión</button>
         </div>
@@ -105,31 +98,29 @@ watchEffect(() => {
       </main>
     </div>
     
-    <!-- Pass the computed allSongs property to the MusicPlayer -->
     <MusicPlayer :songs="allSongs" />
   </div>
 </template>
 
 <style scoped>
 .app-container {
-  position: relative;
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
-  overflow: hidden; 
+  min-height: 100vh;
+  overflow: hidden;
 }
 
 .app {
   display: flex;
   flex: 1;
-  height: 100%; 
-  overflow: hidden; 
+  height: 100%;
+  overflow: hidden;
 }
 
 .sidebar {
   width: 250px;
   background: linear-gradient(180deg, rgb(22, 22, 22) 0%, rgb(0, 0, 0) 100%);
-  color: #ffffff;
+  color: #fff;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -154,6 +145,7 @@ watchEffect(() => {
   text-decoration: none;
   font-size: 1rem;
   margin-bottom: 0.5rem;
+  transition: background-color 0.3s ease;
 }
 
 .menu-item:hover, .menu-item.active {
@@ -166,7 +158,6 @@ watchEffect(() => {
   background-color: #ffffff;
   overflow-y: auto;
   position: relative;
-  height: 100%; 
 }
 
 .menu-search {
@@ -176,19 +167,20 @@ watchEffect(() => {
 }
 
 .menu-search input {
-  padding: 5px;
-  margin-right: 10px;
+  flex: 1;
+  padding: 8px;
   border: 1px solid #ccc;
   border-radius: 4px;
 }
 
 .menu-search button {
-  padding: 5px 10px;
+  padding: 8px 12px;
   background-color: #ff5100;
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
 .menu-search button:hover {
@@ -209,7 +201,7 @@ watchEffect(() => {
   border-radius: 5px;
   cursor: pointer;
   width: 100%;
-  transition: background-color 0.3s;
+  transition: background-color 0.3s ease;
 }
 
 .logout-button:hover {
