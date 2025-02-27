@@ -79,10 +79,10 @@ export default {
         },
         {
           label: 'DESCUBRE NUEVOS ARTISTAS',
-          title: 'Kris Floyd',
+          title: 'Gabs',
           subtitle: 'Hibiki Music',
-          image: 'https://caracoltv.brightspotcdn.com/dims4/default/d38bcec/2147483647/strip/true/crop/1300x650+0+0/resize/800x400!/quality/75/?url=http%3A%2F%2Fcaracol-brightspot.s3.us-west-2.amazonaws.com%2F2a%2F15%2F7d66c99345058e459d8ec090638b%2Fkris-floyd.jpg',
-          description: 'El puertorriqueño es una de las promesas para este 2025'
+          image: 'https://i.scdn.co/image/ab6761670000ecd4f3386d596841d955168ba350',
+          description: 'El español es una de las promesas para este 2025'
         }
       ],
       recentSongs: [],
