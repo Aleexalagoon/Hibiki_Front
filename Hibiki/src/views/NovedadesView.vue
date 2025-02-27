@@ -21,7 +21,7 @@
       </button>
     </div>
     <div class="songs-grid">
-      <div v-for="(song, index) in recentSongs.slice(0, 8)" :key="`song-${index}`" class="song-item">
+      <div v-for="(song, index) in recentSongs.slice(0, 12)" :key="`song-${index}`" class="song-item">
         <div class="song-image-container">
           <img :src="song.image" :alt="song.nombre" class="song-image">
         </div>
@@ -39,7 +39,7 @@
       </button>
     </div>
     <div class="albums-grid">
-      <div v-for="(album, index) in newAlbums.slice(0, 6)" :key="`album-${index}`" class="album-item">
+      <div v-for="(album, index) in newAlbums.slice(0, 12)" :key="`album-${index}`" class="album-item">
         <img :src="album.image" :alt="album.nombre" class="album-image">
       </div>
     </div>
