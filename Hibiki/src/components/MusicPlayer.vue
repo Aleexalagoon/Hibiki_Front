@@ -11,11 +11,11 @@
       </div>
 
       <div class="controls">
-        <button @click="previousSong" aria-label="Canción anterior">⏪</button>
+        <button @click="previousSong" aria-label="Canción anterior">⥢</button>
         <button @click="togglePlay" :aria-label="playerStore.isPlaying ? 'Pausar' : 'Reproducir'" 
-                class="play-button">{{ playerStore.isPlaying ? '⏸️' : '▶️' }}</button>
-        <button @click="nextSong" aria-label="Siguiente canción">⏩</button>
-        <button @click="randomSong" aria-label="Reproducir aleatoriamente">🔀</button>
+                class="play-button">{{ playerStore.isPlaying ? '⥮' : '▶' }}</button>
+        <button @click="nextSong" aria-label="Siguiente canción">⥤</button>
+        <button @click="randomSong" aria-label="Reproducir aleatoriamente">⤨</button>
       </div>
 
       <div class="progress-container">
@@ -238,7 +238,7 @@ button {
 
 button:hover {
   transform: scale(1.2);
-  color: #1db954;
+  color: #ff5100;
 }
 
 .progress-bar {
@@ -257,14 +257,14 @@ button:hover {
   appearance: none;
   width: 10px;
   height: 10px;
-  background: #1db954;
+  background: #ff5100;
   border-radius: 50%;
 }
 
 .progress-bar::-moz-range-thumb {
   width: 10px;
   height: 10px;
-  background: #1db954;
+  background: #ff5100;
   border-radius: 50%;
   border: none;
 }
@@ -281,7 +281,7 @@ button:hover {
 }
 
 .minimize-button:hover {
-  color: #1db954;
+  color: #ff5100;
   transform: none !important;
 }
 </style>

@@ -186,7 +186,7 @@ export default defineComponent({
 }
 
 .artists-list::-webkit-scrollbar-thumb {
-  background: #555;
+  background: #ff5100;
   border-radius: 10px;
 }
 
