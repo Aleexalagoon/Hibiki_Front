@@ -61,10 +61,11 @@
           <!-- Mensaje si no hay canciones -->
           <p v-else>No hay canciones disponibles en este álbum.</p>
         </div>
-
-        <!-- Reproductor de música eliminado para evitar duplicidad -->
       </div>
     </div>
+    
+    <!-- Add the music player component with songs passed as prop -->
+    
   </div>
 </template>
 
@@ -73,8 +74,12 @@ import { defineComponent, computed, onMounted } from 'vue';
 import { useArtistaStore } from '@/stores/artistaStore';
 import { useAlbumStore } from '@/stores/albumStore';
 import { usePlayerStore } from '@/stores/player';
+import MusicPlayer from '@/components/MusicPlayer.vue'; // Import the component
 
 export default defineComponent({
+  components: {
+    MusicPlayer // Register the component
+  },
   setup() {
     const artistaStore = useArtistaStore();
     const albumStore = useAlbumStore();
@@ -101,6 +106,14 @@ export default defineComponent({
 
     // Seleccionar una canción (ahora usando playerStore directamente)
     const selectSong = (song) => {
+      // Ensure the song has the artist name
+      if (song && artistaStore.selectedArtist) {
+        // If the song doesn't have an artista property, add it
+        if (!song.artista) {
+          song.artista = artistaStore.selectedArtist.name;
+        }
+      }
+      
       playerStore.setSong(song);
       // Opcionalmente, actualizar también el album store para mantener la referencia
       albumStore.setSelectedSong(song);

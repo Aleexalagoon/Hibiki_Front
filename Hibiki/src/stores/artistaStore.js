@@ -56,6 +56,8 @@ export const useArtistaStore = defineStore('artistaStore', {
       } finally {
         this.loading = false;
       }
+      
     },
   },
+  
 });
