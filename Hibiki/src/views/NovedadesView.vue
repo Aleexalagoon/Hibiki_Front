@@ -16,9 +16,6 @@
     <div class="section-header">
       <h2 class="section-title">Canciones mas escuchadas en España</h2>
       <span class="section-more"></span>
-      <button @click="$router.push('/artista')" class="orange-button">
-        Ver todo
-      </button>
     </div>
     <div class="songs-grid">
       <div v-for="(song, index) in recentSongs.slice(0, 12)" :key="`song-${index}`" class="song-item">
@@ -34,9 +31,6 @@
     </div>
     <div class="section-header">
       <h2 class="section-title">Nuevos lanzamientos</h2>
-      <button @click="$router.push('/artista')" class="orange-button">
-        Ver todo
-      </button>
     </div>
     <div class="albums-grid">
       <div v-for="(album, index) in newAlbums.slice(0, 12)" :key="`album-${index}`" class="album-item">
