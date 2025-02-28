@@ -1,5 +1,16 @@
 <script>
+import { computed } from 'vue';
+import { useAuthStore } from '@/stores/auth';
+
 export default {
+  setup() {
+    const authStore = useAuthStore();
+    const isPremium = computed(() => authStore.isPremium);
+    
+    return {
+      isPremium
+    };
+  },
   methods: {
     startSubscription() {
       this.$router.push('/pago'); 
@@ -70,8 +81,10 @@ export default {
     <canvas ref="backgroundCanvas" class="background-canvas"></canvas>
     <section class="promo-section">
       <div class="promo-text">
-        <h1>Disfruta de tu contenido favorito sin límites.</h1>
-        <h2>Prueba Premium Individual durante 2 meses por 0 €.</h2>
+        <h1 v-if="!isPremium">Disfruta de tu contenido favorito sin límites.</h1>
+        <h1 v-else>¡Ya estás disfrutando de Premium!</h1>
+        <h2 v-if="!isPremium">Prueba Premium Individual durante 2 meses por 0 €.</h2>
+        <h2 v-else>Continúa disfrutando de todas las ventajas premium.</h2>
       </div>
     </section>
     <section class="comparison-section">
@@ -118,14 +131,22 @@ export default {
         </tbody>
       </table>
       <div class="plan-card">
-        <button class="plan-button" @click="startSubscription">Seleccionar</button>
+        <div v-if="!isPremium">
+          <button class="plan-button" @click="startSubscription">Seleccionar</button>
+        </div>
+        <div v-else class="premium-status">
+          <div class="premium-badge">
+            <span class="premium-icon">★</span>
+            <span>PREMIUM ACTIVO</span>
+          </div>
+          <p class="premium-message">Ya estás disfrutando de todas las ventajas premium</p>
+        </div>
       </div>
     </section>
   </div>
 </template>
   
 <style scoped>
-
 .premium-view {
   position: relative;
   display: flex;
@@ -229,5 +250,37 @@ export default {
 
 .plan-button:hover {
   background-color: #ca3900;
+}
+
+/* Nuevos estilos para usuario premium */
+.premium-status {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1.5rem;
+  border: 2px solid #ff5100;
+  border-radius: 10px;
+  background-color: rgba(255, 81, 0, 0.1);
+}
+
+.premium-badge {
+  display: flex;
+  align-items: center;
+  background-color: #ff5100;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+.premium-icon {
+  margin-right: 8px;
+  font-size: 1.2rem;
+}
+
+.premium-message {
+  font-size: 1.1rem;
+  margin: 0;
 }
 </style>
