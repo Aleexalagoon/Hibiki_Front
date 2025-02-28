@@ -24,6 +24,9 @@ export interface Playlist {
   creador: Usuario;
 }
 
+// URL base para todas las solicitudes API
+const API_BASE_URL = 'https://localhost:7295/api';
+
 export const usePlaylistStore = defineStore('playlist', {
   state: () => ({
     playlists: [] as Playlist[],
@@ -80,7 +83,7 @@ export const usePlaylistStore = defineStore('playlist', {
       this.error = null;
 
       try {
-        const response = await fetch(`/api/Playlist/${id}`);
+        const response = await fetch('https://localhost:7295/api/Playlist');
         if (!response.ok) throw new Error(`Error al obtener la playlist con ID: ${id}`);
 
         const data = await response.json();
@@ -106,7 +109,7 @@ export const usePlaylistStore = defineStore('playlist', {
       this.error = null;
 
       try {
-        const response = await fetch('/api/Playlist', {
+        const response = await fetch('https://localhost:7295/api/Playlist', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(playlist)
@@ -130,7 +133,7 @@ export const usePlaylistStore = defineStore('playlist', {
       this.error = null;
 
       try {
-        const response = await fetch(`/api/Playlist/${id}`, { method: 'DELETE' });
+        const response = await fetch('https://localhost:7295/api/Playlist', { method: 'DELETE' });
         if (!response.ok) throw new Error(`Error al eliminar la playlist ${id}`);
 
         this.playlists = this.playlists.filter(p => p.playlistId !== id);
@@ -151,7 +154,7 @@ export const usePlaylistStore = defineStore('playlist', {
       this.error = null;
 
       try {
-        const response = await fetch(`/api/Playlist/${playlistId}/canciones`, {
+        const response = await fetch(`${API_BASE_URL}/Playlist/${playlistId}/canciones`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(cancion)
@@ -180,7 +183,7 @@ export const usePlaylistStore = defineStore('playlist', {
       this.error = null;
 
       try {
-        const response = await fetch(`/api/Playlist/${playlistId}/canciones/${cancionId}`, {
+        const response = await fetch(`${API_BASE_URL}/Playlist/${playlistId}/canciones/${cancionId}`, {
           method: 'DELETE'
         });
 
@@ -209,7 +212,7 @@ export const usePlaylistStore = defineStore('playlist', {
       this.error = null;
 
       try {
-        await fetch('/api/Playlist/initialize', { method: 'POST' });
+        await fetch(`${API_BASE_URL}/Playlist/initialize`, { method: 'POST' });
         await this.fetchAllPlaylists();
       } catch (err) {
         this.error = err.message;
