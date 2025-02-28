@@ -1,11 +1,27 @@
 <script setup>
 import { useAuthStore } from '@/stores/auth';
 import { useRouter } from 'vue-router';
+import { ref } from 'vue';
 
 const authStore = useAuthStore();
 const router = useRouter();
+const formIsValid = ref(true);
+const errorMessage = ref('');
 
-const handlePayment = async () => {
+const handlePayment = async (event) => {
+  event.preventDefault();
+  
+  // Validación sencilla del formulario
+  const cardNumber = document.getElementById('cardNumber').value;
+  const expiryDate = document.getElementById('expiryDate').value;
+  const securityCode = document.getElementById('securityCode').value;
+  
+  if (!cardNumber || !expiryDate || !securityCode) {
+    formIsValid.value = false;
+    errorMessage.value = 'Por favor, completa todos los campos requeridos.';
+    return;
+  }
+  
   try {
     // Lógica de pago aquí
     // Si el pago es exitoso:
@@ -17,7 +33,7 @@ const handlePayment = async () => {
     });
 
     // Navegamos a la página premium
-    router.push('/premium');
+    router.push('/pagocompletado');
     
     // Alerta de éxito
     Swal.fire({
@@ -81,54 +97,55 @@ const handlePayment = async () => {
             <img src="https://cdn.cdnlogo.com/logos/m/33/mastercard.svg" alt="Mastercard" class="card-icon">
             <img src="https://support.apple.com/content/dam/edam/applecare/images/en_US/psp/psp_heroes/mini-hero-applepay.png" alt="Amex" class="card-icon">
           </div>
-          <div class="card-form">
+          <form @submit="handlePayment" class="card-form">
+            <div v-if="!formIsValid" class="error-message">
+              {{ errorMessage }}
+            </div>
             <div class="form-group">
-              <label for="cardNumber">Número de tarjeta</label>
-              <input type="text" id="cardNumber" placeholder="0000 0000 0000 0000" class="form-control">
+              <label for="cardNumber">Número de tarjeta *</label>
+              <input type="text" id="cardNumber" placeholder="0000 0000 0000 0000" class="form-control" required>
             </div>
             <div class="form-row">
               <div class="form-group half">
-                <label for="expiryDate">Fecha de caducidad</label>
-                <input type="text" id="expiryDate" placeholder="MM/AA" class="form-control">
+                <label for="expiryDate">Fecha de caducidad *</label>
+                <input type="text" id="expiryDate" placeholder="MM/AA" class="form-control" required>
               </div>
               <div class="form-group half">
-                <label for="securityCode">Código de seguridad</label>
+                <label for="securityCode">Código de seguridad *</label>
                 <div class="security-code-wrapper">
-                  <input type="text" id="securityCode" class="form-control">
+                  <input type="text" id="securityCode" class="form-control" required>
                   <div class="help-icon">?</div>
                 </div>
               </div>
             </div>
-          </div>
+            <div class="section summary-section">
+              <h2>Resumen</h2>
+              <div class="summary-content">
+                <div class="summary-header">Artículos</div>
+                <div class="summary-item">
+                  <div class="item-info">
+                    <div class="item-icon"></div>
+                    <span class="item-name">Premium Individual</span>
+                  </div>
+                  <span class="item-price">0,00 €</span>
+                </div>
+                
+                <div class="summary-details">
+                  <p>• Hoy: 1 mes por 0,00 €</p>
+                  <p>• A partir del 10 abr 2025: 10,99 €/mes</p>
+                </div>
+                
+                <div class="summary-total">
+                  <span>Total ahora</span>
+                  <span class="total-price">0,00 €</span>
+                </div>
+              </div>
+            </div>
+            <button type="submit" class="payment-button">Pagar ahora</button>
+          </form>
         </div>
       </div>
     </div>
-    <div class="section summary-section">
-      <h2>Resumen</h2>
-      <div class="summary-content">
-        <div class="summary-header">Artículos</div>
-        <div class="summary-item">
-          <div class="item-info">
-            <div class="item-icon"></div>
-            <span class="item-name">Premium Individual</span>
-          </div>
-          <span class="item-price">0,00 €</span>
-        </div>
-        
-        <div class="summary-details">
-          <p>• Hoy: 1 mes por 0,00 €</p>
-          <p>• A partir del 10 abr 2025: 10,99 €/mes</p>
-        </div>
-        
-        <div class="summary-total">
-          <span>Total ahora</span>
-          <span class="total-price">0,00 €</span>
-        </div>
-      </div>
-    </div>
-    
-    div class="payment-button-section">
-    <a href="/novedades" class="payment-button" @click="handlePayment">Pagar ahora</a>
   </div>
 </template>
 
@@ -336,6 +353,10 @@ label {
   color: #666;
 }
 
+.form-control:invalid {
+  border-color: #ff5500;
+}
+
 .security-code-wrapper {
   position: relative;
 }
@@ -448,7 +469,7 @@ label {
 
 .payment-button {
   display: block;
-  width: 10%;
+  width: 100%;
   padding: 1rem;
   background-color: #ff5500;
   color: white;
@@ -457,5 +478,16 @@ label {
   border-radius: 5px;
   font-weight: bold;
   cursor: pointer;
+  border: none;
+  margin-top: 1.5rem;
+}
+
+.error-message {
+  color: #ff5500;
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  background-color: rgba(255, 85, 0, 0.1);
+  border-radius: 0.25rem;
+  border-left: 3px solid #ff5500;
 }
 </style>

@@ -13,6 +13,7 @@ import PlaylistView from "@/views/PlaylistView.vue";
 import ArtistaView from "@/views/ArtistaView.vue";
 import CancionesView from "@/views/CancionesView.vue";
 import PagoView from "@/views/PagoView.vue";
+import PagoCompletadoView from "@/views/PagoCompletadoView.vue";
 
 
 const router = createRouter({
@@ -98,8 +99,13 @@ const router = createRouter({
       path: "/pago",
       name: "pago",
       component: PagoView,
-    }
+    },
 
+    {
+      path: "/pagocompletado",
+      name: "pagocompletado",
+      component: PagoCompletadoView,
+    }
   ],
 });
 
