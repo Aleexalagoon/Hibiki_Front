@@ -36,7 +36,7 @@ onMounted(async () => {
   if (!isPremium.value) {
     adInterval = setInterval(() => {
       Swal.fire({
-        title: "🎵 ¡Hazte Premium!",
+        title: "Hazte Premium!",
         text: "Disfruta de música sin anuncios y accede a contenido exclusivo.",
         icon: "info",
         confirmButtonText: "Ver planes",
