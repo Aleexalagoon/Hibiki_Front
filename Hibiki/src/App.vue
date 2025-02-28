@@ -80,11 +80,11 @@ onUnmounted(() => {
           
           <router-link to="/inicio" class="menu-item" active-class="active">Inicio</router-link>
           <router-link to="/novedades" class="menu-item" active-class="active">Novedades</router-link>
-          <router-link to="/premium" class="menu-item" active-class="active">Premium</router-link>
           
           <div v-if="isAuthenticated">
             <router-link to="/artista" class="menu-item" active-class="active">Artistas</router-link>
             <router-link to="/playlist" class="menu-item" active-class="active">Playlists</router-link>
+            <router-link to="/premium" class="menu-item" active-class="active">Premium</router-link>
           </div>
         </nav>
         
