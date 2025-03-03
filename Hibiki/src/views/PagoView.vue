@@ -23,15 +23,21 @@ const handlePayment = async (event) => {
   }
   
   try {
-    // Lógica de pago aquí
-    // Si el pago es exitoso:
-    
+    const updateResponse = await fetch(`https://localhost:7295/api/Usuario/${authStore.user.id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        ...authStore.user,
+        isPremium: true
+      })
+    });
     // Actualizamos el estado de usuario a premium
     authStore.setUser({
       ...authStore.user,
       isPremium: true,
     });
-
     // Navegamos a la página premium
     router.push('/pagocompletado');
     
