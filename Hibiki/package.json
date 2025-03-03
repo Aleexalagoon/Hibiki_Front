@@ -13,11 +13,6 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
-<<<<<<< HEAD
-    "lucide-vue-next": "^0.476.0",
-=======
-    "axios": "^1.8.1",
->>>>>>> e3173b503376bd3df1ecfe98e93be4bb36302d4b
     "pinia": "^2.3.1",
     "sweetalert2": "^11.17.2",
     "vue": "^3.5.13",
@@ -35,12 +30,7 @@
     "jiti": "^2.4.2",
     "npm-run-all2": "^7.0.2",
     "prettier": "^3.4.2",
-<<<<<<< HEAD
     "sass-embedded": "^1.85.1",
-=======
-    "sass": "^1.85.1",
-    "sass-loader": "^16.0.5",
->>>>>>> e3173b503376bd3df1ecfe98e93be4bb36302d4b
     "typescript": "~5.7.3",
     "vite": "^6.0.11",
     "vite-plugin-vue-devtools": "^7.7.0",
