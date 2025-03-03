@@ -83,6 +83,76 @@
   transition: fill 0.5s ease-in-out;
 }
 
+@media screen and (max-width: 768px) {
+  .container {
+    padding: 2rem 1rem;
+  }
+
+  .title {
+    font-size: 2rem;
+  }
+
+  .subtitle {
+    font-size: 3rem;
+    margin-top: 1rem;
+  }
+
+  .icon {
+    margin-top: -2rem;
+  }
+
+  .icon svg {
+    width: 180px;
+    height: 180px;
+  }
+
+  .description {
+    font-size: 1rem;
+    padding: 0 1rem;
+  }
+}
+
+/* For extra small devices */
+@media screen and (max-width: 480px) {
+  .container {
+    padding: 1.5rem 0.75rem;
+  }
+
+  .title {
+    font-size: 1.75rem;
+  }
+
+  .subtitle {
+    font-size: 2.25rem;
+    line-height: 1.2;
+  }
+
+  .icon {
+    margin-top: -1rem;
+  }
+
+  .icon svg {
+    width: 150px;
+    height: 150px;
+  }
+
+  .description {
+    font-size: 0.9rem;
+    padding: 0 0.75rem;
+    margin-top: 0.5rem;
+  }
+
+  .button {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.9rem;
+    margin-top: 1rem;
+  }
+  
+  /* Adjust animation for better mobile experience */
+  .logo-group:hover {
+    transform: scale(1.2) rotate(5deg);
+  }
+}
 
 
 </style>

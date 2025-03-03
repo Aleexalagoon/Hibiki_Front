@@ -275,4 +275,217 @@ export default defineComponent({
 .song-duration {
   opacity: 0.8;
 }
+
+/* Add these media queries to your existing CSS */
+@media screen and (max-width: 992px) {
+  .main-container {
+    flex-direction: column;
+  }
+  
+  .artists-list {
+    width: 100%;
+    max-height: 250px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    display: flex;
+    flex-direction: row;
+    padding: 15px;
+    gap: 12px;
+  }
+  
+  .artist-card {
+    flex-direction: column;
+    min-width: 120px;
+    margin-right: 0;
+    text-align: center;
+    transition: transform 0.2s;
+  }
+  
+  .artist-card:hover {
+    transform: scale(1.05);
+  }
+  
+  .artist-image {
+    margin-right: 0;
+    margin-bottom: 8px;
+    width: 70px;
+    height: 70px;
+  }
+  
+  .artist-card h3 {
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100px;
+  }
+  
+  .details-container {
+    width: 100%;
+    padding: 20px 15px;
+  }
+  
+  /* Improved Albums Display */
+  .albums {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    gap: 20px;
+    margin-top: 15px;
+  }
+  
+  .album-card {
+    transition: transform 0.2s;
+    margin-bottom: 10px;
+  }
+  
+  .album-card:hover {
+    transform: scale(1.05);
+  }
+  
+  .album-cover {
+    width: 100%;
+    aspect-ratio: 1/1;
+    object-fit: cover;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  }
+  
+  .album-card p {
+    margin-top: 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+/* For small mobile devices */
+@media screen and (max-width: 576px) {
+  .artists-list {
+    max-height: 200px;
+    padding: 10px;
+  }
+  
+  .artist-card {
+    min-width: 100px;
+    padding: 10px;
+  }
+  
+  .artist-image {
+    width: 60px;
+    height: 60px;
+  }
+  
+  /* Improved Song List for Mobile */
+  .song-card {
+    margin-bottom: 8px;
+    padding: 12px 10px;
+    border-radius: 8px;
+    background-color: rgba(255, 255, 255, 0.05);
+    transition: background-color 0.2s;
+  }
+  
+  .song-card:hover {
+    background-color: rgba(255, 81, 0, 0.2);
+  }
+  
+  .song-info-container {
+    max-width: 75%;
+  }
+  
+  .song-image {
+    width: 45px;
+    height: 45px;
+    margin-left: 0;
+    margin-right: 12px;
+  }
+  
+  .song-info {
+    max-width: calc(100% - 55px);
+  }
+  
+  .song-title {
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .song-artist {
+    font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .song-duration {
+    font-size: 12px;
+  }
+  
+  /* Album grid for very small screens */
+  .albums {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 15px;
+  }
+  
+  /* Better headings for mobile */
+  .details-container h1 {
+    font-size: 24px;
+    margin-bottom: 5px;
+  }
+  
+  .details-container h2 {
+    font-size: 20px;
+    margin: 25px 0 15px 0;
+    position: relative;
+  }
+  
+  .details-container h2::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 0;
+    width: 50px;
+    height: 3px;
+    background-color: #ff5100;
+    border-radius: 3px;
+  }
+  
+  /* Better list styling for songs */
+  ul {
+    padding: 0;
+    list-style-type: none;
+  }
+}
+
+/* Fix scrollbar appearance for horizontal scroll */
+.artists-list::-webkit-scrollbar {
+  height: 6px;
+  width: 6px;
+}
+
+.artists-list::-webkit-scrollbar-thumb {
+  background: #ff5100;
+  border-radius: 10px;
+}
+
+.artists-list::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+
+/* Extra small devices */
+@media screen and (max-width: 400px) {
+  .albums {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .song-image {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .artist-card {
+    min-width: 85px;
+  }
+}
 </style>
