@@ -15,6 +15,23 @@
                 class="play-button">{{ playerStore.isPlaying ? '⥮' : '▶' }}</button>
         <button @click="nextSong" aria-label="Siguiente canción">⥤</button>
         <button @click="randomSong" aria-label="Reproducir aleatoriamente">⤨</button>
+
+        <!-- Control de volumen con iconos -->
+        <div class="volume-container">
+          <button @click="toggleMute" class="volume-icon" aria-label="Silenciar">
+            {{ volumeIcon }}
+          </button>
+          <input
+            type="range"
+            min="0"
+            max="1"
+            step="0.01"
+            :value="playerStore.volume"
+            @input="changeVolume"
+            class="volume-control"
+            aria-label="Volumen"
+          />
+        </div>
       </div>
 
       <div class="progress-container">
@@ -62,24 +79,29 @@ export default {
     const playerStore = usePlayerStore();
     const albumStore = useAlbumStore();
     const isMinimized = ref(false);
+    const prevVolume = ref(1); // Para recordar el volumen antes de silenciar
+
+    // Computed property para el icono de volumen
+    const volumeIcon = computed(() => {
+      if (playerStore.volume === 0) return "🔇"; // Silenciado
+      if (playerStore.volume < 0.3) return "🔈"; // Volumen bajo
+      if (playerStore.volume < 0.7) return "🔉"; // Volumen medio
+      return "🔊"; // Volumen alto
+    });
 
     // Computed property to get songs from both props and albumStore
     const availableSongs = computed(() => {
-      // First try to use songs from props
       if (props.songs && props.songs.length > 0) {
         return props.songs;
       }
-      // If not available, try to get from albumStore
       if (albumStore.songs && albumStore.songs.length > 0) {
         return albumStore.songs;
       }
-      // Fallback to empty array
       return [];
     });
 
     // Función para manejar la primera interacción del usuario
     const handleFirstInteraction = () => {
-      // Solo configurar la canción si hay canciones disponibles
       if (availableSongs.value.length > 0 && !playerStore.currentSong) {
         playerStore.setSong(availableSongs.value[0], false);
       }
@@ -127,6 +149,24 @@ export default {
       }
     });
 
+    // Función para actualizar el volumen del reproductor
+    const changeVolume = (event) => {
+      const newVolume = parseFloat(event.target.value);
+      playerStore.changeVolume(newVolume);
+    };
+
+    // Función para silenciar/desilenciar
+    const toggleMute = () => {
+      if (playerStore.volume > 0) {
+        // Guardar el volumen actual antes de silenciar
+        prevVolume.value = playerStore.volume;
+        playerStore.changeVolume(0);
+      } else {
+        // Restaurar el volumen anterior
+        playerStore.changeVolume(prevVolume.value);
+      }
+    };
+
     // Toggle play/pause
     const togglePlay = () => {
       playerStore.togglePlay();
@@ -162,7 +202,10 @@ export default {
       seek,
       isMinimized,
       availableSongs,
-      handleFirstInteraction
+      handleFirstInteraction,
+      changeVolume,
+      toggleMute,
+      volumeIcon
     };
   },
 };
@@ -261,6 +304,46 @@ export default {
   gap: 15px;
   justify-content: center;
   flex: 1;
+  align-items: center;
+}
+
+.volume-container {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.volume-icon {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.volume-control {
+  width: 80px;
+  height: 4px;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  background: #4d4d4d;
+  border-radius: 3px;
+  outline: none;
+}
+
+.volume-control::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 10px;
+  height: 10px;
+  background: #ff5100;
+  border-radius: 50%;
+}
+
+.volume-control::-moz-range-thumb {
+  width: 10px;
+  height: 10px;
+  background: #ff5100;
+  border-radius: 50%;
+  border: none;
 }
 
 .progress-container {
@@ -337,5 +420,10 @@ button:hover {
 .minimize-button:hover {
   color: #ff5100;
   transform: none !important;
+}
+
+
+.minimized .volume-container {
+  display: flex;
 }
 </style>

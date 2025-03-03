@@ -20,6 +20,7 @@ export const usePlayerStore = defineStore('player', () => {
   const audioPlayer = ref<HTMLAudioElement>(new Audio());
   const currentPlaylist = ref<Song[]>([]);
   const isUserInteracted = ref<boolean>(false);
+  const volume = ref<number>(1); // Añadimos el estado para el volumen
 
   // Inicializar eventos del reproductor
   const initializeAudioEvents = () => {
@@ -46,6 +47,9 @@ export const usePlayerStore = defineStore('player', () => {
     document.addEventListener('click', () => {
       isUserInteracted.value = true;
     });
+    
+    // Establecer el volumen inicial
+    audioPlayer.value.volume = volume.value;
   };
   
   // Inicializar eventos al crear el store
@@ -201,6 +205,23 @@ export const usePlayerStore = defineStore('player', () => {
     }
   };
   
+  // Función para cambiar el volumen
+  const changeVolume = (newVolume: number) => {
+    // Marcar que el usuario ha interactuado
+    isUserInteracted.value = true;
+    
+    // Asegurar que el volumen esté entre 0 y 1
+    const volumeValue = Math.max(0, Math.min(1, newVolume));
+    
+    // Actualizar el volumen del reproductor
+    if (audioPlayer.value) {
+      audioPlayer.value.volume = volumeValue;
+    }
+    
+    // Actualizar el estado
+    volume.value = volumeValue;
+  };
+  
   const formatDuration = (seconds: number) => {
     if (isNaN(seconds) || seconds < 0) return "0:00";
     const minutes = Math.floor(seconds / 60);
@@ -216,6 +237,8 @@ export const usePlayerStore = defineStore('player', () => {
     duration,
     currentPlaylist,
     isUserInteracted,
+    volume,
+    audioPlayer,
     
     // Getters
     getArtistaDisplay,
@@ -227,6 +250,7 @@ export const usePlayerStore = defineStore('player', () => {
     nextSong,
     randomSong,
     seek,
+    changeVolume,
     formatDuration,
     normalizeSong
   };
