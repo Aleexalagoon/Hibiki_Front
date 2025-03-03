@@ -1,404 +1,43 @@
-<script setup>
-
-import { ref, computed, onMounted, onUnmounted } from 'vue';
-import { useAuthStore } from '@/stores/auth';
-
-const authStore = useAuthStore();
-const menuOpen = ref(false);
-
-// Cargar el usuario cuando se monta el componente
-onMounted(() => {
-  authStore.loadUserFromStorage();
-});
-
-// Función para obtener la inicial del usuario
-const getInitial = (name) => {
-  return name ? name.charAt(0).toUpperCase() : '?';
-};
-
-// Alternar menú de usuario
-const toggleMenu = () => {
-  menuOpen.value = !menuOpen.value;
-};
-
-// Cerrar sesión
-const logout = () => {
-  authStore.logout();
-  menuOpen.value = false;
-};
-
-const sliderContent = [
-  {
-    titulo: "Hurry Up Tomorrow",
-    subtitulo: "The Weeknd",
-    imagen:
-      "https://www.sentireascoltare.com/wp-content/uploads/2025/02/weeknd-hurry-up-tomorrow.jpg",
-  },
-  {
-    titulo: "Benidorm Fest 2025",
-    subtitulo: "Apple Music",
-    imagen:
-      "https://is1-ssl.mzstatic.com/image/thumb/Features221/v4/21/4a/c3/214ac3df-2e73-9b6e-3603-5a92c9361ad5/source/1200x300bb.webp",
-  },
-  {
-    titulo: "MORA AMA AL CHIQUI",
-    subtitulo: "Mora",
-    imagen:
-      "https://frasesencanciones.com/wp-content/uploads/2023/11/mora-cantante-768x513.jpg",
-  },
-];
-
-
-const cancionesRecientes = [
-  {
-    titulo: "Cry For Me",
-    artista: "The Weeknd",
-    imagen:
-      "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/3d/0d/06/3d0d06e6-cfd4-8f69-4a42-52b7cf33fb24/25UMGIM09490.rgb.jpg/88x88bb.jpg",
-  },
-  {
-    titulo: "M.A.P.S.",
-    artista: "Amaia",
-    imagen:
-      "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/c5/d3/82/c5d38265-9bd7-88aa-3bb3-9500eceed9d6/24UM1IM01951.rgb.jpg/88x88bb.jpg",
-  },
-  {
-    titulo: "KAIMAN",
-    artista: "Rigoberta Bandini",
-    imagen:
-      "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/79/10/e8/7910e8d8-caa9-9d20-9e30-f8e363af03e7/199066494011.jpg/88x88bb.jpg",
-  },
-  {
-    titulo: "FABERGÉ",
-    artista: "Recycled J · HOKE · Ébano",
-    imagen:
-      "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/ab/54/6a/ab546a81-a18c-2d3d-087f-b2e8d7630554/5021732620965.jpg/88x88bb.jpg",
-  },
-  {
-    titulo: "Cry For Me",
-    artista: "The Weeknd",
-    imagen:
-      "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/3d/0d/06/3d0d06e6-cfd4-8f69-4a42-52b7cf33fb24/25UMGIM09490.rgb.jpg/88x88bb.jpg",
-  },
-  {
-    titulo: "M.A.P.S.",
-    artista: "Amaia",
-    imagen:
-      "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/c5/d3/82/c5d38265-9bd7-88aa-3bb3-9500eceed9d6/24UM1IM01951.rgb.jpg/88x88bb.jpg",
-  },
-  {
-    titulo: "KAIMAN",
-    artista: "Rigoberta Bandini",
-    imagen:
-      "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/79/10/e8/7910e8d8-caa9-9d20-9e30-f8e363af03e7/199066494011.jpg/88x88bb.jpg",
-  },
-  {
-    titulo: "FABERGÉ",
-    artista: "Recycled J · HOKE · Ébano",
-    imagen:
-      "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/ab/54/6a/ab546a81-a18c-2d3d-087f-b2e8d7630554/5021732620965.jpg/88x88bb.jpg",
-  },
-];
-
-const nuevosLanzamientos = [
-  {
-    titulo: "Hurry Up Tomorrow",
-    artista: "The Weeknd",
-    imagen:
-      "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/3d/0d/06/3d0d06e6-cfd4-8f69-4a42-52b7cf33fb24/25UMGIM09490.rgb.jpg/316x316bb.webp",
-  },
-  {
-    titulo: "Si Abro Los Ojos",
-    artista: "Amaia",
-    imagen:
-      "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/c5/d3/82/c5d38265-9bd7-88aa-3bb3-9500eceed9d6/24UM1IM01951.rgb.jpg/316x316bb.webp",
-  },
-  {
-    titulo: "Al romper la burbuja",
-    artista: "Joaquina",
-    imagen:
-      "https://is1-ssl.mzstatic.com/image/thumb/Video221/v4/3b/19/cf/3b19cf3e-b9a5-1c55-47ec-74f6bbfe92b2/Jobaddabaee-3bcc-4d7d-a531-e6ff80ec4b06-184757849-PreviewImage_Preview_Image_Intermediate_nonvideo_sdr_361394388_2036964865-Time1738151215966.png/316x316bb.webp",
-  },
-  {
-    titulo: "Al romper la burbuja",
-    artista: "Joaquina",
-    imagen:
-      "https://is1-ssl.mzstatic.com/image/thumb/Video221/v4/3b/19/cf/3b19cf3e-b9a5-1c55-47ec-74f6bbfe92b2/Jobaddabaee-3bcc-4d7d-a531-e6ff80ec4b06-184757849-PreviewImage_Preview_Image_Intermediate_nonvideo_sdr_361394388_2036964865-Time1738151215966.png/316x316bb.webp",
-  },
-  {
-    titulo: "Hurry Up Tomorrow",
-    artista: "The Weeknd",
-    imagen:
-      "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/3d/0d/06/3d0d06e6-cfd4-8f69-4a42-52b7cf33fb24/25UMGIM09490.rgb.jpg/316x316bb.webp",
-  },
-  {
-    titulo: "Si Abro Los Ojos",
-    artista: "Amaia",
-    imagen:
-      "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/c5/d3/82/c5d38265-9bd7-88aa-3bb3-9500eceed9d6/24UM1IM01951.rgb.jpg/316x316bb.webp",
-  },
-  {
-    titulo: "Al romper la burbuja",
-    artista: "Joaquina",
-    imagen:
-      "https://is1-ssl.mzstatic.com/image/thumb/Video221/v4/3b/19/cf/3b19cf3e-b9a5-1c55-47ec-74f6bbfe92b2/Jobaddabaee-3bcc-4d7d-a531-e6ff80ec4b06-184757849-PreviewImage_Preview_Image_Intermediate_nonvideo_sdr_361394388_2036964865-Time1738151215966.png/316x316bb.webp",
-  },
-  {
-    titulo: "Al romper la burbuja",
-    artista: "Joaquina",
-    imagen:
-      "https://is1-ssl.mzstatic.com/image/thumb/Video221/v4/3b/19/cf/3b19cf3e-b9a5-1c55-47ec-74f6bbfe92b2/Jobaddabaee-3bcc-4d7d-a531-e6ff80ec4b06-184757849-PreviewImage_Preview_Image_Intermediate_nonvideo_sdr_361394388_2036964865-Time1738151215966.png/316x316bb.webp",
-  },
-  {
-    titulo: "Hurry Up Tomorrow",
-    artista: "The Weeknd",
-    imagen:
-      "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/3d/0d/06/3d0d06e6-cfd4-8f69-4a42-52b7cf33fb24/25UMGIM09490.rgb.jpg/316x316bb.webp",
-  },
-  {
-    titulo: "Si Abro Los Ojos",
-    artista: "Amaia",
-    imagen:
-      "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/c5/d3/82/c5d38265-9bd7-88aa-3bb3-9500eceed9d6/24UM1IM01951.rgb.jpg/316x316bb.webp",
-  },
-  {
-    titulo: "Al romper la burbuja",
-    artista: "Joaquina",
-    imagen:
-      "https://is1-ssl.mzstatic.com/image/thumb/Video221/v4/3b/19/cf/3b19cf3e-b9a5-1c55-47ec-74f6bbfe92b2/Jobaddabaee-3bcc-4d7d-a531-e6ff80ec4b06-184757849-PreviewImage_Preview_Image_Intermediate_nonvideo_sdr_361394388_2036964865-Time1738151215966.png/316x316bb.webp",
-  },
-  {
-    titulo: "Al romper la burbuja",
-    artista: "Joaquina",
-    imagen:
-      "https://is1-ssl.mzstatic.com/image/thumb/Video221/v4/3b/19/cf/3b19cf3e-b9a5-1c55-47ec-74f6bbfe92b2/Jobaddabaee-3bcc-4d7d-a531-e6ff80ec4b06-184757849-PreviewImage_Preview_Image_Intermediate_nonvideo_sdr_361394388_2036964865-Time1738151215966.png/316x316bb.webp",
-  },
-  {
-    titulo: "Hurry Up Tomorrow",
-    artista: "The Weeknd",
-    imagen:
-      "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/3d/0d/06/3d0d06e6-cfd4-8f69-4a42-52b7cf33fb24/25UMGIM09490.rgb.jpg/316x316bb.webp",
-  },
-  {
-    titulo: "Si Abro Los Ojos",
-    artista: "Amaia",
-    imagen:
-      "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/c5/d3/82/c5d38265-9bd7-88aa-3bb3-9500eceed9d6/24UM1IM01951.rgb.jpg/316x316bb.webp",
-  },
-  {
-    titulo: "Al romper la burbuja",
-    artista: "Joaquina",
-    imagen:
-      "https://is1-ssl.mzstatic.com/image/thumb/Video221/v4/3b/19/cf/3b19cf3e-b9a5-1c55-47ec-74f6bbfe92b2/Jobaddabaee-3bcc-4d7d-a531-e6ff80ec4b06-184757849-PreviewImage_Preview_Image_Intermediate_nonvideo_sdr_361394388_2036964865-Time1738151215966.png/316x316bb.webp",
-  },
-  {
-    titulo: "Al romper la burbuja",
-    artista: "Joaquina",
-    imagen:
-      "https://is1-ssl.mzstatic.com/image/thumb/Video221/v4/3b/19/cf/3b19cf3e-b9a5-1c55-47ec-74f6bbfe92b2/Jobaddabaee-3bcc-4d7d-a531-e6ff80ec4b06-184757849-PreviewImage_Preview_Image_Intermediate_nonvideo_sdr_361394388_2036964865-Time1738151215966.png/316x316bb.webp",
-  },
-  {
-    titulo: "Hurry Up Tomorrow",
-    artista: "The Weeknd",
-    imagen:
-      "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/3d/0d/06/3d0d06e6-cfd4-8f69-4a42-52b7cf33fb24/25UMGIM09490.rgb.jpg/316x316bb.webp",
-  },
-  {
-    titulo: "Al romper la burbuja",
-    artista: "Joaquina",
-    imagen:
-      "https://is1-ssl.mzstatic.com/image/thumb/Video221/v4/3b/19/cf/3b19cf3e-b9a5-1c55-47ec-74f6bbfe92b2/Jobaddabaee-3bcc-4d7d-a531-e6ff80ec4b06-184757849-PreviewImage_Preview_Image_Intermediate_nonvideo_sdr_361394388_2036964865-Time1738151215966.png/316x316bb.webp",
-  },
-];
-
-
-const currentSlide = ref(0);
-const totalSlides = sliderContent.length;
-let slideInterval;
-
-const nextSlide = () => {
-  currentSlide.value = (currentSlide.value + 1) % totalSlides;
-};
-
-const prevSlide = () => {
-  currentSlide.value = (currentSlide.value - 1 + totalSlides) % totalSlides;
-};
-
-const startSlideInterval = () => {
-  slideInterval = setInterval(() => {
-    nextSlide();
-  }, 7000); 
-};
-
-const stopSlideInterval = () => {
-  clearInterval(slideInterval);
-};
-
-onMounted(() => {
-  startSlideInterval();
-});
-
-onUnmounted(() => {
-  stopSlideInterval();
-});
-
-const tracks = [
-  {
-    titulo: "Cry For Me",
-    artista: "The Weeknd",
-    imagen:
-      "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/3d/0d/06/3d0d06e6-cfd4-8f69-4a42-52b7cf33fb24/25UMGIM09490.rgb.jpg/88x88bb.jpg",
-  },
-  {
-    titulo: "M.A.P.S.",
-    artista: "Amaia",
-    imagen:
-      "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/c5/d3/82/c5d38265-9bd7-88aa-3bb3-9500eceed9d6/24UM1IM01951.rgb.jpg/88x88bb.jpg",
-  },
-  {
-    titulo: "KAIMAN",
-    artista: "Rigoberta Bandini",
-    imagen:
-      "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/79/10/e8/7910e8d8-caa9-9d20-9e30-f8e363af03e7/199066494011.jpg/88x88bb.jpg",
-  },
-];
-
-const currentTrackIndex = ref(0);
-const isPlaying = ref(false);
-const volume = ref(0.5);
-
-const currentTrack = computed(() => tracks[currentTrackIndex.value]);
-
-const togglePlayPause = () => {
-  isPlaying.value = !isPlaying.value;
-};
-
-const nextTrack = () => {
-  currentTrackIndex.value = (currentTrackIndex.value + 1) % tracks.length;
-};
-
-const prevTrack = () => {
-  currentTrackIndex.value =
-    (currentTrackIndex.value - 1 + tracks.length) % tracks.length;
-};
-
-const updateVolume = () => {
-  console.log("Volumen actualizado a: ", volume.value);
-};
-
-
-
-</script>
-
 <template>
-  <div class="novedades">
-    <div class="top-bar">
-    <!-- Si NO está autenticado, mostrar botones -->
-    <div v-if="!authStore.isAuthenticated">
-      <router-link to="/register">
-        <button class="register-button">Registrarse</button>
-      </router-link>
-
-      <router-link to="/login">
-        <button class="login-button">Iniciar Sesión</button>
-      </router-link>
-    </div>
-
-    <!-- Si está autenticado, mostrar icono con la inicial -->
-    <div v-else class="user-icon">
-      <div class="icon-circle" @click="toggleMenu">
-        {{ getInitial(authStore.user?.name) }}
-      </div>
-      <div v-if="menuOpen" class="dropdown">
-        <router-link to="/perfil">Perfil</router-link>
-        <button @click="logout">Cerrar Sesión</button>
-      </div>
-    </div>
-  </div>
-
-    <section class="slider">
-      <div class="carousel-container">
-        <div class="carousel">
-          <div
-            v-for="(slide, index) in sliderContent"
-            :key="index"
-            class="slide"
-            :class="{ active: index === currentSlide }"
-          >
-            <img :src="slide.imagen" :alt="slide.titulo" />
-            <div class="slide-content">
-              <h2>{{ slide.titulo }}</h2>
-              <p>{{ slide.subtitulo }}</p>
-            </div>
-          </div>
-        </div>
-        <button class="prev" @click="() => { prevSlide(); stopSlideInterval(); startSlideInterval(); }">‹</button>
-        <button class="next" @click="() => { nextSlide(); stopSlideInterval(); startSlideInterval(); }">›</button>
-      </div>
-    </section>
-
-    <section class="canciones-recientes">
-      <h2>Canciones recién llegadas</h2>
-      <div class="canciones-grid">
-        <div
-          v-for="(cancion, index) in cancionesRecientes"
-          :key="index"
-          class="cancion-item"
-        >
-          <img :src="cancion.imagen" :alt="cancion.titulo" />
-          <div>
-            <h3>{{ cancion.titulo }}</h3>
-            <p>{{ cancion.artista }}</p>
-          </div>
+  <div class="music-app">
+    <h2 class="section-title">Novedades</h2>
+    <div class="featured-cards">
+      <div v-for="(card, index) in featuredCards" :key="`featured-${index}`" class="featured-card">
+        <div class="card-label">{{ card.label }}</div>
+        <div class="card-title">{{ card.title }}</div>
+        <div class="card-subtitle">{{ card.subtitle }}</div>
+        <div class="card-image-container">
+          <img :src="card.image" :alt="card.title" class="card-image">
+          <div class="card-description">{{ card.description }}</div>
         </div>
       </div>
-    </section>
+    </div>
 
-    <section class="nuevos-lanzamientos">
+    <div class="section-header">
+      <h2 class="section-title">Canciones mas escuchadas en España</h2>
+      <span class="section-more"></span>
+    </div>
+    <div class="songs-grid">
+      <div v-for="(song, index) in recentSongs.slice(0, 12)" :key="`song-${index}`" class="song-item">
+        <div class="song-image-container">
+          <img :src="song.image" :alt="song.nombre" class="song-image">
+        </div>
+        <div class="song-info">
+          <div class="song-title">{{ song.nombre }}</div>
+          <div class="song-artist">{{ song.artista }}</div>
+        </div>
+        <button class="more-options-btn">•••</button>
+      </div>
+    </div>
+    <div class="section-header">
       <h2 class="section-title">Nuevos lanzamientos</h2>
-      <div class="album-grid">
-        <div
-          v-for="(album, index) in nuevosLanzamientos"
-          :key="index"
-          class="album-item"
-        >
-          <img :src="album.imagen" :alt="album.titulo" class="album-img" />
-          <h3 class="album-title">{{ album.titulo }}</h3>
-          <p class="album-artist">{{ album.artista }}</p>
-        </div>
-      </div>
-    </section>
-  </div>
-
-  <div class="music-player">
-    <div class="player-controls">
-      <button @click="prevTrack" class="control-btn">⏮</button>
-      <button @click="togglePlayPause" class="control-btn">
-        {{ isPlaying ? "⏸" : "▶️" }}
-      </button>
-      <button @click="nextTrack" class="control-btn">⏭</button>
     </div>
-    <div class="track-info">
-      <img :src="currentTrack.imagen" alt="Album cover" class="album-cover" />
-      <div>
-        <h3 class="track-title">{{ currentTrack.titulo }}</h3>
-        <p class="track-artist">{{ currentTrack.artista }}</p>
+    <div class="albums-grid">
+      <div v-for="(album, index) in newAlbums.slice(0, 12)" :key="`album-${index}`" class="album-item">
+        <img :src="album.image" :alt="album.nombre" class="album-image">
       </div>
     </div>
-    <div class="volume-slider">
-      <label for="volume">🔊</label>
-      <input
-        id="volume"
-        type="range"
-        min="0"
-        max="1"
-        step="0.1"
-        v-model="volume"
-        @input="updateVolume"
-      />
-    </div>
   </div>
-
   <footer class="footer">
     <div class="footer-content">
       <p class="footer-text">© 2025 Hibiki. Todos los derechos reservados.</p>
@@ -412,404 +51,359 @@ const updateVolume = () => {
   </footer>
 </template>
 
-<style scoped>
+<script>
+export default {
+  name: 'MusicApp',
+  data() {
+    return {
+      featuredCards: [
+        {
+          label: 'NUEVO ALBUM DE BAD BUNNY',
+          title: 'DeBÍ TiRAR MáS FOToS',
+          subtitle: 'Hibiki Music',
+          image: 'https://binary.media/wp-content/uploads/2025/01/debi_tirar_mas_fotos_bad_bunny_binary-1048x630.jpg',
+          description: 'Descubre las nuevas canciones de Bad Bunny .'
+        },
+        {
+          label: 'DESTINO 2014 TOUR',
+          title: 'Gira del nuevo album de Raul Clyde',
+          subtitle: 'Hibiki Music',
+          image: 'https://entradas.lavanguardia.com/wp-content/uploads/2025/01/raul-clyde-sala-razzmatazz.jpg',
+          description: 'El valenciano hará este 2025 un tour por toda España.'
+        },
+        {
+          label: 'DESCUBRE NUEVOS ARTISTAS',
+          title: 'Gabs',
+          subtitle: 'Hibiki Music',
+          image: 'https://i.scdn.co/image/ab6761670000ecd4f3386d596841d955168ba350',
+          description: 'El español es una de las promesas para este 2025'
+        }
+      ],
+      recentSongs: [],
+      newAlbums: []
+    }
+  },
+  mounted() {
+    this.fetchRecentSongs();
+    this.fetchNewAlbums();
+  },
+  methods: {
+    async fetchRecentSongs() {
+      try {
+        const response = await fetch('https://localhost:7295/api/Cancion');
+        const data = await response.json();
+        this.recentSongs = data;
+      } catch (error) {
+        console.error('Error fetching recent songs:', error);
+      }
+    },
+    async fetchNewAlbums() {
+      try {
+        const response = await fetch('https://localhost:7295/api/Album');
+        const data = await response.json();
+        this.newAlbums = data;
+      } catch (error) {
+        console.error('Error fetching new albums:', error);
+      }
+    }
+  }
+}
+</script>
 
-/* Estilos para el icono del usuario */
-.user-icon {
-  position: relative;
-  display: flex;
-  align-items: center;
-  cursor: pointer;
+<style scoped>
+.music-app {
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #121212;
+  color: white;
 }
 
-/* Círculo del icono del usuario */
-.icon-circle {
-  width: 45px;
-  height: 45px;
-  background: linear-gradient(135deg, #4a90e2, #3164c7); /* Degradado azul */
+.section-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 16px;
+  border-bottom: 1px solid #333;
+  padding-bottom: 10px;
   color: white;
+}
+
+/* Tarjetas destacadas */
+.featured-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-bottom: 40px;
+}
+
+.featured-card {
+  display: flex;
+  flex-direction: column;
+  background-color: #181818;
+  border-radius: 8px;
+  padding: 15px;
+  transition: background-color 0.3s;
+}
+
+.featured-card:hover {
+  background-color: #282828;
+}
+
+.card-label {
+  font-size: 12px;
+  color: #ff5100;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+}
+
+.card-title {
   font-size: 18px;
   font-weight: bold;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-/* Efecto al pasar el cursor */
-.icon-circle:hover {
-  transform: scale(1.1);
-  box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.2);
-}
-
-/* Estilo del menú desplegable */
-.dropdown {
-  position: absolute;
-  top: 50px;
-  right: 0;
-  background: #222; /* Color oscuro */
+  margin-bottom: 4px;
   color: white;
-  border-radius: 10px;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-  width: 200px;
-  display: flex;
-  flex-direction: column;
-  z-index: 10;
-  overflow: hidden;
 }
 
-/* Opciones del menú */
-.dropdown a, .dropdown button {
-  padding: 12px 15px;
-  text-align: left;
+.card-subtitle {
   font-size: 14px;
-  color: white;
-  text-decoration: none;
-  display: flex;
-  align-items: center;
-  border: none;
-  background: none;
-  cursor: pointer;
-  transition: background 0.3s ease;
-  width: 100%;
+  color: #b3b3b3;
+  margin-bottom: 10px;
 }
 
-/* Separadores entre opciones */
-.dropdown a:not(:last-child),
-.dropdown button:not(:last-child) {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-/* Efecto al pasar el cursor */
-.dropdown a:hover, .dropdown button:hover {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-/* Espaciado extra en la opción de cerrar sesión */
-.dropdown button:last-child {
-  color: #ff4b4b;
-  font-weight: bold;
-}
-
-.music-player {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background-color: #333;
-  color: white;
-  padding: 1rem;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.player-controls {
-  display: flex;
-  gap: 1rem;
-}
-
-.control-btn {
-  background: none;
-  border: none;
-  color: white;
-  font-size: 1.5rem;
-  cursor: pointer;
-  transition: transform 0.2s;
-}
-
-.control-btn:hover {
-  transform: scale(1.1);
-}
-
-.track-info {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.album-cover {
-  width: 50px;
-  height: 50px;
-  border-radius: 8px;
-}
-
-.track-title {
-  font-size: 1rem;
-  margin: 0;
-}
-
-.track-artist {
-  font-size: 0.875rem;
-  color: #bbb;
-  margin: 0;
-}
-
-.volume-slider {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-input[type="range"] {
-  width: 100px;
-}
-
-.novedades {
-  background-color: white;
-  padding: 2rem;
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-}
-
-.top-bar {
-  display: flex;
-  justify-content: flex-end;
-  width: 100%;
-  padding: 1rem;
-  top: 0;
-  right: 0;
-}
-
-.login-button {
-  background-color: #ff5100;
-  color: white;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background 0.3s;
-  margin-right: 1rem;
-  margin-top: -37px;
-}
-
-.login-button:hover {
-  background-color: #ca3900;
-}
-.register-button {
-  background-color: white;
-  color: #ff5100;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background 0.3s;
-  margin-right: 1rem;
-  margin-top: -37px;
-}
-
-.carousel-container {
-  width: 100%;
-  max-width: 1200px; 
-  margin: 0 auto;
+.card-image-container {
   position: relative;
+  height: 0;
+  padding-bottom: 75%;
   overflow: hidden;
-  border-radius: 10px;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  border-radius: 6px;
 }
 
-.carousel {
-  display: flex;
-  position: relative;
-  height: 500px; 
-}
-
-.slide {
-  min-width: 100%;
-  opacity: 0;
-  transform: translateX(100%);
-  transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+.card-image {
   position: absolute;
   top: 0;
   left: 0;
-}
-
-.slide.active {
-  opacity: 1;
-  transform: translateX(0);
-  position: relative;
-}
-
-.slide img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  display: block;
-  border-radius: 10px;
 }
 
-.slide-content {
+.card-description {
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
-  background: rgba(0, 0, 0, 0.6);
+  padding: 16px;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
   color: white;
-  padding: 1.5rem; 
-  text-align: center;
-  border-radius: 0 0 10px 10px;
+  font-size: 14px;
 }
 
-.prev,
-.next {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  background: rgba(0, 0, 0, 0.5);
+/* Sección de header con "Ver todo" */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.section-more {
+  color: #ff5100; 
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.orange-button {
+  background-color: #ff5100; 
   color: white;
   border: none;
-  border-radius: 50%;
-  width: 50px; 
-  height: 50px;
+  border-radius: 5px;
+  padding: 8px 16px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.orange-button:hover {
+  background-color: #ff5100; 
+}
+
+/* Canciones recién llegadas */
+.songs-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  margin-bottom: 40px;
+}
+
+.song-item {
   display: flex;
   align-items: center;
-  justify-content: center;
+  padding: 8px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+  background-color: #181818;
+}
+
+.song-item:hover {
+  background-color: #282828;
+}
+
+.song-image-container {
+  width: 60px;
+  height: 60px;
+  margin-right: 12px;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.song-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.song-info {
+  flex: 1;
+}
+
+.song-title {
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: white;
+}
+
+.song-artist {
+  font-size: 12px;
+  color: #b3b3b3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.more-options-btn {
+  background: none;
+  border: none;
+  color: #ff5100; 
+  font-size: 16px;
   cursor: pointer;
-  z-index: 10;
-  transition: background 0.3s;
+  padding: 4px;
 }
 
-.prev:hover,
-.next:hover {
-  background: rgba(0, 0, 0, 0.7);
-}
-
-.prev {
-  left: 20px;
-}
-
-.next {
-  right: 20px;
-}
-
-
-.album-grid {
+/* Nuevos lanzamientos */
+.albums-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 1rem;
-  justify-items: center;
-}
-
-.album-item img {
-  width: 248px;
-  border-radius: 8px;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 16px;
+  margin-bottom: 40px;
 }
 
 .album-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  background-color: #f9f9f9;
-  border-radius: 12px;
-  padding: 1rem;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.album-item:hover {
-  transform: scale(1.05);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
-
-.album-img {
-  width: 100%;
-  max-width: 120px;
-  border-radius: 8px;
-  margin-bottom: 0.5rem;
-}
-
-.album-title {
-  font-size: 1rem;
-  margin: 0.5rem 0 0.25rem;
-  color: #333;
-}
-
-.album-artist {
-  font-size: 0.875rem;
-  color: #777;
-  margin: 0;
-}
-
-.canciones-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1rem;
-}
-
-.cancion-item {
   position: relative;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: white;
+  height: 0;
+  padding-bottom: 100%;
+  overflow: hidden;
   border-radius: 8px;
-  padding: 0.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  background-color: #181818;
 }
 
-.cancion-item img {
-  width: 50px;
-  height: 50px;
-  border-radius: 5px;
+.album-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s;
 }
 
-.cancion-item h3 {
-  font-size: 0.75rem;
-  margin-bottom: 0.1rem;
-}
-
-.cancion-item p {
-  font-size: 0.65rem;
-  margin: 0;
+.album-item:hover .album-image {
+  transform: scale(1.05);
 }
 
 .footer {
-  background-color: white;
-  color: #ff5100;
-  padding: 20px;
-  text-align: center;
-  margin-top: 40px;
+  background-color: #181818;
+  padding: 20px 0;
+  border-top: 1px solid #ff5100;
 }
 
 .footer-content {
   max-width: 1200px;
   margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
 }
 
 .footer-text {
+  color: white;
   font-size: 14px;
-  margin-bottom: 10px;
+  margin-bottom: 15px;
 }
 
 .footer-links {
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
-  gap: 15px;
+  gap: 20px;
 }
 
 .footer-link {
-  color: black;
-  text-decoration: none;
+  color: #ff5100; 
   font-size: 14px;
-  transition: color 0.3s ease;
+  text-decoration: none;
+  transition: color 0.2s;
 }
 
 .footer-link:hover {
-  color: #ff5100;
+  color: white;
+  text-decoration: underline;
 }
 
-.nuevos-lanzamientos {
-  background-color: white;
-  padding: 2rem 1rem;
+/* Responsive */
+@media (max-width: 576px) {
+  .footer-links {
+    flex-direction: column;
+    gap: 10px;
+  }
 }
 
-.section-title {
-  font-size: 1.5rem;
-  margin-bottom: 1.5rem;
-  color: #333;
+/* Responsive */
+@media (max-width: 1200px) {
+  .albums-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 992px) {
+  .featured-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .songs-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .featured-cards,
+  .songs-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .albums-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 576px) {
+  .featured-cards,
+  .songs-grid,
+  .albums-grid {
+    grid-template-columns: 1fr;
+  }
 }
 </style>

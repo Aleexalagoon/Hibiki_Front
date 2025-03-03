@@ -12,8 +12,13 @@ import InicioView from "@/views/InicioView.vue";
 import PlaylistView from "@/views/PlaylistView.vue";
 import ArtistaView from "@/views/ArtistaView.vue";
 import CancionesView from "@/views/CancionesView.vue";
+<<<<<<< HEAD
 import perfilView from "@/views/perfil.vue";
 
+=======
+import PagoView from "@/views/PagoView.vue";
+import PagoCompletadoView from "@/views/PagoCompletadoView.vue";
+>>>>>>> e3173b503376bd3df1ecfe98e93be4bb36302d4b
 
 
 const router = createRouter({
@@ -94,12 +99,26 @@ const router = createRouter({
       name: "canciones",
       component: CancionesView,
     },
+<<<<<<< HEAD
     {
       path: "/perfil",
       name: "perfil",
       component: perfilView,
     },
+=======
+>>>>>>> e3173b503376bd3df1ecfe98e93be4bb36302d4b
 
+    {
+      path: "/pago",
+      name: "pago",
+      component: PagoView,
+    },
+
+    {
+      path: "/pagocompletado",
+      name: "pagocompletado",
+      component: PagoCompletadoView,
+    }
   ],
 });
 

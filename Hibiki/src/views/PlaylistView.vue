@@ -1,128 +1,266 @@
 <template>
-    <div class="album-view">
-      <div class="album-header">
-        <img src="https://fotografias.lasexta.com/clipping/cmsimages01/2024/12/08/A6C326BB-77A0-4454-BAC3-E7100CEF2AB9/fernando-alonso_104.jpg?crop=5167,5167,x2585,y0&width=1200&height=1200&optimize=low&format=webply" alt="Playlist Cover" class="album-cover" />
-        <div class="album-info">
-          <h1>Mi Playlist</h1>
-          <h2>Usuario</h2>
-          <p>Una colección personalizada de mis canciones favoritas...</p>
-          <button class="preview-btn">▶ Reproducir</button>
+  <div class="playlist-page">
+    <div class="main-container">
+      <div class="playlists-list">
+        <h2>Playlists</h2>
+        <p v-if="loading">Cargando playlists...</p>
+        <p v-if="error" class="error">{{ error }}</p>
+        
+        <div 
+          v-for="playlist in allPlaylists" 
+          :key="playlist.playlistId" 
+          class="playlist-card"
+          @click="selectPlaylist(playlist.playlistId)"
+        >
+          <img :src="playlist.image || defaultImage" alt="Playlist Cover" class="playlist-image" />
+          <h3>{{ playlist.nombre }}</h3>
         </div>
       </div>
-      <div class="tracklist">
-        <div class="track" v-for="(song, index) in playlist" :key="index">
-          <img :src="song.image" alt="Song Thumbnail" class="track-thumbnail" />
-          <span class="track-title">{{ song.title }}</span>
-          <span class="track-duration">{{ song.duration }}</span>
+
+      <div class="details-container">
+        <div v-if="selectedPlaylist">
+          <h1 class="playlist-name">{{ selectedPlaylist.nombre }}</h1>
+          <p><strong>Descripción:</strong> {{ selectedPlaylist.descripcion }}</p>
+
+          <p v-if="selectedPlaylist.creador">
+            <strong>Creador:</strong> {{ selectedPlaylist.creador.nombre }}
+          </p>
+
+          <h2>Canciones</h2>
+          <ul v-if="selectedPlaylist.canciones && selectedPlaylist.canciones.length > 0">
+            <li
+              v-for="song in selectedPlaylist.canciones"
+              :key="song.cancionId"
+              class="song-card"
+              @click="selectSong(song)"
+            >
+              <div class="song-info-container">
+                <img :src="song.image" alt="Song Thumbnail" class="song-image" />
+                <div class="song-info">
+                  <span class="song-title">{{ song.nombre }}</span>
+                  <span class="song-artist">{{ song.artista }}</span>
+                </div>
+              </div>
+              <span class="song-duration">{{ formatDuration(song.duracion) }}</span>
+            </li>
+          </ul>
+          <p v-else>No hay canciones en esta playlist.</p>
         </div>
-      </div>
-      <div class="album-details">
-        <p><strong>Número de canciones:</strong> {{ playlist.length }}</p>
-        <p><strong>Duración total:</strong> {{ totalDuration }}</p>
       </div>
     </div>
-  </template>
+  </div>
+</template>
+
+<script>
+import { defineComponent, computed, onMounted } from 'vue';
+import { usePlaylistStore } from '@/stores/PlaylistStore';
+import { usePlayerStore } from '@/stores/player';
+
+export default defineComponent({
+  setup() {
+    const playlistStore = usePlaylistStore();
+    const playerStore = usePlayerStore();
+
+    const defaultImage = 'https://placehold.co/150';
+
+    const formatDuration = (duration) => {
+      if (!duration) return '0:00';
+      const [minutes, seconds] = duration.split(':').map(Number);
+      return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    };
+
+    const selectPlaylist = (playlistId) => {
+      playlistStore.fetchPlaylistById(playlistId);
+    };
+
+    const selectSong = (song) => {
+      playerStore.setSong(song);
+    };
+
+    onMounted(() => {
+      playlistStore.fetchAllPlaylists();
+    });
+
+    return {
+      allPlaylists: computed(() => playlistStore.playlists),
+      selectedPlaylist: computed(() => playlistStore.currentPlaylist),
+      loading: computed(() => playlistStore.loading),
+      error: computed(() => playlistStore.error),
+      selectPlaylist,
+      selectSong,
+      formatDuration,
+      defaultImage,
+    };
+  },
+});
+</script>
+
+<style scoped>
+.playlist-page {
+  display: flex;
+  min-height: 100vh;
+  background: #121212;
+  color: white;
+}
+
+.main-container {
+  display: flex;
+  flex: 1;
+  width: 100%;
+}
+
+.playlists-list {
+  width: 30%;
+  padding: 20px;
+  background: #181818;
+  overflow-y: auto;
+  max-height: 110vh;
+}
+
+.playlists-list h2 {
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.playlists-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.playlists-list::-webkit-scrollbar-track {
+  background: #222;
+}
+
+.playlists-list::-webkit-scrollbar-thumb {
+  background: #ff5100;
+  border-radius: 10px;
+}
+
+.error {
+  color: #e91e63;
+  padding: 10px;
+  border-radius: 10px;
+  background: rgba(233, 30, 99, 0.1);
+}
+
+.playlist-card {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  margin-bottom: 10px;
+  padding: 10px;
+  background: #222;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.playlist-card:hover {
+  background: #333;
+  transform: translateY(-2px);
+}
+
+.playlist-image {
+  width: 50px;
+  height: 50px;
+  border-radius: 10px;
+  margin-right: 10px;
+  object-fit: cover;
+}
+
+.playlist-card h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.details-container {
+  width: 70%;
+  padding: 20px;
+}
+
+h1.playlist-name {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.details-container p {
+  margin-bottom: 15px;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.details-container p strong {
+  color: white;
+}
+
+.details-container h2 {
+  font-size: 1.5rem;
+  margin: 30px 0 20px;
+  position: relative;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.song-card {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid #333;
+  justify-content: space-between;
+  transition: all 0.3s ease;
+  border-radius: 5px;
+  margin-bottom: 5px;
+}
+
+.song-card:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.song-info-container {
+  display: flex;
+  align-items: center;
+}
+
+.song-image {
+  width: 60px;
+  height: 60px;
+  border-radius: 10px;
+  margin-right: 10px;
+}
+
+.song-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.song-title {
+  font-weight: bold;
+}
+
+.song-artist {
+  font-size: 13px;
+  opacity: 0.5;
+  margin-top: 8px;
+}
+
+.song-duration {
+  opacity: 0.8;
+}
+
+@media (max-width: 900px) {
+  .main-container {
+    flex-direction: column;
+  }
   
-  <script>
-  export default {
-    data() {
-      return {
-        playlist: [
-          { title: "Canción 1", duration: "3:15", image: "https://i.scdn.co/image/ab67616d0000b273dcec31b44548687b2a81d0c2" },
-          { title: "Canción 2", duration: "2:45", image: "https://cdn-images.dzcdn.net/images/cover/2194275a797bd8d5ed038b61b053813a/0x1900-000000-80-0-0.jpg" },
-          { title: "Canción 3", duration: "4:10", image: "https://i.scdn.co/image/ab67616d0000b273851222dc5c5681bd4c3119d3" },
-          { title: "Canción 4", duration: "3:55", image: "https://i.scdn.co/image/ab67616d0000b273076ef0fed51ff7a4911459e9" },
-          { title: "Canción 5", duration: "3:55", image: "https://i.scdn.co/image/ab67616d0000b273dcec31b44548687b2a81d0c2" },
-          { title: "Canción 6", duration: "3:55", image: "https://cdn-images.dzcdn.net/images/cover/2194275a797bd8d5ed038b61b053813a/0x1900-000000-80-0-0.jpg" },
-          { title: "Canción 7", duration: "3:55", image: "https://i.scdn.co/image/ab67616d0000b273851222dc5c5681bd4c3119d3" },
-          { title: "Canción 8", duration: "3:55", image: "https://cdn-images.dzcdn.net/images/cover/2194275a797bd8d5ed038b61b053813a/0x1900-000000-80-0-0.jpg" },
-          { title: "Canción 9", duration: "3:55", image: "https://i.scdn.co/image/ab67616d0000b273dcec31b44548687b2a81d0c2" },
-          { title: "Canción 10", duration: "3:55", image: "https://i.scdn.co/image/ab67616d0000b273076ef0fed51ff7a4911459e9" }
-        ]
-      };
-    },
-  };
-  </script>
-  
-  <style scoped>
-  .album-view {
-    margin: auto;
-    padding: 20px;
-    font-family: Arial, sans-serif;
-    background: linear-gradient(33deg, black, #ff5100);
-    color: white;
+  .playlists-list, .details-container {
+    width: 100%;
+    max-height: none;
   }
-  .album-header {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    padding: 20px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 10px;
-  }
-  .album-cover {
-    width: 160px;
-    height: 160px;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-  }
-  .album-info h1, h2 {
-    margin: 0;
-  }
-  .preview-btn {
-    background: #ff5100;
-    color: white;
-    border: none;
-    padding: 12px 18px;
-    cursor: pointer;
-    font-weight: bold;
-    border-radius: 5px;
-    transition: 0.3s;
-  }
-  .preview-btn:hover {
-    background: #ca3900;
-  }
-  .tracklist {
-    margin-top: 20px;
-    padding: 10px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 10px;
-  }
-  .track {
-    display: flex;
-    align-items: center;
-    padding: 12px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-    transition: 0.3s;
-  }
-  .track:hover {
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 5px;
-  }
-  .track-number {
-    font-weight: bold;
-    color: #ff5100;
-  }
-  .track-thumbnail {
-    width: 40px;
-    height: 40px;
-    border-radius: 5px;
-    margin-left: 10px;
-  }
-  .track-title {
-    flex-grow: 1;
-    padding-left: 10px;
-    font-weight: bold;
-  }
-  .track-duration {
-    text-align: right;
-    font-style: italic;
-  }
-  .album-details {
-    margin-top: 20px;
-    padding-top: 10px;
-    text-align: left;
-    border-top: 1px solid rgba(255, 255, 255, 0.2);
-  }
-  </style>
-  
+}
+</style>
