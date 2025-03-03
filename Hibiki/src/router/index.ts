@@ -90,6 +90,13 @@ const router = createRouter({
     },
 
     {
+      path: '/artista/:id',
+      name: 'Artista',
+      component: () => import('@/views/ArtistaView.vue'), // Asegúrate de que la ruta es correcta
+      props: true
+    },
+
+    {
       path: "/canciones",
       name: "canciones",
       component: CancionesView,

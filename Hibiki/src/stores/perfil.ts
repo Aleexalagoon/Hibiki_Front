@@ -33,7 +33,7 @@ interface Playlist {
 export const useProfileStore = defineStore('profileStore', {
   state: () => ({
     userData: {
-      name: 'Usuario',
+      userData: null,
       avatar: '',
       publicLists: 0,
       following: 0

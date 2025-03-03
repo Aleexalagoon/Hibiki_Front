@@ -1,16 +1,16 @@
 import { defineStore } from 'pinia';
-import { useAlbumStore } from './albumStore'; // Importamos el store de álbumes
+import { useAlbumStore } from './albumStore';
+import { useRouter } from 'vue-router';
 
 export const useArtistaStore = defineStore('artistaStore', {
   state: () => ({
-    allArtists: [], // Lista de artistas
-    selectedArtist: null, // Artista seleccionado
+    allArtists: [],
+    selectedArtist: null,
     loading: false,
     error: null,
   }),
 
   actions: {
-    // Obtener todos los artistas
     async fetchAllArtists() {
       this.loading = true;
       this.error = null;
@@ -28,7 +28,6 @@ export const useArtistaStore = defineStore('artistaStore', {
       }
     },
 
-    // Obtener información del artista seleccionado
     async fetchArtistData(artistId) {
       this.loading = true;
       this.error = null;
@@ -39,15 +38,13 @@ export const useArtistaStore = defineStore('artistaStore', {
         }
         const data = await response.json();
 
-        // Aquí se incluye la descripción
         this.selectedArtist = {
           name: data.nombre,
           verified: true,
           monthlyListeners: data.oyentesMensuales,
-          description: data.descripcion, // Agregamos la descripción
+          description: data.descripcion,
         };
 
-        // Llamar a albumStore para cargar los álbumes del artista seleccionado
         const albumStore = useAlbumStore();
         albumStore.fetchAlbumsByArtist(artistId);
       } catch (err) {
@@ -56,8 +53,11 @@ export const useArtistaStore = defineStore('artistaStore', {
       } finally {
         this.loading = false;
       }
-      
     },
+
+    navigateToArtist(artistId) {
+      const router = useRouter();
+      router.push(`/artista/${artistId}`);
+    }
   },
-  
 });

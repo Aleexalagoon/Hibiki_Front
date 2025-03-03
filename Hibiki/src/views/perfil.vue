@@ -1,70 +1,66 @@
 <template>
   <div class="profile-container">
-    <div v-if="profileStore.loading" class="loading-container">
-      <div class="loading-spinner"></div>
-      <p>Cargando perfil...</p>
-    </div>
-    
-    <div v-else-if="profileStore.error" class="error-message">
-      <p>{{ profileStore.error }}</p>
-      <button class="retry-button" @click="loadUserData">Reintentar</button>
-    </div>
-    
-    <div v-else>
-      <div class="profile-header">
-        <div class="profile-avatar">
-          <div v-if="profileStore.userData.avatar && profileStore.userData.avatar.trim() !== ''" class="avatar-image">
-            <img :src="profileStore.userData.avatar" alt="Foto de perfil" />
-          </div>
-          <div v-else class="avatar-placeholder">
-            <div class="avatar-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
-              </svg>
-            </div>
-          </div>
+    <!-- Sección de perfil de usuario -->
+    <div class="profile-header">
+      <div class="profile-avatar">
+        <div v-if="profileStore.userData.avatar" class="avatar-image">
+          <img :src="profileStore.userData.avatar" alt="Foto de perfil" />
         </div>
-        
-        <div class="profile-info">
-          <span class="profile-label">Perfil</span>
-          <h1 class="profile-name">{{ profileStore.userData.name || 'Usuario' }}</h1>
-          <div class="profile-stats">
-            <span>{{ profileStore.userData.publicLists }} listas públicas</span>
-            <span v-if="profileStore.userData.following > 0"> • Sigue a <span class="follow-text">{{ profileStore.userData.following }}</span> {{ profileStore.userData.following === 1 ? 'usuario' : 'usuarios' }}</span>
-          </div>
-        </div>
-        
-        <div class="profile-options">
-          <button class="options-button" @click.stop="toggleOptions">
-            <div class="dot"></div>
-            <div class="dot"></div>
-            <div class="dot"></div>
-          </button>
-          
-          <div v-if="showOptions" class="options-dropdown">
-            <ul>
-              <li @click="editProfile">Editar perfil</li>
-              <li @click="shareProfile">Compartir perfil</li>
-              <li @click="copyLink">Copiar enlace</li>
-            </ul>
-          </div>
+        <div v-else class="avatar-placeholder">
+          <svg class="avatar-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5.121 17.804A4 4 0 018.98 15h6.04a4 4 0 013.858 2.804M12 11a4 4 0 100-8 4 4 0 000 8z"></path>
+          </svg>
         </div>
       </div>
       
-      <!-- Top Artists section -->
-      <div v-if="profileStore.topArtists.length > 0">
+      <div class="profile-info">
+        <span class="profile-label">Perfil</span>
+        <h1 class="profile-name">{{ profileStore.userData.name }}</h1>
+        <p class="profile-stats">
+          {{ profileStore.userData.publicLists }} listas públicas • 
+          <span class="follow-text">Sigue a {{ profileStore.userData.following }} usuarios</span>
+        </p>
+      </div>
+      
+      <div class="profile-options">
+        <button class="options-button" @click="toggleOptions">
+          <span class="dot"></span>
+          <span class="dot"></span>
+          <span class="dot"></span>
+        </button>
+        <div v-if="showOptions" class="options-dropdown">
+          <ul>
+            <li @click="editProfile">Editar perfil</li>
+            <li @click="shareProfile">Compartir perfil</li>
+            <li @click="copyLink">Copiar enlace</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Loading indicator -->
+    <div v-if="profileStore.loading" class="loading-container">
+      <div class="loading-spinner"></div>
+      <p>Cargando datos...</p>
+    </div>
+    
+    <!-- Error message -->
+    <div v-if="profileStore.error" class="error-message">
+      <p>{{ profileStore.error }}</p>
+      <button @click="loadUserData" class="retry-button">Reintentar</button>
+    </div>
+    
+    <div v-if="!profileStore.loading && !profileStore.error">
+      <!-- Sección de artistas más escuchados -->
+      <div class="top-artists-section" v-if="profileStore.topArtists.length > 0">
         <div class="section-header">
-          <h2 class="section-title">Artistas favoritos</h2>
-          <button class="show-all-button" @click="showAllArtists">Ver todos</button>
+          <h2 class="section-title">Artistas más escuchados este mes</h2>
+          <span class="section-visibility">Solo visibles para ti</span>
+          <button class="show-all-button" @click="showAllArtists">Mostrar todos</button>
         </div>
         
         <div class="artists-grid">
-          <div
-            v-for="artist in profileStore.topArtists"
-            :key="artist.id"
-            class="artist-card"
-            @click="navigateToArtist(artist.id.toString())"
-          >
+          <div v-for="artist in profileStore.topArtists" :key="artist.id" class="artist-card" @click="navigateToArtist(String(artist.id))">
             <div class="artist-image">
               <img :src="artist.image" :alt="artist.name" />
             </div>
@@ -74,68 +70,64 @@
         </div>
       </div>
       
-      <!-- Top Tracks section -->
-      <div v-if="profileStore.topTracks.length > 0">
+      <!-- Sección de canciones más escuchadas -->
+      <section class="top-tracks-section" v-if="profileStore.topTracks.length > 0">
         <div class="section-header">
-          <h2 class="section-title">Canciones favoritas</h2>
-          <button class="show-all-button" @click="showAllTracks">Ver todas</button>
+          <h2 class="section-title">Canciones más escuchadas este mes</h2>
+          <span class="section-visibility">Solo visibles para ti</span>
+          <button class="show-all-button" @click="showAllTracks">Mostrar todos</button>
         </div>
         
         <div class="tracks-list">
-          <div
-            v-for="(track, index) in profileStore.topTracks"
-            :key="track.id"
-            class="track-item"
-          >
+          <div v-for="(track, index) in profileStore.topTracks" :key="track.id" class="track-item">
             <div class="track-index">
-              <span>{{ index + 1 }}</span>
-              <button class="play-button" @click.stop="playTrack(track.id.toString())">
-                <svg v-if="playingTrack === track.id.toString()" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                  <path d="M3 2h3v12H3V2zm7 0h3v12h-3V2z"/>
+              <button v-if="index === 0 || (playingTrack === String(track.id))" class="play-button" @click="playTrack(String(track.id))">
+                <svg v-if="playingTrack !== String(track.id)" viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
+                  <path d="M8 5v14l11-7z"></path>
                 </svg>
-                <svg v-else width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                  <path d="M4 2v12.4l8.8-6.2L4 2z"/>
+                <svg v-else viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
+                  <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"></path>
                 </svg>
               </button>
+              <span v-else>{{ index + 1 }}</span>
             </div>
-            
+
             <div class="track-image">
               <img :src="track.image" :alt="track.title" />
             </div>
-            
+
             <div class="track-info">
-              <div :class="['track-title', track.explicit ? 'explicit' : '']">
+              <div class="track-title" :class="{ 'explicit': track.explicit }">
                 {{ track.title }}
                 <span v-if="track.explicit" class="explicit-badge">E</span>
               </div>
               <div class="track-artist">{{ track.artist }}</div>
             </div>
-            
+
             <div class="track-album">{{ track.album }}</div>
-            
+
             <div class="track-liked">
               <button @click.stop="toggleLike(track)">
-                <svg v-if="track.liked" width="16" height="16" viewBox="0 0 16 16" fill="#1DB954">
-                  <path d="M13.797 2.727a4.057 4.057 0 00-5.488-.253.558.558 0 01-.31.112.531.531 0 01-.311-.112 4.054 4.054 0 00-5.487.253c-.77.77-1.194 1.794-1.194 2.883s.424 2.114 1.168 2.855l4.462 5.223a1.791 1.791 0 002.726 0l4.435-5.195a4.052 4.052 0 001.195-2.883 4.057 4.057 0 00-1.196-2.883z"/>
+                <svg v-if="track.liked" viewBox="0 0 24 24" fill="red" width="20" height="20">
+                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path>
                 </svg>
-                <svg v-else width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                  <path d="M13.798 2.727a4.057 4.057 0 00-5.488-.253.558.558 0 01-.31.112.531.531 0 01-.311-.112 4.054 4.054 0 00-5.487.253A4.05 4.05 0 001.01 5.61c0 1.089.424 2.113 1.168 2.855l4.462 5.223a1.791 1.791 0 002.726 0l4.435-5.195a4.052 4.052 0 001.196-2.883 4.057 4.057 0 00-1.199-2.883zm-.722 4.454L8.64 12.374a.594.594 0 01-.92 0L3.26 7.181a2.89 2.89 0 01-.834-2.04c0-.776.302-1.507.853-2.058a2.89 2.89 0 012.0-.853c.76 0 1.475.292 2.004.823l.806.824.805-.824a2.89 2.89 0 012.006-.823c.772 0 1.496.302 2.038.853.543.55.836 1.275.836 2.058 0 .783-.293 1.498-.798 2.039z"/>
+                <svg v-else viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" width="20" height="20">
+                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path>
                 </svg>
               </button>
             </div>
-            
+
             <div class="track-duration">{{ track.duration }}</div>
-            
+
             <div class="track-options">
               <button class="options-button" @click.stop="toggleTrackOptions(track.id)">
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                  <path d="M3 9.5a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm5 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm5 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/>
+                <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
+                  <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"></path>
                 </svg>
               </button>
-              
               <div v-if="activeTrackOptions === track.id" class="track-options-dropdown">
                 <ul>
-                  <li @click="addToPlaylist(track.id)">Añadir a lista</li>
+                  <li @click="addToPlaylist(track.id)">Añadir a una lista</li>
                   <li @click="goToArtist(track.id)">Ir al artista</li>
                   <li @click="goToAlbum(track.id)">Ir al álbum</li>
                   <li @click="shareTrack(track.id)">Compartir</li>
@@ -144,29 +136,24 @@
             </div>
           </div>
         </div>
-      </div>
+      </section>
       
-      <!-- Public Playlists section -->
-      <div v-if="profileStore.publicPlaylists.length > 0">
+      <!-- Sección de listas públicas -->
+      <section class="public-playlists-section" v-if="profileStore.publicPlaylists.length > 0">
         <div class="section-header">
           <h2 class="section-title">Listas públicas</h2>
-          <button class="show-all-button" @click="showAllPlaylists">Ver todas</button>
+          <button v-if="profileStore.publicPlaylists.length > 6" class="show-all-button" @click="showAllPlaylists">Mostrar todas</button>
         </div>
         
         <div class="playlists-grid">
-          <div
-            v-for="playlist in profileStore.publicPlaylists"
-            :key="playlist.id"
-            class="playlist-card"
-            @click="navigateToPlaylist(playlist.id)"
-          >
+          <div v-for="playlist in profileStore.publicPlaylists" :key="playlist.id" class="playlist-card" @click="navigateToPlaylist(playlist.id)">
             <div class="playlist-image">
               <img :src="playlist.image" :alt="playlist.title" />
             </div>
             <div class="playlist-title">{{ playlist.title }}</div>
           </div>
         </div>
-      </div>
+      </section>
     </div>
   </div>
 </template>
@@ -186,14 +173,16 @@ const showOptions = ref(false);
 const activeTrackOptions = ref<number | null>(null);
 const playingTrack = ref<string | null>(null);
 
+// Función para cargar los datos del usuario utilizando Pinia
 const loadUserData = async () => {
   if (!authStore.isAuthenticated) {
     router.push('/login');
     return;
   }
+  
+  // Utilizar el store para cargar todos los datos
   await profileStore.fetchUserData(authStore.user.token);
 };
-
 
 // Funciones de interacción con la UI
 const toggleOptions = () => {
@@ -330,11 +319,15 @@ const shareTrack = (trackId: number) => {
   }
 };
 
+// Inicializar el componente
 onMounted(() => {
+  // Comprobar si el usuario está autenticado
   if (!authStore.isAuthenticated) {
     router.push('/login');
     return;
   }
+  
+  // Cargar los datos del usuario
   loadUserData();
   
   // Cerrar los menús cuando se hace clic fuera de ellos
