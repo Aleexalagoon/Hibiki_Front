@@ -345,7 +345,6 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 .profile-container {
-  width: 100%;
   min-height: 100%;
   background: linear-gradient(180deg, #1e1e1e 0%, #121212 100%);
   color: white;
