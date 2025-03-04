@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watchEffect, onMounted, onUnmounted } from 'vue';
+import { ref, computed, watchEffect, onMounted, onUnmounted, onBeforeUnmount } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 import { usePlayerStore } from '@/stores/player';
@@ -8,7 +8,10 @@ import MusicPlayer from '@/components/MusicPlayer.vue';
 import Swal from 'sweetalert2';
 
 const searchQuery = ref('');
-const sidebarVisible = ref(false); // Track sidebar visibility
+const sidebarVisible = ref(false);
+const dropdownVisible = ref(false);
+const userDropdownRef = ref<HTMLElement | null>(null);
+
 const authStore = useAuthStore();
 const playerStore = usePlayerStore();
 const cancionesStore = useCancionesStore();
@@ -17,20 +20,44 @@ const router = useRouter();
 const isAuthenticated = computed(() => authStore.isAuthenticated);
 const isPremium = computed(() => authStore.isPremium); 
 
+const getUserInitial = computed(() => {
+  const userName = authStore.user?.name || authStore.user?.email || '';
+  return userName.charAt(0).toUpperCase();
+});
+
+const getUserName = computed(() => {
+  return authStore.user?.name || authStore.user?.email || 'Usuario';
+});
+
+const toggleDropdown = () => {
+  dropdownVisible.value = !dropdownVisible.value;
+};
+
+const handleClickOutside = (event: MouseEvent) => {
+  if (userDropdownRef.value && !userDropdownRef.value.contains(event.target as Node)) {
+    dropdownVisible.value = false;
+  }
+};
+
 const toggleSidebar = () => {
   sidebarVisible.value = !sidebarVisible.value;
 };
 
 const search = () => {
   console.log('Buscando:', searchQuery.value);
-  // Close sidebar after search on mobile
+
   if (window.innerWidth <= 768) {
     sidebarVisible.value = false;
   }
 };
 
+const goToProfile = () => {
+  router.push('/perfil');
+  dropdownVisible.value = false;
+};
+
 const logout = () => {
-  // Detener el intervalo de anuncios al cerrar sesión
+ 
   if (adInterval) {
     clearInterval(adInterval);
     adInterval = null;
@@ -38,15 +65,16 @@ const logout = () => {
   
   authStore.logout();
   router.push('/login');
+  dropdownVisible.value = false;
 };
 
 const startAdInterval = () => {
-  // Cancelar cualquier intervalo existente primero
+
   if (adInterval) {
     clearInterval(adInterval);
   }
 
-  // Iniciar nuevo intervalo de anuncios
+  
   adInterval = setInterval(() => {
     Swal.fire({
       title: "Hazte Premium!",
@@ -72,23 +100,26 @@ onMounted(async () => {
   authStore.loadUserFromStorage();
   await cancionesStore.fetchCanciones();
   
-  // Set sidebar visible by default on desktop
+  
   sidebarVisible.value = window.innerWidth > 768;
 
-  // Solo iniciar anuncios si no es premium
+ 
   if (!isPremium.value && isAuthenticated.value) {
     startAdInterval();
   }
+
+  
+  document.addEventListener('click', handleClickOutside);
 });
 
-// 🔥 Verifica si el usuario se volvió premium para detener anuncios
+
 watchEffect(() => {
   if (authStore.isPremium && adInterval) {
     clearInterval(adInterval);
     adInterval = null;
     console.log("🚀 Usuario es premium. Anuncios desactivados.");
   } else if (!authStore.isPremium && isAuthenticated.value) {
-    // Si no es premium y está autenticado, reiniciar los anuncios
+    
     startAdInterval();
   }
 });
@@ -97,18 +128,67 @@ onUnmounted(() => {
   if (adInterval) {
     clearInterval(adInterval);
   }
+
+  document.removeEventListener('click', handleClickOutside);
 });
 </script>
 
 <template>
   <div class="app-container">
     <div class="app">
-      <!-- Mobile menu toggle button -->
+     
       <div class="menu-toggle" @click="toggleSidebar">
         <div class="menu-icon">
           <span></span>
           <span></span>
           <span></span>
+        </div>
+      </div>
+      
+  
+      <div 
+        v-if="isAuthenticated" 
+        ref="userDropdownRef"
+        class="user-profile" 
+        @click.stop="toggleDropdown"
+      >
+        <div class="user-icon">
+          <span>{{ getUserInitial }}</span>
+        </div>
+        
+        <div 
+          v-if="dropdownVisible" 
+          class="user-dropdown"
+        >
+          <div class="user-info">
+            <div class="user-icon user-icon-small">
+              <span>{{ getUserInitial }}</span>
+            </div>
+            <div class="user-details">
+              <p class="user-name">{{ getUserName }}</p>
+              <p class="user-email">{{ authStore.user?.email }}</p>
+            </div>
+          </div>
+          
+          <div class="dropdown-divider"></div>
+          
+          <div class="dropdown-menu">
+            <div class="dropdown-item" @click="goToProfile">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+              <span>Perfil</span>
+            </div>
+            <div class="dropdown-item" @click="logout">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+              </svg>
+              <span>Cerrar Sesión</span>
+            </div>
+          </div>
         </div>
       </div>
       
@@ -158,6 +238,98 @@ onUnmounted(() => {
   height: 100%;
   overflow: hidden;
   position: relative;
+}
+
+
+.user-profile {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  z-index: 1100;
+}
+
+.user-icon {
+  width: 40px;
+  height: 40px;
+  background-color: #ff5100;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.user-icon-small {
+  width: 40px;
+  height: 40px;
+  font-size: 0.9rem;
+}
+
+.user-dropdown {
+  position: absolute;
+  top: 55px;
+  right: 0;
+  width: 250px;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  overflow: hidden;
+  border: 1px solid #e0e0e0;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  background-color: #f8f9fa;
+}
+
+.user-details {
+  margin-left: 15px;
+}
+
+.user-name {
+  font-weight: bold;
+  margin: 0;
+}
+
+.user-email {
+  color: #6c757d;
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.dropdown-divider {
+  height: 1px;
+  background-color: #e0e0e0;
+}
+
+.dropdown-menu {
+  padding: 10px 0;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 15px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.dropdown-item:hover {
+  background-color: #f1f3f5;
+}
+
+.dropdown-item svg {
+  margin-right: 10px;
+  stroke: #6c757d;
+}
+
+.dropdown-item span {
+  color: #333;
 }
 
 .sidebar {
@@ -252,7 +424,6 @@ onUnmounted(() => {
   background-color: #ca3900;
 }
 
-/* Hamburger menu button */
 .menu-toggle {
   display: none;
   position: fixed;
@@ -296,7 +467,7 @@ onUnmounted(() => {
   top: 16px;
 }
 
-/* Mobile styles */
+
 @media screen and (max-width: 768px) {
   .menu-toggle {
     display: flex;
@@ -318,41 +489,11 @@ onUnmounted(() => {
   
   .content {
     width: 100%;
-    padding-top: 60px; /* Add space for the menu button */
+    padding-top: 60px;
   }
   
-  /* Add overlay when sidebar is open */
   .app:after {
     content: '';
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 999;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s;
-    pointer-events: none;
-  }
-  
-  .sidebar.visible + .content:before {
-    opacity: 1;
-    visibility: visible;
-    pointer-events: auto;
-  }
-}
-
-/* For very small devices */
-@media screen and (max-width: 480px) {
-  .menu-item {
-    font-size: 0.9rem;
-    padding: 0.4rem 0.8rem;
-  }
-  
-  .sidebar {
-    width: 85%;
-  }
-}
-</style>
+    top: 0}}
+    </style>
