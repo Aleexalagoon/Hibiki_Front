@@ -30,8 +30,38 @@ const search = () => {
 };
 
 const logout = () => {
+  // Detener el intervalo de anuncios al cerrar sesión
+  if (adInterval) {
+    clearInterval(adInterval);
+    adInterval = null;
+  }
+  
   authStore.logout();
   router.push('/login');
+};
+
+const startAdInterval = () => {
+  // Cancelar cualquier intervalo existente primero
+  if (adInterval) {
+    clearInterval(adInterval);
+  }
+
+  // Iniciar nuevo intervalo de anuncios
+  adInterval = setInterval(() => {
+    Swal.fire({
+      title: "Hazte Premium!",
+      text: "Disfruta de música sin anuncios y accede a contenido exclusivo.",
+      icon: "info",
+      confirmButtonText: "Ver planes",
+      confirmButtonColor: "#ff5100",
+      showCancelButton: true,
+      cancelButtonText: "Cerrar",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        router.push('/premium');
+      }
+    });
+  }, 60000); // Cada 1 minuto (60000 milisegundos)
 };
 
 const allSongs = computed(() => cancionesStore.canciones || []);
@@ -45,22 +75,9 @@ onMounted(async () => {
   // Set sidebar visible by default on desktop
   sidebarVisible.value = window.innerWidth > 768;
 
-  if (!isPremium.value) {
-    adInterval = setInterval(() => {
-      Swal.fire({
-        title: "Hazte Premium!",
-        text: "Disfruta de música sin anuncios y accede a contenido exclusivo.",
-        icon: "info",
-        confirmButtonText: "Ver planes",
-        confirmButtonColor: "#ff5100",
-        showCancelButton: true,
-        cancelButtonText: "Cerrar",
-      }).then((result) => {
-        if (result.isConfirmed) {
-          router.push('/premium');
-        }
-      });
-    }, 60000);
+  // Solo iniciar anuncios si no es premium
+  if (!isPremium.value && isAuthenticated.value) {
+    startAdInterval();
   }
 });
 
@@ -68,7 +85,11 @@ onMounted(async () => {
 watchEffect(() => {
   if (authStore.isPremium && adInterval) {
     clearInterval(adInterval);
+    adInterval = null;
     console.log("🚀 Usuario es premium. Anuncios desactivados.");
+  } else if (!authStore.isPremium && isAuthenticated.value) {
+    // Si no es premium y está autenticado, reiniciar los anuncios
+    startAdInterval();
   }
 });
 
