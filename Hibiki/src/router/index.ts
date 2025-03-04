@@ -19,6 +19,11 @@ import PagoCompletadoView from "@/views/PagoCompletadoView.vue";
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+
+    {
+      path: "/",  // Add this route to redirect to the home page
+      redirect: "/inicio"
+    },
     {
       path: "/novedades",
       name: "novedades",
