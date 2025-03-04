@@ -31,31 +31,31 @@ export default {
         alert('Las contraseñas no coinciden');
         return;
       }
-
+      
       try {
         const response = await fetch('https://localhost:7295/api/Usuario', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json'
-  },
-  body: JSON.stringify({
-    name: this.username,
-    email: this.email,
-    password: this.password,
-    isPremium: false,
-    fecha_Registro: new Date().toISOString()
-  })
-});
-
-
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            name: this.username,
+            email: this.email,
+            password: this.password,
+            isPremium: false,
+            fecha_Registro: new Date().toISOString()
+          })
+        });
+        
         if (!response.ok) {
           throw new Error('Error al registrar el usuario');
         }
-
+        
         const data = await response.json();
-        alert('Registro exitoso');
-        localStorage.setItem('isAuthenticated', 'true');
-        this.$router.push('/novedades');
+        alert('Registro exitoso. Por favor, inicia sesión.');
+        
+        // Redirect to login page after successful registration
+        this.$router.push('/login');
       } catch (error) {
         alert('Error en el registro');
         console.error(error);
@@ -64,7 +64,6 @@ export default {
   }
 };
 </script>
-
 
 <style scoped>
 .register-title {
