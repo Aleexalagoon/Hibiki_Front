@@ -6,6 +6,7 @@ import { usePlayerStore } from '@/stores/player';
 import { useCancionesStore } from '@/stores/cancionesStore';
 import MusicPlayer from '@/components/MusicPlayer.vue';
 import Swal from 'sweetalert2';
+import Perfil from '@/components/Perfil.vue';
 
 const searchQuery = ref('');
 const sidebarVisible = ref(false);
@@ -136,7 +137,7 @@ onUnmounted(() => {
 <template>
   <div class="app-container">
     <div class="app">
-     
+      <!-- Botón de menú para móvil -->
       <div class="menu-toggle" @click="toggleSidebar">
         <div class="menu-icon">
           <span></span>
@@ -145,53 +146,12 @@ onUnmounted(() => {
         </div>
       </div>
       
-  
-      <div 
-        v-if="isAuthenticated" 
-        ref="userDropdownRef"
-        class="user-profile" 
-        @click.stop="toggleDropdown"
-      >
-        <div class="user-icon">
-          <span>{{ getUserInitial }}</span>
-        </div>
-        
-        <div 
-          v-if="dropdownVisible" 
-          class="user-dropdown"
-        >
-          <div class="user-info">
-            <div class="user-icon user-icon-small">
-              <span>{{ getUserInitial }}</span>
-            </div>
-            <div class="user-details">
-              <p class="user-name">{{ getUserName }}</p>
-              <p class="user-email">{{ authStore.user?.email }}</p>
-            </div>
-          </div>
-          
-          <div class="dropdown-divider"></div>
-          
-          <div class="dropdown-menu">
-            <div class="dropdown-item" @click="goToProfile">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                <circle cx="12" cy="7" r="4"></circle>
-              </svg>
-              <span>Perfil</span>
-            </div>
-            <div class="dropdown-item" @click="logout">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                <polyline points="16 17 21 12 16 7"></polyline>
-                <line x1="21" y1="12" x2="9" y2="12"></line>
-              </svg>
-              <span>Cerrar Sesión</span>
-            </div>
-          </div>
-        </div>
+      <!-- Componente de perfil de usuario -->
+      <div class="profile-container-p">
+        <Perfil />
       </div>
       
+      <!-- Sidebar -->
       <aside class="sidebar" :class="{ 'visible': sidebarVisible }">
         <div class="logo">HIBIKI</div>
         <nav class="menu">
@@ -240,8 +200,15 @@ onUnmounted(() => {
   position: relative;
 }
 
+/* Nuevo contenedor para el perfil */
+.profile-container-p {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  z-index: 1100;
+}
 
-.user-profile {
+.header-profile-container {
   position: absolute;
   top: 15px;
   right: 15px;
@@ -466,7 +433,6 @@ onUnmounted(() => {
   top: 16px;
 }
 
-
 @media screen and (max-width: 768px) {
   .menu-toggle {
     display: flex;
@@ -494,5 +460,7 @@ onUnmounted(() => {
   .app:after {
     content: '';
     position: fixed;
-    top: 0}}
-    </style>
+    top: 0;
+  }
+}
+</style>

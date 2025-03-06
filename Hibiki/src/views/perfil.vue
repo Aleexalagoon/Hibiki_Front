@@ -284,14 +284,12 @@ const copyLink = () => {
 
 // Funciones para opciones de pista
 const addToPlaylist = (trackId: number) => {
-  // Aquí implementarías la lógica para mostrar un modal de selección de playlist
   console.log('Añadir pista a una lista:', trackId);
 };
 
 const goToArtist = (trackId: number) => {
   const track = profileStore.topTracks.find(t => t.id === trackId);
   if (track) {
-    // Idealmente, necesitarías obtener el ID del artista
     router.push(`/buscar?q=${encodeURIComponent(track.artist)}`);
   }
 };
@@ -299,7 +297,6 @@ const goToArtist = (trackId: number) => {
 const goToAlbum = (trackId: number) => {
   const track = profileStore.topTracks.find(t => t.id === trackId);
   if (track) {
-    // Idealmente, necesitarías obtener el ID del álbum
     router.push(`/buscar?q=${encodeURIComponent(track.album)}`);
   }
 };
@@ -349,6 +346,8 @@ onMounted(() => {
   background: linear-gradient(180deg, #1e1e1e 0%, #121212 100%);
   color: white;
   padding: 24px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 // Loading spinner
@@ -420,9 +419,24 @@ onMounted(() => {
   padding-bottom: 48px;
   position: relative;
   
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+    
+    .profile-avatar {
+      margin-bottom: 24px;
+    }
+    
+    .profile-info {
+      margin-left: 0;
+      margin-bottom: 24px;
+    }
+  }
+  
   .profile-avatar {
     width: 180px;
     height: 180px;
+    min-width: 180px;
     border-radius: 50%;
     background-color: #2a2a2a;
     overflow: hidden;
@@ -467,6 +481,7 @@ onMounted(() => {
   .profile-info {
     margin-left: 24px;
     flex: 1;
+    overflow: hidden;
     
     .profile-label {
       display: block;
@@ -484,6 +499,17 @@ onMounted(() => {
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      
+      @media (max-width: 1024px) {
+        font-size: 48px;
+      }
+      
+      @media (max-width: 768px) {
+        font-size: 36px;
+      }
     }
     
     .profile-stats {
@@ -500,6 +526,12 @@ onMounted(() => {
   
   .profile-options {
     position: relative;
+    
+    @media (max-width: 768px) {
+      position: absolute;
+      top: 0;
+      right: 0;
+    }
     
     .options-button {
       background: none;
@@ -564,18 +596,24 @@ onMounted(() => {
   display: flex;
   align-items: center;
   margin-bottom: 24px;
+  flex-wrap: wrap;
   
   .section-title {
     font-size: 24px;
     font-weight: 700;
     margin: 0;
     flex: 1;
+    min-width: 200px;
   }
   
   .section-visibility {
     font-size: 14px;
     color: #a7a7a7;
     margin: 0 16px;
+    
+    @media (max-width: 768px) {
+      margin: 8px 0;
+    }
   }
   
   .show-all-button {
@@ -599,6 +637,11 @@ onMounted(() => {
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   gap: 24px;
   margin-bottom: 48px;
+  
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 16px;
+  }
   
   .artist-card {
     background-color: #181818;
@@ -629,6 +672,9 @@ onMounted(() => {
       font-weight: 600;
       font-size: 16px;
       margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     
     .artist-label {
@@ -644,11 +690,27 @@ onMounted(() => {
   
   .track-item {
     display: grid;
-    grid-template-columns: auto 56px 1fr auto auto auto auto;
+    grid-template-columns: 40px 56px 1fr 1fr auto auto auto;
     align-items: center;
     padding: 8px 16px;
     border-radius: 4px;
     transition: background-color 0.2s;
+    
+    @media (max-width: 1024px) {
+      grid-template-columns: 40px 56px 1fr auto auto auto;
+      
+      .track-album {
+        display: none;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      grid-template-columns: 40px 56px 1fr auto auto;
+      
+      .track-duration {
+        display: none;
+      }
+    }
     
     &:hover {
       background-color: rgba(255, 255, 255, 0.1);
@@ -663,10 +725,12 @@ onMounted(() => {
     }
     
     .track-index {
-      width: 24px;
+      width: 40px;
       text-align: center;
       color: #a7a7a7;
-      margin-right: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       
       .play-button {
         background: none;
@@ -688,7 +752,6 @@ onMounted(() => {
       width: 40px;
       height: 40px;
       overflow: hidden;
-      margin-right: 16px;
       
       img {
         width: 100%;
@@ -700,6 +763,7 @@ onMounted(() => {
     .track-info {
       overflow: hidden;
       margin-right: 16px;
+      padding: 0 8px;
       
       .track-title {
         font-weight: 500;
@@ -736,12 +800,11 @@ onMounted(() => {
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      flex: 1;
-      margin-right: 16px;
+      padding: 0 8px;
     }
     
     .track-liked {
-      margin-right: 16px;
+      margin-right: 8px;
       
       button {
         background: none;
@@ -757,7 +820,9 @@ onMounted(() => {
     .track-duration {
       color: #a7a7a7;
       font-size: 14px;
-      margin-right: 16px;
+      margin-right: 8px;
+      text-align: right;
+      min-width: 40px;
     }
     
     .track-options {
