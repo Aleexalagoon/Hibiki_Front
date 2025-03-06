@@ -64,11 +64,11 @@ export const usePlaylistStore = defineStore('playlist', {
     async fetchAllPlaylists() {
       this.loading = true;
       this.error = null;
-      
+    
       try {
-        const response = await fetch('https://localhost:7295/api/Playlist');
+        const response = await fetch(`https://localhost:7295/api/Playlist`); // ← QUITAMOS `id`
         if (!response.ok) throw new Error('Error al obtener playlists');
-        
+    
         this.playlists = await response.json();
       } catch (err) {
         this.error = err.message;
@@ -81,21 +81,15 @@ export const usePlaylistStore = defineStore('playlist', {
     async fetchPlaylistById(id: number) {
       this.loading = true;
       this.error = null;
-
+    
       try {
-        const response = await fetch('https://localhost:7295/api/Playlist');
+        const response = await fetch(`${API_BASE_URL}/Playlist/${id}`);
         if (!response.ok) throw new Error(`Error al obtener la playlist con ID: ${id}`);
-
+    
         const data = await response.json();
+        console.log("Playlist obtenida:", data); // 👀 Verifica qué devuelve la API
+    
         this.currentPlaylist = data;
-
-        // Actualizar en la lista de playlists si ya existe
-        const index = this.playlists.findIndex(p => p.playlistId === id);
-        if (index !== -1) {
-          this.playlists[index] = data;
-        } else {
-          this.playlists.push(data);
-        }
       } catch (err) {
         this.error = err.message;
         console.error(`Error al obtener la playlist ${id}:`, err);
@@ -152,24 +146,18 @@ export const usePlaylistStore = defineStore('playlist', {
     async addSongToPlaylist(playlistId: number, cancion: Cancion) {
       this.loading = true;
       this.error = null;
-
+    
       try {
         const response = await fetch(`${API_BASE_URL}/Playlist/${playlistId}/canciones`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(cancion)
         });
-
+    
         if (!response.ok) throw new Error('Error al añadir la canción');
-
-        const playlist = this.playlists.find(p => p.playlistId === playlistId);
-        if (playlist) {
-          playlist.canciones.push(cancion);
-        }
-
-        if (this.currentPlaylist?.playlistId === playlistId) {
-          this.currentPlaylist.canciones.push(cancion);
-        }
+    
+        // Luego de añadir la canción, volvemos a obtener la playlist actualizada
+        await this.fetchPlaylistById(playlistId);
       } catch (err) {
         this.error = err.message;
         console.error(`Error al añadir canción a la playlist ${playlistId}:`, err);

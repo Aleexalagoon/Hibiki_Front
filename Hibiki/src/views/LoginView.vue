@@ -7,6 +7,9 @@
       <button type="submit" class="login-button">Iniciar sesión</button>
       <div class="link">
         <a href="/register" class="signup">¿No tienes cuenta? Regístrate en Hibiki</a>
+        </div>
+        <div class="link">
+        <a href="/loginzonaprivada" class="signup">Si eres trabajador pulsa aqui</a>
       </div>
     </form>
   </div>
@@ -26,14 +29,13 @@ const loginUser = async () => {
   try {
     await authStore.loginUser(email.value, password.value);
     alert('Inicio de sesión exitoso');
-    router.push('/novedades');
+    router.push('/inicio'); // Changed to '/inicio'
   } catch (error) {
     alert('Credenciales inválidas');
     console.error(error);
   }
 };
 </script>
-
 
 <style scoped>
 .login-title {

@@ -2,8 +2,32 @@ import { defineStore } from 'pinia';
 import { useAlbumStore } from './albumStore';
 import { useRouter } from 'vue-router';
 
+// Interfaz para definir la estructura de un Artista
+interface Artista {
+  id?: number;
+  nombre: string;
+  oyentesMensuales?: number;
+  descripcion?: string;
+}
+
+// Interfaz para el estado del store
+interface ArtistaState {
+  allArtists: Artista[];
+  selectedArtist: SelectedArtistData | null;
+  loading: boolean;
+  error: string | null;
+}
+
+// Interfaz para los datos del artista seleccionado
+interface SelectedArtistData {
+  name: string;
+  verified: boolean;
+  monthlyListeners: number;
+  description: string;
+}
+
 export const useArtistaStore = defineStore('artistaStore', {
-  state: () => ({
+  state: (): ArtistaState => ({
     allArtists: [],
     selectedArtist: null,
     loading: false,
@@ -19,16 +43,18 @@ export const useArtistaStore = defineStore('artistaStore', {
         if (!response.ok) {
           throw new Error('Error al obtener los artistas');
         }
-        this.allArtists = await response.json();
-      } catch (err) {
-        this.error = err.message;
+        const data: Artista[] = await response.json();
+        this.allArtists = data;
+      } catch (err: unknown) {
+        const errorMessage = err instanceof Error ? err.message : String(err);
+        this.error = errorMessage;
         console.error('Error de red o servidor:', err);
       } finally {
         this.loading = false;
       }
     },
 
-    async fetchArtistData(artistId) {
+    async fetchArtistData(artistId: number) {
       this.loading = true;
       this.error = null;
       try {
@@ -36,26 +62,27 @@ export const useArtistaStore = defineStore('artistaStore', {
         if (!response.ok) {
           throw new Error('Error al obtener los datos del artista');
         }
-        const data = await response.json();
+        const data: Artista = await response.json();
 
         this.selectedArtist = {
           name: data.nombre,
           verified: true,
-          monthlyListeners: data.oyentesMensuales,
-          description: data.descripcion,
+          monthlyListeners: data.oyentesMensuales || 0,
+          description: data.descripcion || '',
         };
 
         const albumStore = useAlbumStore();
         albumStore.fetchAlbumsByArtist(artistId);
-      } catch (err) {
-        this.error = err.message;
+      } catch (err: unknown) {
+        const errorMessage = err instanceof Error ? err.message : String(err);
+        this.error = errorMessage;
         console.error('Error de red o servidor:', err);
       } finally {
         this.loading = false;
       }
     },
 
-    navigateToArtist(artistId) {
+    navigateToArtist(artistId: number) {
       const router = useRouter();
       router.push(`/artista/${artistId}`);
     }
