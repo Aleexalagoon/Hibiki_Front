@@ -1,17 +1,46 @@
 import { defineStore } from 'pinia';
 
+// Interfaz para definir la estructura de un Álbum
+interface Album {
+  albumId: number;
+  nombre: string;
+  artista?: string;
+  fechaLanzamiento?: string;
+  // Añade otras propiedades según tu modelo de datos
+}
+
+// Interfaz para definir la estructura de una Canción
+interface Cancion {
+  id?: number;
+  titulo: string;
+  duracion?: string;
+  albumId?: number;
+  // Añade otras propiedades según tu modelo de datos
+}
+
+// Interfaz para el estado del store
+interface AlbumState {
+  albums: Album[];
+  selectedAlbum: Album | null;
+  songs: Cancion[];
+  selectedSong: Cancion | null;
+  error: string | null;
+  loading: boolean;
+}
+
 export const useAlbumStore = defineStore('albumStore', {
-  state: () => ({
+  state: (): AlbumState => ({
     albums: [], // Lista de álbumes del artista seleccionado
     selectedAlbum: null, // Álbum seleccionado
     songs: [], // Canciones del álbum seleccionado
+    selectedSong: null, // Canción seleccionada
     error: null,
     loading: false
   }),
 
   actions: {
     // Obtener álbumes de un artista específico
-    async fetchAlbumsByArtist(artistId) {
+    async fetchAlbumsByArtist(artistId: number) {
       this.loading = true;
       this.error = null;
       try {
@@ -19,8 +48,10 @@ export const useAlbumStore = defineStore('albumStore', {
         if (!response.ok) {
           throw new Error(`Error en la API: ${response.statusText}`);
         }
-        this.albums = await response.json();
-      } catch (error) {
+        const data: Album[] = await response.json();
+        this.albums = data;
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
         console.error('Error en la API:', error);
         this.error = 'No se pudieron cargar los álbumes del artista';
       } finally {
@@ -29,7 +60,7 @@ export const useAlbumStore = defineStore('albumStore', {
     },
 
     // Obtener canciones de un álbum seleccionado
-    async fetchAlbumSongs(albumId) {
+    async fetchAlbumSongs(albumId: number) {
       this.loading = true;
       this.error = null;
       try {
@@ -37,13 +68,14 @@ export const useAlbumStore = defineStore('albumStore', {
         if (!response.ok) {
           throw new Error(`Error en la API: ${response.statusText}`);
         }
-        const data = await response.json();
+        const data: Cancion[] = await response.json();
 
         // Aquí solo actualizamos las canciones, no necesitamos buscar el álbum si ya está cargado
         this.songs = data;
         // Si deseas, puedes actualizar el álbum seleccionado también:
         this.selectedAlbum = this.albums.find(album => album.albumId === albumId) || null;
-      } catch (error) {
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
         console.error('Error en la API:', error);
         this.error = 'No se pudieron cargar las canciones del álbum';
       } finally {
@@ -57,10 +89,9 @@ export const useAlbumStore = defineStore('albumStore', {
       this.selectedAlbum = null;
     },
 
-      setSelectedSong(song) {
-        this.selectedSong = song;
-      }
-    
-    
+    // Establecer la canción seleccionada
+    setSelectedSong(song: Cancion | null) {
+      this.selectedSong = song;
+    }
   }
 });
