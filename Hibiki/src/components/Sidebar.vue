@@ -17,6 +17,7 @@ const authStore = useAuthStore();
 const router = useRouter();
 
 const isAuthenticated = computed(() => authStore.isAuthenticated);
+const isPremium = computed(() => authStore.isPremium);
 
 const toggleSidebar = () => {
   emit('update:visible', !props.visible);
@@ -44,7 +45,8 @@ const logout = () => {
         <button @click="search">Buscar</button>
       </div>
       
-      <router-link to="/inicio" class="menu-item" active-class="active" @click="$emit('update:visible', false)">Inicio</router-link>
+      <!-- Mostrar Inicio solo si no es premium o no está autenticado -->
+      <router-link v-if="!isPremium || !isAuthenticated" to="/inicio" class="menu-item" active-class="active" @click="$emit('update:visible', false)">Inicio</router-link>
       <router-link to="/novedades" class="menu-item" active-class="active" @click="$emit('update:visible', false)">Novedades</router-link>
       
       <div v-if="isAuthenticated">

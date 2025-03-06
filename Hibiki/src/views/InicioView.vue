@@ -1,3 +1,21 @@
+<script setup>
+import { computed } from 'vue';
+import { useRouter } from 'vue-router';
+import { useAuthStore } from '@/stores/auth';
+
+const router = useRouter();
+const authStore = useAuthStore();
+const isAuthenticated = computed(() => authStore.isAuthenticated);
+
+const handleButtonClick = () => {
+  if (isAuthenticated.value) {
+    router.push('/premium');
+  } else {
+    router.push('/login');
+  }
+};
+</script>
+
 <template>
   <div class="container">
     <h1 class="title">HIBIKI</h1>
@@ -16,7 +34,9 @@
     <p class="description">
       Obtén playlists y álbumes inspirados en los artistas y géneros que escuchas. 1 mes gratis y luego, 10,99 € al mes.
     </p>
-    <a href="/login" class="button">Probar gratis</a>
+    <button @click="handleButtonClick" class="button">
+      {{ isAuthenticated ? 'Ver Premium' : 'Probar gratis' }}
+    </button>
   </div>
 </template>
 
@@ -153,6 +173,4 @@
     transform: scale(1.2) rotate(5deg);
   }
 }
-
-
 </style>
