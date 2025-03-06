@@ -33,10 +33,13 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 
+// URL base para todas las solicitudes API
+const API_BASE_URL = import.meta.env.VITE_API_URL;
+
 const artists = ref([])
 const fetchArtists = async () => {
   try {
-    const response = await fetch('https://localhost:7295/api/Artista')
+    const response = await fetch(`${API_BASE_URL}/Artista`)
     const data = await response.json()
     artists.value = data
   } catch (error) {
@@ -53,7 +56,7 @@ const updateArtist = async (artist) => {
     const updatedImage = prompt('Enter image:', artist.image)
     
     if (updatedNombre && updatedOyentes && updatedDescripcion && updatedImage) {
-      const response = await fetch(`https://localhost:7295/api/Artista/${artist.cantanteId}`, {
+      const response = await fetch(`${API_BASE_URL}/Artista/${artist.cantanteId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -82,7 +85,7 @@ const showAddArtistModal = async () => {
     const image = prompt('Enter image URL:')
     
     if (nombre && oyentesMensuales && descripcion && image) {
-      const response = await fetch('https://localhost:7295/api/Artista', {
+      const response = await fetch(`${API_BASE_URL}/Artista`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ nombre, oyentesMensuales: parseInt(oyentesMensuales), descripcion, image })
@@ -104,7 +107,7 @@ const showDeleteArtistModal = async () => {
     const cantanteId = prompt('Enter artist ID to delete:')
     
     if (cantanteId) {
-      const response = await fetch(`https://localhost:7295/api/Artista/${cantanteId}`, { method: 'DELETE' })
+      const response = await fetch(`${API_BASE_URL}/Artista/${cantanteId}`, { method: 'DELETE' })
       
       if (response.ok) {
         fetchArtists()

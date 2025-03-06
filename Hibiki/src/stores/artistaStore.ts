@@ -26,6 +26,9 @@ interface SelectedArtistData {
   description: string;
 }
 
+// URL base para todas las solicitudes API
+const API_BASE_URL = import.meta.env.VITE_API_URL;
+
 export const useArtistaStore = defineStore('artistaStore', {
   state: (): ArtistaState => ({
     allArtists: [],
@@ -39,7 +42,7 @@ export const useArtistaStore = defineStore('artistaStore', {
       this.loading = true;
       this.error = null;
       try {
-        const response = await fetch('https://localhost:7295/api/Artista');
+        const response = await fetch(`${API_BASE_URL}/Artista`);
         if (!response.ok) {
           throw new Error('Error al obtener los artistas');
         }
@@ -58,7 +61,7 @@ export const useArtistaStore = defineStore('artistaStore', {
       this.loading = true;
       this.error = null;
       try {
-        const response = await fetch(`https://localhost:7295/api/Artista/${artistId}`);
+        const response = await fetch(`${API_BASE_URL}/Artista/${artistId}`);
         if (!response.ok) {
           throw new Error('Error al obtener los datos del artista');
         }

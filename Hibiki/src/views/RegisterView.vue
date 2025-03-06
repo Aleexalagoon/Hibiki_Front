@@ -32,8 +32,11 @@ export default {
         return;
       }
       
+      // Obtenemos la URL base de la API desde las variables de entorno
+      const API_BASE_URL = import.meta.env.VITE_API_URL;
+      
       try {
-        const response = await fetch('https://localhost:7295/api/Usuario', {
+        const response = await fetch(`${API_BASE_URL}/Usuario`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'

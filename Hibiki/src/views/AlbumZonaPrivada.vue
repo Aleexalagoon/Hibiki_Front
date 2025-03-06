@@ -33,10 +33,13 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 
+// URL base para todas las solicitudes API
+const API_BASE_URL = import.meta.env.VITE_API_URL;
+
 const albums = ref([])
 const fetchAlbums = async () => {
   try {
-    const response = await fetch('https://localhost:7295/api/Album')
+    const response = await fetch(`${API_BASE_URL}/Album`)
     const data = await response.json()
     albums.value = data
   } catch (error) {
@@ -54,7 +57,7 @@ const updateAlbum = async (album) => {
     const updatedImage = prompt('Enter new image URL:', album.image)
     
     if (updatedName && updatedArtistId && updatedReleaseDate) {
-      const response = await fetch(`https://localhost:7295/api/Album/${album.albumId}`, {
+      const response = await fetch(`${API_BASE_URL}/Album/${album.albumId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -83,7 +86,7 @@ const showAddAlbumModal = async () => {
     const image = prompt('Enter image URL:')
     
     if (name && artistId && releaseDate) {
-      const response = await fetch('https://localhost:7295/api/Album', {
+      const response = await fetch(`${API_BASE_URL}/Album`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, artistId: parseInt(artistId), releaseDate, image })
@@ -105,7 +108,7 @@ const showDeleteAlbumModal = async () => {
     const albumId = prompt('Enter album ID to delete:')
     
     if (albumId) {
-      const response = await fetch(`https://localhost:7295/api/Album/${albumId}`, { method: 'DELETE' })
+      const response = await fetch(`${API_BASE_URL}/Album/${albumId}`, { method: 'DELETE' })
       
       if (response.ok) {
         fetchAlbums()

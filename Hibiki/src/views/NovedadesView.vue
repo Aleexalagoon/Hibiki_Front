@@ -90,7 +90,8 @@ export default {
   methods: {
     async fetchRecentSongs() {
       try {
-        const response = await fetch('https://localhost:7295/api/Cancion');
+        const API_BASE_URL = import.meta.env.VITE_API_URL;
+        const response = await fetch(`${API_BASE_URL}/Cancion`);
         const data = await response.json();
         this.recentSongs = data;
       } catch (error) {
@@ -99,7 +100,8 @@ export default {
     },
     async fetchNewAlbums() {
       try {
-        const response = await fetch('https://localhost:7295/api/Album');
+        const API_BASE_URL = import.meta.env.VITE_API_URL;
+        const response = await fetch(`${API_BASE_URL}/Album`);
         const data = await response.json();
         this.newAlbums = data;
       } catch (error) {

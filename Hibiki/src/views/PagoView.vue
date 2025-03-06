@@ -2,11 +2,15 @@
 import { useAuthStore } from '@/stores/auth';
 import { useRouter } from 'vue-router';
 import { ref } from 'vue';
+import Swal from 'sweetalert2';
 
 const authStore = useAuthStore();
 const router = useRouter();
 const formIsValid = ref(true);
 const errorMessage = ref('');
+
+// Obtenemos la URL base de la API desde las variables de entorno
+const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 const handlePayment = async (event) => {
   event.preventDefault();
@@ -23,7 +27,7 @@ const handlePayment = async (event) => {
   }
   
   try {
-    const updateResponse = await fetch(`https://localhost:7295/api/Usuario/${authStore.user.id}`, {
+    const updateResponse = await fetch(`${API_BASE_URL}/Usuario/${authStore.user.id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',

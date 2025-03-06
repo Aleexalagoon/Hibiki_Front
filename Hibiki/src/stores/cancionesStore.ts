@@ -8,6 +8,9 @@ interface Cancion {
   artista?: string;
 }
 
+// URL base para todas las solicitudes API
+const API_BASE_URL = import.meta.env.VITE_API_URL;
+
 export const useCancionesStore = defineStore('canciones', () => {
   const canciones: Ref<Cancion[]> = ref([]);
   const loading: Ref<boolean> = ref(false);
@@ -16,7 +19,7 @@ export const useCancionesStore = defineStore('canciones', () => {
   const fetchCanciones = async (): Promise<void> => {
     loading.value = true;
     try {
-      const response = await fetch('https://localhost:7295/api/Cancion');
+      const response = await fetch(`${API_BASE_URL}/Cancion`);
       if (!response.ok) {
         throw new Error(`Error: ${response.status} - ${response.statusText}`);
       }

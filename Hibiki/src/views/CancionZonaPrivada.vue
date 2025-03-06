@@ -33,10 +33,13 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 
+// URL base para todas las solicitudes API
+const API_BASE_URL = import.meta.env.VITE_API_URL;
+
 const songs = ref([])
 const fetchSongs = async () => {
   try {
-    const response = await fetch('https://localhost:7295/api/Cancion')
+    const response = await fetch(`${API_BASE_URL}/Cancion`)
     const data = await response.json()
     songs.value = data
   } catch (error) {
@@ -55,7 +58,7 @@ const updateSong = async (song) => {
     const updatedImage = prompt('Enter image:', song.image)
     
     if (updatedNombre && updatedAlbum && updatedDuracion && updatedCantanteId) {
-      const response = await fetch(`https://localhost:7295/api/Cancion/${song.cancionId}`, {
+      const response = await fetch(`${API_BASE_URL}/Cancion/${song.cancionId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -85,7 +88,7 @@ const showAddSongModal = async () => {
     const cantanteId = prompt('Enter singer ID:')
     
     if (nombre && albumId && duracion && cantanteId) {
-      const response = await fetch('https://localhost:7295/api/Cancion', {
+      const response = await fetch(`${API_BASE_URL}/Cancion`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ nombre, albumId: parseInt(albumId), duracion, cantanteId: parseInt(cantanteId) })
@@ -107,7 +110,7 @@ const showDeleteSongModal = async () => {
     const cancionId = prompt('Enter song ID to delete:')
     
     if (cancionId) {
-      const response = await fetch(`https://localhost:7295/api/Cancion/${cancionId}`, { method: 'DELETE' })
+      const response = await fetch(`${API_BASE_URL}/Cancion/${cancionId}`, { method: 'DELETE' })
       
       if (response.ok) {
         fetchSongs()

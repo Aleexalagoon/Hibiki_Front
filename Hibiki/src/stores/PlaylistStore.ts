@@ -25,7 +25,8 @@ export interface Playlist {
 }
 
 // URL base para todas las solicitudes API
-const API_BASE_URL = 'https://localhost:7295/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL
+
 
 export const usePlaylistStore = defineStore('playlist', {
   state: () => ({
@@ -66,12 +67,12 @@ export const usePlaylistStore = defineStore('playlist', {
       this.error = null;
     
       try {
-        const response = await fetch(`https://localhost:7295/api/Playlist`); // ← QUITAMOS `id`
+        const response = await fetch(`${API_BASE_URL}/Playlist`); // Cambiado a API_BASE_URL
         if (!response.ok) throw new Error('Error al obtener playlists');
     
         this.playlists = await response.json();
-      } catch (err) {
-        this.error = err.message;
+      } catch (err: any) {
+        this.error = err instanceof Error ? err.message : String(err);
         console.error('Error al obtener playlists:', err);
       } finally {
         this.loading = false;
@@ -90,8 +91,8 @@ export const usePlaylistStore = defineStore('playlist', {
         console.log("Playlist obtenida:", data); // 👀 Verifica qué devuelve la API
     
         this.currentPlaylist = data;
-      } catch (err) {
-        this.error = err.message;
+      } catch (err: any) {
+        this.error = err instanceof Error ? err.message : String(err);
         console.error(`Error al obtener la playlist ${id}:`, err);
       } finally {
         this.loading = false;
@@ -103,7 +104,7 @@ export const usePlaylistStore = defineStore('playlist', {
       this.error = null;
 
       try {
-        const response = await fetch('https://localhost:7295/api/Playlist', {
+        const response = await fetch(`${API_BASE_URL}/Playlist`, { // Cambiado a API_BASE_URL
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(playlist)
@@ -114,8 +115,8 @@ export const usePlaylistStore = defineStore('playlist', {
         const newPlaylist = await response.json();
         this.playlists.push(newPlaylist);
         return newPlaylist;
-      } catch (err) {
-        this.error = err.message;
+      } catch (err: any) {
+        this.error = err instanceof Error ? err.message : String(err);
         console.error('Error al crear la playlist:', err);
       } finally {
         this.loading = false;
@@ -127,7 +128,7 @@ export const usePlaylistStore = defineStore('playlist', {
       this.error = null;
 
       try {
-        const response = await fetch('https://localhost:7295/api/Playlist', { method: 'DELETE' });
+        const response = await fetch(`${API_BASE_URL}/Playlist/${id}`, { method: 'DELETE' }); // Cambiado a API_BASE_URL y corregido para incluir el ID
         if (!response.ok) throw new Error(`Error al eliminar la playlist ${id}`);
 
         this.playlists = this.playlists.filter(p => p.playlistId !== id);
@@ -135,8 +136,8 @@ export const usePlaylistStore = defineStore('playlist', {
         if (this.currentPlaylist?.playlistId === id) {
           this.currentPlaylist = null;
         }
-      } catch (err) {
-        this.error = err.message;
+      } catch (err: any) {
+        this.error = err instanceof Error ? err.message : String(err);
         console.error(`Error al eliminar la playlist ${id}:`, err);
       } finally {
         this.loading = false;
@@ -158,8 +159,8 @@ export const usePlaylistStore = defineStore('playlist', {
     
         // Luego de añadir la canción, volvemos a obtener la playlist actualizada
         await this.fetchPlaylistById(playlistId);
-      } catch (err) {
-        this.error = err.message;
+      } catch (err: any) {
+        this.error = err instanceof Error ? err.message : String(err);
         console.error(`Error al añadir canción a la playlist ${playlistId}:`, err);
       } finally {
         this.loading = false;
@@ -187,8 +188,8 @@ export const usePlaylistStore = defineStore('playlist', {
             c => c.cancionId !== cancionId
           );
         }
-      } catch (err) {
-        this.error = err.message;
+      } catch (err: any) {
+        this.error = err instanceof Error ? err.message : String(err);
         console.error(`Error al eliminar canción de la playlist ${playlistId}:`, err);
       } finally {
         this.loading = false;
@@ -202,8 +203,8 @@ export const usePlaylistStore = defineStore('playlist', {
       try {
         await fetch(`${API_BASE_URL}/Playlist/initialize`, { method: 'POST' });
         await this.fetchAllPlaylists();
-      } catch (err) {
-        this.error = err.message;
+      } catch (err: any) {
+        this.error = err instanceof Error ? err.message : String(err);
         console.error('Error al inicializar datos:', err);
       } finally {
         this.loading = false;

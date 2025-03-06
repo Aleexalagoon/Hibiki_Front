@@ -1,6 +1,9 @@
 import { defineStore } from 'pinia';
 import Swal from 'sweetalert2';
 
+// URL base para todas las solicitudes API
+const API_BASE_URL = import.meta.env.VITE_API_URL;
+
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     user: JSON.parse(localStorage.getItem('user') || 'null'),
@@ -14,14 +17,14 @@ export const useAuthStore = defineStore('auth', {
       try {
         const userEmail = email || `${username}@example.com`;
 
-        const response = await fetch('https://localhost:7295/api/Usuario', {
+        const response = await fetch(`${API_BASE_URL}/Usuario`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             name: username,
             email: userEmail,
             password: password,
-            isPremium: false, 
+            isPremium: false,
             fecha_Registro: new Date().toISOString(),
           }),
         });
@@ -39,7 +42,7 @@ export const useAuthStore = defineStore('auth', {
         });
 
         return data;
-      } catch (error) {
+      } catch (error: any) {
         this.error = error;
         Swal.fire({
           icon: "error",
@@ -53,7 +56,7 @@ export const useAuthStore = defineStore('auth', {
 
     async loginUser(email: string, password: string) {
       try {
-        const url = `https://localhost:7295/api/Usuario/login?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`;
+        const url = `${API_BASE_URL}/Usuario/login?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`;
         const response = await fetch(url, { method: 'GET' });
 
         if (!response.ok) throw new Error('Credenciales inválidas');
@@ -69,7 +72,7 @@ export const useAuthStore = defineStore('auth', {
         });
 
         return data;
-      } catch (error) {
+      } catch (error: any) {
         this.error = error;
         Swal.fire({
           icon: "error",
@@ -90,12 +93,12 @@ export const useAuthStore = defineStore('auth', {
 
     async actualizarDatosUsuario() {
       try {
-        const response = await fetch(`https://localhost:7295/api/Usuario/${this.user.id}`);
+        const response = await fetch(`${API_BASE_URL}/Usuario/${this.user.id}`);
         if (!response.ok) throw new Error('Error al obtener datos del usuario');
 
         const userData = await response.json();
         this.setUser(userData);
-      } catch (error) {
+      } catch (error: any) {
         console.error("Error actualizando usuario:", error);
       }
     },

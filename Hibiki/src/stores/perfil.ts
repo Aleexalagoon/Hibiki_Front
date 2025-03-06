@@ -30,6 +30,9 @@ interface Playlist {
   image: string;
 }
 
+// URL base para todas las solicitudes API
+const API_BASE_URL = import.meta.env.VITE_API_URL;
+
 export const useProfileStore = defineStore('profileStore', {
   state: () => ({
     userData: {
@@ -52,7 +55,7 @@ export const useProfileStore = defineStore('profileStore', {
       
       try {
         console.log('Realizando petición a la API...');
-        const response = await fetch('https://localhost:7295/api/perfil', {
+        const response = await fetch(`${API_BASE_URL}/perfil`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
