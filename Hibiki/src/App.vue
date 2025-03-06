@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watchEffect, onMounted, onUnmounted, onBeforeUnmount } from 'vue';
+import { ref, computed, onMounted, onUnmounted, watchEffect } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 import { usePlayerStore } from '@/stores/player';
@@ -7,11 +7,10 @@ import { useCancionesStore } from '@/stores/cancionesStore';
 import MusicPlayer from '@/components/MusicPlayer.vue';
 import Swal from 'sweetalert2';
 import Perfil from '@/components/Perfil.vue';
+import Sidebar from '@/components/Sidebar.vue'; 
 
-const searchQuery = ref('');
 const sidebarVisible = ref(false);
-const dropdownVisible = ref(false);
-const userDropdownRef = ref<HTMLElement | null>(null);
+const searchQuery = ref('');
 
 const authStore = useAuthStore();
 const playerStore = usePlayerStore();
@@ -19,46 +18,19 @@ const cancionesStore = useCancionesStore();
 const router = useRouter();
 
 const isAuthenticated = computed(() => authStore.isAuthenticated);
-const isPremium = computed(() => authStore.isPremium); 
+const isPremium = computed(() => authStore.isPremium);
 
-const getUserInitial = computed(() => {
-  const userName = authStore.user?.name || authStore.user?.email || '';
-  return userName.charAt(0).toUpperCase();
-});
+const allSongs = computed(() => cancionesStore.canciones || []);
 
-const getUserName = computed(() => {
-  return authStore.user?.name || authStore.user?.email || 'Usuario';
-});
+let adInterval: any = null;
 
-const toggleDropdown = () => {
-  dropdownVisible.value = !dropdownVisible.value;
+const handleSearch = (query: string) => {
+  searchQuery.value = query;
+  console.log('Buscando:', query);
 };
 
-const handleClickOutside = (event: MouseEvent) => {
-  if (userDropdownRef.value && !userDropdownRef.value.contains(event.target as Node)) {
-    dropdownVisible.value = false;
-  }
-};
 
-const toggleSidebar = () => {
-  sidebarVisible.value = !sidebarVisible.value;
-};
-
-const search = () => {
-  console.log('Buscando:', searchQuery.value);
-
-  if (window.innerWidth <= 768) {
-    sidebarVisible.value = false;
-  }
-};
-
-const goToProfile = () => {
-  router.push('/perfil');
-  dropdownVisible.value = false;
-};
-
-const logout = () => {
- 
+const handleLogout = () => {
   if (adInterval) {
     clearInterval(adInterval);
     adInterval = null;
@@ -66,15 +38,12 @@ const logout = () => {
   
   authStore.logout();
   router.push('/login');
-  dropdownVisible.value = false;
 };
 
 const startAdInterval = () => {
-
   if (adInterval) {
     clearInterval(adInterval);
   }
-
   
   adInterval = setInterval(() => {
     Swal.fire({
@@ -90,29 +59,19 @@ const startAdInterval = () => {
         router.push('/premium');
       }
     });
-  }, 60000); // Cada 1 minuto (60000 milisegundos)
+  }, 60000); // Cada 1 minuto
 };
-
-const allSongs = computed(() => cancionesStore.canciones || []);
-
-let adInterval: any = null;
 
 onMounted(async () => {
   authStore.loadUserFromStorage();
   await cancionesStore.fetchCanciones();
   
-  
   sidebarVisible.value = window.innerWidth > 768;
-
- 
+  
   if (!isPremium.value && isAuthenticated.value) {
     startAdInterval();
   }
-
-  
-  document.addEventListener('click', handleClickOutside);
 });
-
 
 watchEffect(() => {
   if (authStore.isPremium && adInterval) {
@@ -120,7 +79,6 @@ watchEffect(() => {
     adInterval = null;
     console.log("🚀 Usuario es premium. Anuncios desactivados.");
   } else if (!authStore.isPremium && isAuthenticated.value) {
-    
     startAdInterval();
   }
 });
@@ -129,51 +87,23 @@ onUnmounted(() => {
   if (adInterval) {
     clearInterval(adInterval);
   }
-
-  document.removeEventListener('click', handleClickOutside);
 });
 </script>
 
 <template>
   <div class="app-container">
     <div class="app">
-      <!-- Botón de menú para móvil -->
-      <div class="menu-toggle" @click="toggleSidebar">
-        <div class="menu-icon">
-          <span></span>
-          <span></span>
-          <span></span>
-        </div>
-      </div>
+      <!-- Sidebar component with v-model for visibility -->
+      <Sidebar 
+        v-model:visible="sidebarVisible"
+        @search="handleSearch"
+        @logout="handleLogout"
+      />
       
       <!-- Componente de perfil de usuario -->
       <div class="profile-container-p">
         <Perfil />
       </div>
-      
-      <!-- Sidebar -->
-      <aside class="sidebar" :class="{ 'visible': sidebarVisible }">
-        <div class="logo">HIBIKI</div>
-        <nav class="menu">
-          <div class="menu-search">
-            <input type="text" placeholder="Buscar..." v-model="searchQuery" />
-            <button @click="search">Buscar</button>
-          </div>
-          
-          <router-link to="/inicio" class="menu-item" active-class="active" @click="sidebarVisible = false">Inicio</router-link>
-          <router-link to="/novedades" class="menu-item" active-class="active" @click="sidebarVisible = false">Novedades</router-link>
-          
-          <div v-if="isAuthenticated">
-            <router-link to="/artista" class="menu-item" active-class="active" @click="sidebarVisible = false">Artistas</router-link>
-            <router-link to="/playlist" class="menu-item" active-class="active" @click="sidebarVisible = false">Playlists</router-link>
-            <router-link to="/premium" class="menu-item" active-class="active" @click="sidebarVisible = false">Premium</router-link>
-          </div>
-        </nav>
-        
-        <div v-if="isAuthenticated" class="auth-buttons">
-          <button class="logout-button" @click="logout">Cerrar Sesión</button>
-        </div>
-      </aside>
       
       <main class="content">
         <RouterView />
