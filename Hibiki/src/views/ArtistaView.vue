@@ -152,12 +152,17 @@ export default defineComponent({
   min-height: 100vh;
   background: #121212;
   color: white;
+  overflow-x: hidden; /* Prevent horizontal scrolling at the page level */
+  max-width: 100vw;
+  box-sizing: border-box;
 }
 
 .main-container {
   display: flex;
   flex: 1;
   width: 100%;
+  max-width: 100%; /* Ensure it doesn't overflow */
+  box-sizing: border-box; /* Include padding in width calculation */
 }
 
 .artists-list {
@@ -276,7 +281,23 @@ export default defineComponent({
   opacity: 0.8;
 }
 
-/* Add these media queries to your existing CSS */
+
+.artists-list::-webkit-scrollbar {
+  height: 6px;
+  width: 6px;
+}
+
+.artists-list::-webkit-scrollbar-thumb {
+  background: #ff5100;
+  border-radius: 10px;
+}
+
+.artists-list::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+
+
 @media screen and (max-width: 992px) {
   .main-container {
     flex-direction: column;
@@ -322,10 +343,11 @@ export default defineComponent({
   
   .details-container {
     width: 100%;
-    padding: 20px 15px;
+    padding: 20px 15px 20px 15px; 
+    box-sizing: border-box;
   }
   
-  /* Improved Albums Display */
+
   .albums {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
@@ -358,8 +380,10 @@ export default defineComponent({
   }
 }
 
-/* For small mobile devices */
+
 @media screen and (max-width: 576px) {
+ 
+  
   .artists-list {
     max-height: 200px;
     padding: 10px;
@@ -375,13 +399,26 @@ export default defineComponent({
     height: 60px;
   }
   
-  /* Improved Song List for Mobile */
+  .details-container {
+    padding: 20px 15px; 
+    overflow-x: hidden; 
+  }
+  
+ 
+  ul {
+    padding: 0 5px 0 0; 
+    list-style-type: none;
+ 
+  }
+  
   .song-card {
     margin-bottom: 8px;
     padding: 12px 10px;
     border-radius: 8px;
     background-color: rgba(255, 255, 255, 0.05);
     transition: background-color 0.2s;
+    width: calc(100% - 10px); 
+    box-sizing: border-box;
   }
   
   .song-card:hover {
@@ -421,13 +458,14 @@ export default defineComponent({
     font-size: 12px;
   }
   
-  /* Album grid for very small screens */
+ 
   .albums {
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
     gap: 15px;
+    width: 100%;
+    box-sizing: border-box;
   }
   
-  /* Better headings for mobile */
+  
   .details-container h1 {
     font-size: 24px;
     margin-bottom: 5px;
@@ -449,34 +487,17 @@ export default defineComponent({
     background-color: #ff5100;
     border-radius: 3px;
   }
-  
-  /* Better list styling for songs */
-  ul {
-    padding: 0;
-    list-style-type: none;
-  }
 }
 
-/* Fix scrollbar appearance for horizontal scroll */
-.artists-list::-webkit-scrollbar {
-  height: 6px;
-  width: 6px;
-}
 
-.artists-list::-webkit-scrollbar-thumb {
-  background: #ff5100;
-  border-radius: 10px;
-}
-
-.artists-list::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 10px;
-}
-
-/* Extra small devices */
 @media screen and (max-width: 400px) {
+  .details-container {
+    padding: 20px 15px 20px 20px; 
+  }
+  
   .albums {
     grid-template-columns: repeat(2, 1fr);
+    
   }
   
   .song-image {
