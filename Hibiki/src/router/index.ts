@@ -15,6 +15,11 @@ import CancionesView from "@/views/CancionesView.vue";
 import perfilView from "@/views/perfil.vue";
 import PagoView from "@/views/PagoView.vue";
 import PagoCompletadoView from "@/views/PagoCompletadoView.vue";
+import LoginZonaPrivada from "@/views/LoginZonaPrivada.vue";
+import ZonaPrivada from "@/views/ZonaPrivada.vue";
+import CancionZonaPrivada from "@/views/CancionZonaPrivada.vue";
+import CantanteZonaPrivada from "@/views/CantanteZonaPrivada.vue";
+import AlbumZonaPrivada from "@/views/AlbumZonaPrivada.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -122,6 +127,36 @@ const router = createRouter({
       path: "/pagocompletado",
       name: "pagocompletado",
       component: PagoCompletadoView,
+    },
+
+    {
+      path: "/loginzonaprivada",
+      name: "loginzonaprivada",
+      component: LoginZonaPrivada,
+    },
+
+    {
+      path: "/zonaprivada",
+      name: "zonaprivada",
+      component: ZonaPrivada,
+    },
+
+    {
+      path: "/cancionzonaprivada",
+      name: "cancionzonaprivada",
+      component: CancionZonaPrivada,
+    },
+
+    {
+      path: "/cantantezonaprivada",
+      name: "cantantezonaprivada",
+      component: CantanteZonaPrivada,
+    },
+
+    {
+      path: "/albumzonaprivada",
+      name: "albumzonaprivada",
+      component: AlbumZonaPrivada,
     }
   ],
 });

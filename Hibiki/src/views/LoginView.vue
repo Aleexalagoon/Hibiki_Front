@@ -7,6 +7,9 @@
       <button type="submit" class="login-button">Iniciar sesión</button>
       <div class="link">
         <a href="/register" class="signup">¿No tienes cuenta? Regístrate en Hibiki</a>
+        </div>
+        <div class="link">
+        <a href="/loginzonaprivada" class="signup">Si eres trabajador pulsa aqui</a>
       </div>
     </form>
   </div>
