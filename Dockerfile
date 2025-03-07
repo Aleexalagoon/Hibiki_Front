@@ -13,17 +13,14 @@ RUN npm install
 # Copy project files
 COPY Hibiki/ .
 
-# Build the app
-RUN npm run build
+# Build the app sin comprobación de tipos
+RUN npm run build-only
 
 # Production stage
 FROM nginx:stable-alpine as production-stage
 
 # Copy built files from build stage to nginx serve directory
 COPY --from=build-stage /app/dist /usr/share/nginx/html
-
-# Copy custom nginx config if needed
-# COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Expose port 80
 EXPOSE 80

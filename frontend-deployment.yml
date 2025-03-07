@@ -9,7 +9,7 @@ metadata:
   name: hibiki-config
   namespace: hibiki
 data:
-  API_URL: "https://api.hibiki.example.com"
+  API_URL: "http://hibikiapi.retocsv.es/api"
   NODE_ENV: "production"
 ---
 apiVersion: v1
@@ -40,7 +40,7 @@ spec:
     spec:
       containers:
       - name: hibiki
-        image: hibiki:latest
+        image: alejandroalagon33/sanvalero:hibikifront
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 80

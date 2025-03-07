@@ -28,13 +28,13 @@ export default {
   },
   methods: {
     async fetchSongData() {
-      const response = await fetch('https://localhost:7295/api/Cancion');
+      const response = await fetch('${API_BASE_URL}/Cancion');
       if (response.ok) {
         this.tracks = await response.json();
       }
     },
     async fetchSongDetails(songId) {
-      const response = await fetch(`https://localhost:7295/api/Cancion/${songId}`);
+      const response = await fetch(`${API_BASE_URL}/Cancion/${songId}`);
       if (response.ok) {
         this.songInfo = await response.json();
       }

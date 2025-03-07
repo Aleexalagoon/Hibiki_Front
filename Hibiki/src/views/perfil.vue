@@ -206,7 +206,7 @@ const toggleLike = async (track: { id: number; liked: boolean }) => {
     const token = authStore.user.token;
     const endpoint = track.liked ? 'unlike' : 'like';
     
-    const response = await fetch(`https://localhost:7295/api/canciones/${track.id}/${endpoint}`, {
+    const response = await fetch(`${API_BASE_URL}/canciones/${track.id}/${endpoint}`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,

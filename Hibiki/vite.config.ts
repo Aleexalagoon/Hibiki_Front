@@ -12,7 +12,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:5149', // Cambia este puerto al de tu API
+        target: 'http://hibikiapi.retocsv.es/api', // Cambia este puerto al de tu API
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, '')
       }
