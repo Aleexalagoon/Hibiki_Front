@@ -9,7 +9,7 @@ interface Cancion {
 }
 
 // URL base para todas las solicitudes API
-const API_BASE_URL = import.meta.env.VITE_API_URL;
+const API_BASE_URL = "http://aa0918044ca2b4e9b94f01593a2e67bf-1447626218.us-east-1.elb.amazonaws.com/api";
 
 export const useCancionesStore = defineStore('canciones', () => {
   const canciones: Ref<Cancion[]> = ref([]);

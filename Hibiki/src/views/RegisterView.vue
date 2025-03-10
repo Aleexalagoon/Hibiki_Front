@@ -33,7 +33,7 @@ export default {
       }
       
       // Obtenemos la URL base de la API desde las variables de entorno
-      const API_BASE_URL = import.meta.env.VITE_API_URL;
+      const API_BASE_URL = "http://aa0918044ca2b4e9b94f01593a2e67bf-1447626218.us-east-1.elb.amazonaws.com/api";
       
       try {
         const response = await fetch(`${API_BASE_URL}/Usuario`, {
