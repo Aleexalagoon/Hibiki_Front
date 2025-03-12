@@ -14,6 +14,6 @@ spec:
     spec:
       containers:
       - name: front-app
-        image: alejandroalagon33/sanvalero:hibikifrontV50
+        image: alejandroalagon33/sanvalero:hibikifrontVFin
         ports:
         - containerPort: 80

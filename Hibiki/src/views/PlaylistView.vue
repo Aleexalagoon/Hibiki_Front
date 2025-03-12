@@ -64,9 +64,15 @@ export default defineComponent({
     const defaultImage = 'https://placehold.co/150';
 
     const formatDuration = (duration) => {
-      if (!duration) return '0:00';
-      const [minutes, seconds] = duration.split(':').map(Number);
-      return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+      if (!duration) return '0m 0s';
+      
+      const [hours, minutes, seconds] = duration.split(':').map(Number);
+
+      if (hours > 0) {
+        return `${hours}h ${minutes}m ${seconds}s`;
+      } else {
+        return `${minutes}m ${seconds}s`;
+      }
     };
 
     const selectPlaylist = (playlistId) => {
