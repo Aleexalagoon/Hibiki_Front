@@ -1,18 +1,15 @@
-// store/playerStore.ts
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 
-// Definir el tipo para una canción
 export interface Song {
   nombre: string;
   artista: string;
   ruta: string;
   image: string;
-  [key: string]: any; // Para permitir propiedades adicionales
+  [key: string]: any; 
 }
 
 export const usePlayerStore = defineStore('player', () => {
-  // Estado
   const isPlaying = ref<boolean>(false);
   const currentSong = ref<Song | null>(null);
   const currentTime = ref<number>(0);
@@ -20,51 +17,42 @@ export const usePlayerStore = defineStore('player', () => {
   const audioPlayer = ref<HTMLAudioElement>(new Audio());
   const currentPlaylist = ref<Song[]>([]);
   const isUserInteracted = ref<boolean>(false);
-  const volume = ref<number>(1); // Añadimos el estado para el volumen
+  const volume = ref<number>(1); 
 
-  // Inicializar eventos del reproductor
+
   const initializeAudioEvents = () => {
-    // Evento para actualizar el tiempo actual
     audioPlayer.value.addEventListener('timeupdate', () => {
       currentTime.value = audioPlayer.value.currentTime;
     });
     
-    // Evento para cargar la duración cuando los metadatos están disponibles
     audioPlayer.value.addEventListener('loadedmetadata', () => {
       duration.value = audioPlayer.value.duration;
     });
     
-    // Evento para manejar el final de la canción
     audioPlayer.value.addEventListener('ended', () => {
       isPlaying.value = false;
-      // Auto-play next song when current song ends
       if (currentPlaylist.value && currentPlaylist.value.length > 0) {
         nextSong(currentPlaylist.value);
       }
     });
 
-    // Registrar interacción del usuario
     document.addEventListener('click', () => {
       isUserInteracted.value = true;
     });
     
-    // Establecer el volumen inicial
     audioPlayer.value.volume = volume.value;
   };
   
-  // Inicializar eventos al crear el store
   initializeAudioEvents();
   
-  // Computed properties
   const getArtistaDisplay = computed(() => {
-    // Check for artista in different possible formats
     return currentSong.value?.artista || 
            currentSong.value?.artist || 
            (currentSong.value?.cantante?.nombre) || 
            "Artista desconocido";
   });
   
-  // Función para normalizar una canción y asegurar que tenga todos los campos necesarios
+
   const normalizeSong = (song: any): Song => {
     return {
       ...song,
@@ -79,27 +67,21 @@ export const usePlayerStore = defineStore('player', () => {
   const setSong = (song: Song | null, autoplay = true) => {
     if (!song) return;
     
-    // Normalizar la canción para asegurar que tenga todos los campos necesarios
     const normalizedSong = normalizeSong(song);
     
-    // Guardar estado de reproducción actual
     const wasPlaying = isPlaying.value;
     
-    // Pausar reproducción actual si está reproduciéndose
     if (isPlaying.value) {
       audioPlayer.value.pause();
       isPlaying.value = false;
     }
     
-    // Actualizar canción actual
     currentSong.value = normalizedSong;
     audioPlayer.value.src = normalizedSong.ruta;
     
-    // Solo intentar reproducir si autoplay es true y el usuario ha interactuado o estaba reproduciendo
     if (autoplay && (isUserInteracted.value || wasPlaying)) {
       playSong();
     } else {
-      // Precargar audio sin reproducirlo
       audioPlayer.value.load();
     }
   };
@@ -108,13 +90,11 @@ export const usePlayerStore = defineStore('player', () => {
     if (!currentSong.value) return;
     
     try {
-      // Solo intentar reproducir si el usuario ha interactuado
       if (isUserInteracted.value) {
         await audioPlayer.value.play();
         isPlaying.value = true;
       } else {
         console.log('No se puede reproducir automáticamente: se requiere interacción del usuario');
-        // Preparar audio, pero no reproducir
         audioPlayer.value.load();
       }
     } catch (error) {
@@ -124,7 +104,6 @@ export const usePlayerStore = defineStore('player', () => {
   };
   
   const togglePlay = () => {
-    // Marcar que el usuario ha interactuado
     isUserInteracted.value = true;
     
     if (isPlaying.value) {
@@ -137,15 +116,12 @@ export const usePlayerStore = defineStore('player', () => {
   
   const changeSong = (indexChange: number, songs: Song[]) => {
     if (!songs?.length || !currentSong.value) return;
-    
-    // Normalizar todas las canciones en la playlist
+
     const normalizedSongs = songs.map(song => normalizeSong(song));
-    
-    // Update current playlist
+
     currentPlaylist.value = normalizedSongs;
     
     const currentIndex = normalizedSongs.findIndex(song => 
-      // Compare by ID or name depending on your data structure
       (song.cancionId && currentSong.value?.cancionId && song.cancionId === currentSong.value?.cancionId) || 
       song.nombre === currentSong.value?.nombre
     );
@@ -153,32 +129,26 @@ export const usePlayerStore = defineStore('player', () => {
     if (currentIndex === -1) return;
     
     const newIndex = (currentIndex + indexChange + normalizedSongs.length) % normalizedSongs.length;
-    // Pasar el estado actual de reproducción
     setSong(normalizedSongs[newIndex], isPlaying.value);
   };
   
   const previousSong = (songs: Song[]) => {
-    // Marcar que el usuario ha interactuado
     isUserInteracted.value = true;
     changeSong(-1, songs);
   };
   
   const nextSong = (songs: Song[]) => {
-    // Marcar que el usuario ha interactuado
     isUserInteracted.value = true;
     changeSong(1, songs);
   };
   
   const randomSong = (songs: Song[]) => {
-    // Marcar que el usuario ha interactuado
     isUserInteracted.value = true;
     
     if (!songs || songs.length <= 1 || !currentSong.value) return;
     
-    // Normalizar todas las canciones en la playlist
     const normalizedSongs = songs.map(song => normalizeSong(song));
     
-    // Update current playlist
     currentPlaylist.value = normalizedSongs;
     
     let randomIndex: number;
@@ -191,12 +161,10 @@ export const usePlayerStore = defineStore('player', () => {
        normalizedSongs[randomIndex].nombre === currentSong.value?.nombre)
     );
     
-    // Pasar el estado actual de reproducción
     setSong(normalizedSongs[randomIndex], isPlaying.value);
   };
   
   const seek = (time: number) => {
-    // Marcar que el usuario ha interactuado
     isUserInteracted.value = true;
     
     if (audioPlayer.value) {
@@ -205,20 +173,14 @@ export const usePlayerStore = defineStore('player', () => {
     }
   };
   
-  // Función para cambiar el volumen
   const changeVolume = (newVolume: number) => {
-    // Marcar que el usuario ha interactuado
     isUserInteracted.value = true;
-    
-    // Asegurar que el volumen esté entre 0 y 1
     const volumeValue = Math.max(0, Math.min(1, newVolume));
     
-    // Actualizar el volumen del reproductor
     if (audioPlayer.value) {
       audioPlayer.value.volume = volumeValue;
     }
     
-    // Actualizar el estado
     volume.value = volumeValue;
   };
   
@@ -230,7 +192,6 @@ export const usePlayerStore = defineStore('player', () => {
   };
   
   return {
-    // Estado
     isPlaying,
     currentSong,
     currentTime,
@@ -240,10 +201,9 @@ export const usePlayerStore = defineStore('player', () => {
     volume,
     audioPlayer,
     
-    // Getters
+
     getArtistaDisplay,
     
-    // Acciones
     setSong,
     togglePlay,
     previousSong,

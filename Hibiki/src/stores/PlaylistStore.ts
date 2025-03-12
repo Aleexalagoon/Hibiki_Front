@@ -1,6 +1,5 @@
 import { defineStore } from 'pinia';
 
-// Definición de interfaces
 interface Cancion {
   cancionId: number;
   nombre: string;
@@ -24,7 +23,6 @@ export interface Playlist {
   creador: Usuario;
 }
 
-// URL base para todas las solicitudes API
 const API_BASE_URL = "http://aa0918044ca2b4e9b94f01593a2e67bf-1447626218.us-east-1.elb.amazonaws.com/api"
 
 
@@ -67,7 +65,7 @@ export const usePlaylistStore = defineStore('playlist', {
       this.error = null;
     
       try {
-        const response = await fetch(`${API_BASE_URL}/Playlist`); // Cambiado a API_BASE_URL
+        const response = await fetch(`${API_BASE_URL}/Playlist`); 
         if (!response.ok) throw new Error('Error al obtener playlists');
     
         this.playlists = await response.json();
@@ -88,7 +86,7 @@ export const usePlaylistStore = defineStore('playlist', {
         if (!response.ok) throw new Error(`Error al obtener la playlist con ID: ${id}`);
     
         const data = await response.json();
-        console.log("Playlist obtenida:", data); // 👀 Verifica qué devuelve la API
+        console.log("Playlist obtenida:", data); 
     
         this.currentPlaylist = data;
       } catch (err: any) {
@@ -104,7 +102,7 @@ export const usePlaylistStore = defineStore('playlist', {
       this.error = null;
 
       try {
-        const response = await fetch(`${API_BASE_URL}/Playlist`, { // Cambiado a API_BASE_URL
+        const response = await fetch(`${API_BASE_URL}/Playlist`, { 
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(playlist)
@@ -128,7 +126,7 @@ export const usePlaylistStore = defineStore('playlist', {
       this.error = null;
 
       try {
-        const response = await fetch(`${API_BASE_URL}/Playlist/${id}`, { method: 'DELETE' }); // Cambiado a API_BASE_URL y corregido para incluir el ID
+        const response = await fetch(`${API_BASE_URL}/Playlist/${id}`, { method: 'DELETE' }); 
         if (!response.ok) throw new Error(`Error al eliminar la playlist ${id}`);
 
         this.playlists = this.playlists.filter(p => p.playlistId !== id);
@@ -157,7 +155,6 @@ export const usePlaylistStore = defineStore('playlist', {
     
         if (!response.ok) throw new Error('Error al añadir la canción');
     
-        // Luego de añadir la canción, volvemos a obtener la playlist actualizada
         await this.fetchPlaylistById(playlistId);
       } catch (err: any) {
         this.error = err instanceof Error ? err.message : String(err);

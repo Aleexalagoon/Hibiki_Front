@@ -36,7 +36,6 @@ const password = ref('')
 
 const router = useRouter()
 const login = () => {
-  // Predefined credentials
   const predefinedUsername = 'HibikiUser33'
   const predefinedPassword = 'Hibiki1234'
   if (username.value === predefinedUsername && password.value === predefinedPassword) {

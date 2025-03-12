@@ -8,7 +8,7 @@
       <input v-model="confirmPassword" type="password" placeholder="Confirmar contraseña" required />
       <button type="submit" class="register-button">Registrarse</button>
       <div class="link">
-        <a href="/login" class="login">¿Ya tienes cuenta? Inicia sesión en Hibiki</a>
+      <router-link to="/login" class="login">¿Ya tienes cuenta? Inicia sesión en Hibiki</router-link>
       </div>
     </form>
   </div>
@@ -31,8 +31,6 @@ export default {
         alert('Las contraseñas no coinciden');
         return;
       }
-      
-      // Obtenemos la URL base de la API desde las variables de entorno
       const API_BASE_URL = "http://aa0918044ca2b4e9b94f01593a2e67bf-1447626218.us-east-1.elb.amazonaws.com/api";
       
       try {
@@ -57,7 +55,6 @@ export default {
         const data = await response.json();
         alert('Registro exitoso. Por favor, inicia sesión.');
         
-        // Redirect to login page after successful registration
         this.$router.push('/login');
       } catch (error) {
         alert('Error en el registro');

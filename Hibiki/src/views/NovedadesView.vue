@@ -42,10 +42,10 @@
     <div class="footer-content">
       <p class="footer-text">© 2025 Hibiki. Todos los derechos reservados.</p>
       <div class="footer-links">
-        <a href="/politica" class="footer-link">Política de Privacidad</a>
-        <a href="/terminos" class="footer-link">Términos y Condiciones</a>
-        <a href="/cookies" class="footer-link">Política de Cookies</a>
-        <a href="/infoanuncios" class="footer-link">Información de anuncios</a>
+        <router-link to="/politica" class="footer-link">Política de Privacidad</router-link>
+        <router-link to="/terminos" class="footer-link">Términos y Condiciones</router-link>
+        <router-link to="/cookies" class="footer-link">Política de Cookies</router-link>
+        <router-link to="/infoanuncios" class="footer-link">Información de anuncios</router-link>
       </div>
     </div>
   </footer>
@@ -198,7 +198,6 @@ export default {
   font-size: 14px;
 }
 
-/* Sección de header con "Ver todo" */
 .section-header {
   display: flex;
   justify-content: space-between;
@@ -227,7 +226,6 @@ export default {
   background-color: #ff5100; 
 }
 
-/* Canciones recién llegadas */
 .songs-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -293,7 +291,6 @@ export default {
   padding: 4px;
 }
 
-/* Nuevos lanzamientos */
 .albums-grid {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
@@ -365,7 +362,6 @@ export default {
   text-decoration: underline;
 }
 
-/* Responsive */
 @media (max-width: 576px) {
   .footer-links {
     flex-direction: column;
@@ -373,7 +369,6 @@ export default {
   }
 }
 
-/* Responsive */
 @media (max-width: 1200px) {
   .albums-grid {
     grid-template-columns: repeat(4, 1fr);

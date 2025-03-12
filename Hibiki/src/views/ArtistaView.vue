@@ -104,7 +104,6 @@ export default defineComponent({
       albumStore.clearSongs(); // Limpiar canciones anteriores
     };
 
-    // Seleccionar una canción (ahora usando playerStore directamente)
     const selectSong = (song) => {
       // Ensure the song has the artist name
       if (song && artistaStore.selectedArtist) {
@@ -115,17 +114,15 @@ export default defineComponent({
       }
       
       playerStore.setSong(song);
-      // Opcionalmente, actualizar también el album store para mantener la referencia
       albumStore.setSelectedSong(song);
     };
 
-    // Seleccionar un álbum
     const selectAlbum = (albumId) => {
-      albumStore.fetchAlbumSongs(albumId); // Cargar canciones del álbum
+      albumStore.fetchAlbumSongs(albumId); 
     };
 
     onMounted(() => {
-      artistaStore.fetchAllArtists(); // Cargar todos los artistas cuando se monta
+      artistaStore.fetchAllArtists(); 
     });
 
     return {
@@ -152,7 +149,7 @@ export default defineComponent({
   min-height: 100vh;
   background: #121212;
   color: white;
-  overflow-x: hidden; /* Prevent horizontal scrolling at the page level */
+  overflow-x: hidden;
   max-width: 100vw;
   box-sizing: border-box;
 }
@@ -161,8 +158,8 @@ export default defineComponent({
   display: flex;
   flex: 1;
   width: 100%;
-  max-width: 100%; /* Ensure it doesn't overflow */
-  box-sizing: border-box; /* Include padding in width calculation */
+  max-width: 100%; 
+  box-sizing: border-box; 
 }
 
 .artists-list {

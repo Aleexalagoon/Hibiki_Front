@@ -9,13 +9,11 @@ const router = useRouter();
 const formIsValid = ref(true);
 const errorMessage = ref('');
 
-// Obtenemos la URL base de la API desde las variables de entorno
 const API_BASE_URL = "http://aa0918044ca2b4e9b94f01593a2e67bf-1447626218.us-east-1.elb.amazonaws.com/api";
 
 const handlePayment = async (event) => {
   event.preventDefault();
   
-  // Validación sencilla del formulario
   const cardNumber = document.getElementById('cardNumber').value;
   const expiryDate = document.getElementById('expiryDate').value;
   const securityCode = document.getElementById('securityCode').value;
@@ -37,15 +35,12 @@ const handlePayment = async (event) => {
         isPremium: true
       })
     });
-    // Actualizamos el estado de usuario a premium
     authStore.setUser({
       ...authStore.user,
       isPremium: true,
     });
-    // Navegamos a la página premium
     router.push('/pagocompletado');
     
-    // Alerta de éxito
     Swal.fire({
       title: "¡Pago exitoso!",
       text: "Ahora eres un usuario Premium.",
@@ -53,7 +48,6 @@ const handlePayment = async (event) => {
       confirmButtonColor: "#4a90e2",
     });
   } catch (error) {
-    // Si el pago falla
     Swal.fire({
       title: "Error",
       text: "Hubo un error al procesar tu pago. Intenta nuevamente.",

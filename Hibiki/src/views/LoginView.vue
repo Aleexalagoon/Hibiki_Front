@@ -6,10 +6,10 @@
       <input v-model="password" type="password" placeholder="Contraseña" required />
       <button type="submit" class="login-button">Iniciar sesión</button>
       <div class="link">
-        <a href="/register" class="signup">¿No tienes cuenta? Regístrate en Hibiki</a>
+        <router-link to="/register" class="signup">¿No tienes cuenta? Regístrate en Hibiki</router-link>
         </div>
         <div class="link">
-        <a href="/loginzonaprivada" class="signup">Si eres trabajador pulsa aqui</a>
+        <router-link to="/loginzonaprivada" class="signup">Si eres trabajador pulsa aqui</router-link>
       </div>
     </form>
   </div>
@@ -29,7 +29,7 @@ const loginUser = async () => {
   try {
     await authStore.loginUser(email.value, password.value);
     alert('Inicio de sesión exitoso');
-    router.push('/inicio'); // Changed to '/inicio'
+    router.push('/inicio');
   } catch (error) {
     alert('Credenciales inválidas');
     console.error(error);

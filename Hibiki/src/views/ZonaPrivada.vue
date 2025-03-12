@@ -12,7 +12,7 @@
 
 <script setup>
 import { ref } from 'vue'
-const logoSrc = ref('/imagenes/Logo_Inicio.png')
+const logoSrc = ref('https://static.vecteezy.com/system/resources/previews/009/359/510/non_2x/letter-h-alphabet-music-logo-design-isolated-on-black-color-background-initial-and-musical-note-logo-concept-monogram-lettermark-logotype-vector.jpg')
 </script>
 
 <style scoped>

@@ -30,7 +30,6 @@ interface Playlist {
   image: string;
 }
 
-// URL base para todas las solicitudes API
 const API_BASE_URL = "http://aa0918044ca2b4e9b94f01593a2e67bf-1447626218.us-east-1.elb.amazonaws.com/api";
 
 export const useProfileStore = defineStore('profileStore', {
@@ -70,7 +69,6 @@ export const useProfileStore = defineStore('profileStore', {
         const data = await response.json();
         console.log('Datos recibidos de la API:', data);
 
-        // Si data es un array, tomar el primer elemento, si no, usar directamente data
         const user = Array.isArray(data) && data.length > 0 ? data[0] : data;
 
         this.userData = {
@@ -82,14 +80,12 @@ export const useProfileStore = defineStore('profileStore', {
 
         console.log('Datos asignados en userData:', this.userData);
         
-        // Obtener correctamente los artistas más escuchados
         this.topArtists = user.artistasMasEscuchados?.map((artista: any) => ({
           id: artista.cantanteId || artista.CantanteId || 0,
           name: artista.nombre || artista.Nombre || 'Desconocido',
           image: artista.image || artista.Image || 'https://via.placeholder.com/150'
         })) || [];
     
-        // Obtener correctamente las canciones más escuchadas
         this.topTracks = user.cancionesMasEscuchadas?.map((cancion: any) => ({
           id: cancion.cancionId || cancion.CancionId || 0,
           title: cancion.nombre || cancion.Nombre || 'Sin título',
@@ -122,7 +118,6 @@ export const useProfileStore = defineStore('profileStore', {
       }
     },
 
-    // Corrige la duración desde el formato HH:MM:SS a MM:SS
     formatDuration(duration: string | null): string {
       if (!duration) return '0:00';
       const parts = duration.split(':');

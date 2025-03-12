@@ -132,7 +132,6 @@ const handleButtonClick = () => {
   }
 }
 
-/* For extra small devices */
 @media screen and (max-width: 480px) {
   .container {
     padding: 1.5rem 0.75rem;
@@ -168,7 +167,6 @@ const handleButtonClick = () => {
     margin-top: 1rem;
   }
   
-  /* Adjust animation for better mobile experience */
   .logo-group:hover {
     transform: scale(1.2) rotate(5deg);
   }

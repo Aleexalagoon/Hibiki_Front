@@ -2,7 +2,6 @@ import { defineStore } from 'pinia';
 import { useAlbumStore } from './albumStore';
 import { useRouter } from 'vue-router';
 
-// Interfaz para definir la estructura de un Artista
 interface Artista {
   id?: number;
   nombre: string;
@@ -10,7 +9,6 @@ interface Artista {
   descripcion?: string;
 }
 
-// Interfaz para el estado del store
 interface ArtistaState {
   allArtists: Artista[];
   selectedArtist: SelectedArtistData | null;
@@ -18,7 +16,6 @@ interface ArtistaState {
   error: string | null;
 }
 
-// Interfaz para los datos del artista seleccionado
 interface SelectedArtistData {
   name: string;
   verified: boolean;
@@ -26,7 +23,6 @@ interface SelectedArtistData {
   description: string;
 }
 
-// URL base para todas las solicitudes API
 const API_BASE_URL = "http://aa0918044ca2b4e9b94f01593a2e67bf-1447626218.us-east-1.elb.amazonaws.com/api";
 
 export const useArtistaStore = defineStore('artistaStore', {
