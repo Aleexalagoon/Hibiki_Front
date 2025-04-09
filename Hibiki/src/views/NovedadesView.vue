@@ -1,16 +1,43 @@
 <template>
   <div class="music-app">
     <h2 class="section-title">Novedades</h2>
-    <div class="featured-cards">
-      <div v-for="(card, index) in featuredCards" :key="`featured-${index}`" class="featured-card">
-        <div class="card-label">{{ card.label }}</div>
-        <div class="card-title">{{ card.title }}</div>
-        <div class="card-subtitle">{{ card.subtitle }}</div>
-        <div class="card-image-container">
-          <img :src="card.image" :alt="card.title" class="card-image">
-          <div class="card-description">{{ card.description }}</div>
+    
+    <!-- Carousel for Featured Cards -->
+    <div class="carousel-container">
+      <button class="carousel-nav carousel-prev" @click="prevSlide">&lt;</button>
+      
+      <div class="featured-cards-carousel">
+        <div 
+          class="carousel-slide" 
+          :style="{ transform: `translateX(-${currentSlide * slideWidth}%)` }"
+        >
+          <div 
+            v-for="(card, index) in featuredCards" 
+            :key="`featured-${index}`" 
+            class="featured-card"
+          >
+            <div class="card-label">{{ card.label }}</div>
+            <div class="card-title">{{ card.title }}</div>
+            <div class="card-subtitle">{{ card.subtitle }}</div>
+            <div class="card-image-container">
+              <img :src="card.image" :alt="card.title" class="card-image">
+              <div class="card-description">{{ card.description }}</div>
+            </div>
+          </div>
         </div>
       </div>
+      
+      <button class="carousel-nav carousel-next" @click="nextSlide">&gt;</button>
+    </div>
+    
+    <!-- Carousel indicators -->
+    <div class="carousel-indicators">
+      <span 
+        v-for="(_, index) in Math.ceil(featuredCards.length / cardsPerSlide)" 
+        :key="`indicator-${index}`"
+        :class="['carousel-dot', { active: currentSlide === index }]"
+        @click="goToSlide(index)"
+      ></span>
     </div>
 
     <div class="section-header">
@@ -56,19 +83,21 @@ export default {
   name: 'MusicApp',
   data() {
     return {
+      currentSlide: 0,
+      cardsPerSlide: 3,
       featuredCards: [
         {
-          label: 'NUEVO ALBUM DE BAD BUNNY',
-          title: 'DeBÍ TiRAR MáS FOToS',
+          label: 'NUEVO ALBUM DE ELADIO CARRION',
+          title: 'DON KBRN',
           subtitle: 'Hibiki Music',
-          image: 'https://binary.media/wp-content/uploads/2025/01/debi_tirar_mas_fotos_bad_bunny_binary-1048x630.jpg',
-          description: 'Descubre las nuevas canciones de Bad Bunny .'
+          image: 'https://s1.ppllstatics.com/canarias7/www/multimedia/2024/01/26/Eladio%20Carrin-kpu--1200x840@Canarias7.jpg',
+          description: 'Descubre las nuevas canciones de Eladio Carrion.'
         },
         {
           label: 'DESTINO 2014 TOUR',
           title: 'Gira del nuevo album de Raul Clyde',
           subtitle: 'Hibiki Music',
-          image: 'https://entradas.lavanguardia.com/wp-content/uploads/2025/01/raul-clyde-sala-razzmatazz.jpg',
+          image: 'https://www.laguiago.com/wp-content/uploads/2025/01/raul-clyde.jpg',
           description: 'El valenciano hará este 2025 un tour por toda España.'
         },
         {
@@ -77,17 +106,110 @@ export default {
           subtitle: 'Hibiki Music',
           image: 'https://i.scdn.co/image/ab6761670000ecd4f3386d596841d955168ba350',
           description: 'El español es una de las promesas para este 2025'
+        },
+        {
+          label: 'PURO LATINO',
+          title: 'Descubre la playlist de Puro Latino en Hibiki',
+          subtitle: 'Hibiki Music',
+          image: 'https://cd1.taquilla.com/data/images/t/4c/puro-latino-fest-2024.webp',
+          description: 'La playlist de los artistas mas pegados del momento.'
+        },
+        {
+          label: 'PLAYLIST ACTUALIZADA',
+          title: 'Novedades diarias',
+          subtitle: 'Hibiki Music',
+          image: 'https://www.clarin.com/img/2023/04/27/ebOFOAW8i_2000x1500__1.jpg',
+          description: 'Los éxitos del momento recién salidos'
+        },
+        {
+          label: 'DALE REGGAETON',
+          title: 'Hibiki Music Urbano Latino',
+          subtitle: 'Hibiki Music',
+          image: 'https://imgs.elpais.com.uy/dims4/default/9eb21d4/2147483647/strip/true/crop/982x675+179+0/resize/1440x990!/quality/90/?url=https%3A%2F%2Fel-pais-uruguay-production-web.s3.us-east-1.amazonaws.com%2Fbrightspot%2F6d%2Fc7%2F4f39909f4a759354589abb8c2818%2Fanuel.jpg',
+          description: 'La mejor playlist de reggaeton del momento'
+        },
+        {
+          label: 'ARTISTA DEL MES',
+          title: 'C. Tangana',
+          subtitle: 'Hibiki Music',
+          image: '/api/placeholder/400/320',
+          description: 'Descubre toda la discografía del madrileño con acceso premium.'
+        },
+        {
+          label: 'EN CONCIERTO',
+          title: 'Festival Hibiki',
+          subtitle: 'Hibiki Music',
+          image: '/api/placeholder/400/320',
+          description: 'Un fin de semana de música en directo con los mejores artistas.'
+        },
+        {
+          label: 'NUEVO SINGLE',
+          title: 'Amanecer',
+          subtitle: 'Hibiki Music',
+          image: '/api/placeholder/400/320',
+          description: 'Karol G sorprende con su nuevo single de verano.'
+        },
+        {
+          label: 'PODCAST EXCLUSIVO',
+          title: 'Detrás del Ritmo',
+          subtitle: 'Hibiki Music',
+          image: '/api/placeholder/400/320',
+          description: 'Entrevistas y charlas con tus artistas favoritos.'
         }
       ],
       recentSongs: [],
       newAlbums: []
     }
   },
+  computed: {
+    slideWidth() {
+      // Calculate width as percentage
+      return 100 / this.cardsPerSlide;
+    },
+    totalSlides() {
+      return Math.ceil(this.featuredCards.length / this.cardsPerSlide);
+    }
+  },
   mounted() {
     this.fetchRecentSongs();
     this.fetchNewAlbums();
+    this.setupCarousel();
+    window.addEventListener('resize', this.setupCarousel);
+  },
+  beforeDestroy() {
+    window.removeEventListener('resize', this.setupCarousel);
   },
   methods: {
+    setupCarousel() {
+      // Adjust cards per slide based on screen width
+      if (window.innerWidth < 768) {
+        this.cardsPerSlide = 1;
+      } else if (window.innerWidth < 992) {
+        this.cardsPerSlide = 2;
+      } else {
+        this.cardsPerSlide = 3;
+      }
+      
+      // Reset to first slide when layout changes
+      this.currentSlide = 0;
+    },
+    nextSlide() {
+      if (this.currentSlide < this.totalSlides - 1) {
+        this.currentSlide++;
+      } else {
+        this.currentSlide = 0; // Loop back to first slide
+      }
+    },
+    prevSlide() {
+      if (this.currentSlide > 0) {
+        this.currentSlide--;
+      } else {
+        this.currentSlide = this.totalSlides - 1; // Loop to last slide
+      }
+    },
+    goToSlide(index) {
+      this.currentSlide = index;
+    },
     async fetchRecentSongs() {
       try {
         const response = await fetch('https://localhost:7295/api/Cancion');
@@ -127,21 +249,87 @@ export default {
   color: white;
 }
 
-/* Tarjetas destacadas */
-.featured-cards {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
-  margin-bottom: 40px;
+/* Carousel Container */
+.carousel-container {
+  position: relative;
+  margin-bottom: 10px;
 }
 
+/* Carousel Controls */
+.carousel-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  transition: background-color 0.3s;
+}
+
+.carousel-nav:hover {
+  background-color: rgba(255, 81, 0, 0.8);
+}
+
+.carousel-prev {
+  left: -20px;
+}
+
+.carousel-next {
+  right: -20px;
+}
+
+/* Carousel Indicators */
+.carousel-indicators {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0 40px;
+}
+
+.carousel-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #555;
+  margin: 0 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.carousel-dot.active {
+  background-color: #ff5100;
+}
+
+/* Carousel Slides */
+.featured-cards-carousel {
+  overflow: hidden;
+  margin: 0 20px;
+}
+
+.carousel-slide {
+  display: flex;
+  transition: transform 0.5s ease;
+}
+
+/* Tarjetas destacadas */
 .featured-card {
+  flex: 0 0 calc(100% / 3); /* Default for desktop */
   display: flex;
   flex-direction: column;
   background-color: #181818;
   border-radius: 8px;
   padding: 15px;
+  margin: 0 10px;
   transition: background-color 0.3s;
+  box-sizing: border-box;
 }
 
 .featured-card:hover {
@@ -364,14 +552,6 @@ export default {
 }
 
 /* Responsive */
-@media (max-width: 576px) {
-  .footer-links {
-    flex-direction: column;
-    gap: 10px;
-  }
-}
-
-/* Responsive */
 @media (max-width: 1200px) {
   .albums-grid {
     grid-template-columns: repeat(4, 1fr);
@@ -379,17 +559,16 @@ export default {
 }
 
 @media (max-width: 992px) {
-  .featured-cards {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  
   .songs-grid {
     grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .featured-card {
+    flex: 0 0 calc(100% / 2); /* 2 cards per slide on medium screens */
   }
 }
 
 @media (max-width: 768px) {
-  .featured-cards,
   .songs-grid {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -397,13 +576,29 @@ export default {
   .albums-grid {
     grid-template-columns: repeat(3, 1fr);
   }
+  
+  .featured-card {
+    flex: 0 0 100%; /* 1 card per slide on small screens */
+  }
 }
 
 @media (max-width: 576px) {
-  .featured-cards,
   .songs-grid,
   .albums-grid {
     grid-template-columns: 1fr;
+  }
+  
+  .footer-links {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .carousel-prev {
+    left: -10px;
+  }
+  
+  .carousel-next {
+    right: -10px;
   }
 }
 </style>

@@ -8,6 +8,7 @@ interface Artista {
   nombre: string;
   oyentesMensuales?: number;
   descripcion?: string;
+  image?: string; // Añadimos el campo image al modelo de datos original
 }
 
 // Interfaz para el estado del store
@@ -24,6 +25,7 @@ interface SelectedArtistData {
   verified: boolean;
   monthlyListeners: number;
   description: string;
+  image: string; // Añadimos el campo image aquí también
 }
 
 export const useArtistaStore = defineStore('artistaStore', {
@@ -69,6 +71,7 @@ export const useArtistaStore = defineStore('artistaStore', {
           verified: true,
           monthlyListeners: data.oyentesMensuales || 0,
           description: data.descripcion || '',
+          image: data.image || '' // Asignamos la imagen del artista
         };
 
         const albumStore = useAlbumStore();

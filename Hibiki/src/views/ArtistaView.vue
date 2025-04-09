@@ -16,8 +16,17 @@
 
       <div class="details-container">
         <div v-if="selectedArtist">
-          <h1 class="artist-name">{{ selectedArtist.name }}</h1>
-          <p>{{ selectedArtist.monthlyListeners }} oyentes mensuales</p>
+          <!-- Nueva cabecera con imagen y degradado -->
+          <div class="artist-header">
+            <div class="artist-image-container">
+              <img :src="selectedArtist.image" alt="Artist Image" class="artist-header-image" />
+              <div class="gradient-overlay"></div>
+            </div>
+            <div class="artist-info">
+              <h1 class="artist-name">{{ selectedArtist.name }}</h1>
+              <p>{{ selectedArtist.monthlyListeners }} oyentes mensuales</p>
+            </div>
+          </div>
 
           <h2>Álbumes</h2>
           <div v-if="albums.length > 0" class="albums">
@@ -212,10 +221,61 @@ export default defineComponent({
   padding: 20px;
 }
 
-.artist-name {
-  font-size: 24px;
-  font-weight: bold;
+/* Nuevos estilos para la cabecera con imagen y degradado */
+.artist-header {
+  position: relative;
+  width: 100%;
+  height: 300px;
+  margin-bottom: 30px;
+  border-radius: 15px;
+  overflow: hidden;
 }
+
+.artist-image-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.artist-header-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.gradient-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    to bottom,
+    rgba(18, 18, 18, 0.1) 0%,
+    rgba(18, 18, 18, 0.4) 50%,
+    rgba(18, 18, 18, 0.8) 100%
+  );
+  z-index: 1;
+}
+
+.artist-info {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  z-index: 2;
+  color: white;
+}
+
+.artist-name {
+  font-size: 36px;
+  font-weight: bold;
+  margin-bottom: 5px;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
+}
+/* Fin de los nuevos estilos */
 
 .artist-description {
   margin-top: 20px;
@@ -281,7 +341,6 @@ export default defineComponent({
   opacity: 0.8;
 }
 
-
 .artists-list::-webkit-scrollbar {
   height: 6px;
   width: 6px;
@@ -296,7 +355,6 @@ export default defineComponent({
   background: rgba(255, 255, 255, 0.1);
   border-radius: 10px;
 }
-
 
 @media screen and (max-width: 992px) {
   .main-container {
@@ -347,6 +405,10 @@ export default defineComponent({
     box-sizing: border-box;
   }
   
+  /* Ajuste para el header con imagen en tabletas */
+  .artist-header {
+    height: 250px;
+  }
 
   .albums {
     display: grid;
@@ -380,10 +442,7 @@ export default defineComponent({
   }
 }
 
-
 @media screen and (max-width: 576px) {
- 
-  
   .artists-list {
     max-height: 200px;
     padding: 10px;
@@ -399,16 +458,23 @@ export default defineComponent({
     height: 60px;
   }
   
+  /* Ajuste para el header con imagen en móviles */
+  .artist-header {
+    height: 200px;
+  }
+  
+  .artist-name {
+    font-size: 24px;
+  }
+  
   .details-container {
     padding: 20px 15px; 
     overflow-x: hidden; 
   }
   
- 
   ul {
     padding: 0 5px 0 0; 
     list-style-type: none;
- 
   }
   
   .song-card {
@@ -458,13 +524,11 @@ export default defineComponent({
     font-size: 12px;
   }
   
- 
   .albums {
     gap: 15px;
     width: 100%;
     box-sizing: border-box;
   }
-  
   
   .details-container h1 {
     font-size: 24px;
@@ -489,7 +553,6 @@ export default defineComponent({
   }
 }
 
-
 @media screen and (max-width: 400px) {
   .details-container {
     padding: 20px 15px 20px 20px; 
@@ -497,7 +560,6 @@ export default defineComponent({
   
   .albums {
     grid-template-columns: repeat(2, 1fr);
-    
   }
   
   .song-image {
@@ -507,6 +569,11 @@ export default defineComponent({
   
   .artist-card {
     min-width: 85px;
+  }
+  
+  /* Ajustes adicionales para el header en móviles muy pequeños */
+  .artist-header {
+    height: 180px;
   }
 }
 </style>
