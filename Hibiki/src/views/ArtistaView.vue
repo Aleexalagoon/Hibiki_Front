@@ -16,7 +16,7 @@
 
       <div class="details-container">
         <div v-if="selectedArtist">
-          <!-- Nueva cabecera con imagen y degradado -->
+          <!-- Cabecera con imagen y degradado -->
           <div class="artist-header">
             <div class="artist-image-container">
               <img :src="selectedArtist.image" alt="Artist Image" class="artist-header-image" />
@@ -28,7 +28,34 @@
             </div>
           </div>
 
-          <h2>Álbumes</h2>
+          <!-- Sección de Temas -->
+          <h2>Populares</h2>
+          <p v-if="temaLoading">Cargando temas...</p>
+          <p v-if="temaError">{{ temaError }}</p>
+          
+          <div v-if="temas.length > 0" class="songs-list">
+            <div
+              v-for="tema in temas"
+              :key="tema.temaId"
+              class="song-card"
+              @click="selectTema(tema)"
+            >
+              <div class="song-info-container">
+                <img :src="tema.image || '/default-song.jpg'" alt="Tema Image" class="song-image" />
+                <div class="song-info">
+                  <span class="song-title">{{ tema.nombre }}</span>
+                  <span class="song-artist">{{ selectedArtist.name }}</span>
+                </div>
+              </div>
+              <span class="song-duration">{{ formatDuration(tema.duracion) }}</span>
+            </div>
+          </div>
+          <div v-else-if="!temaLoading">
+            <p>No hay temas disponibles para este artista.</p>
+          </div>
+
+          <!-- Sección de Álbumes -->
+          <h2>Discografía</h2>
           <div v-if="albums.length > 0" class="albums">
             <div
               v-for="album in albums"
@@ -47,9 +74,9 @@
 
         <div v-if="selectedAlbum">
           <h2>Canciones de {{ selectedAlbum.name }}</h2>
-          <p v-if="loading">Cargando canciones...</p>
-          <p v-if="error">{{ error }}</p>
-          <ul v-if="songs.length > 0">
+          <p v-if="albumLoading">Cargando canciones...</p>
+          <p v-if="albumError">{{ albumError }}</p>
+          <ul v-if="songs.length > 0" class="songs-list">
             <li
               v-for="song in songs"
               :key="song.cancionId"
@@ -66,15 +93,10 @@
               <span class="song-duration">{{ formatDuration(song.duracion) }}</span>
             </li>
           </ul>
-
-          <!-- Mensaje si no hay canciones -->
-          <p v-else>No hay canciones disponibles en este álbum.</p>
+          <p v-else-if="!albumLoading">No hay canciones disponibles en este álbum.</p>
         </div>
       </div>
     </div>
-    
-    <!-- Add the music player component with songs passed as prop -->
-    
   </div>
 </template>
 
@@ -83,16 +105,18 @@ import { defineComponent, computed, onMounted } from 'vue';
 import { useArtistaStore } from '@/stores/artistaStore';
 import { useAlbumStore } from '@/stores/albumStore';
 import { usePlayerStore } from '@/stores/player';
-import MusicPlayer from '@/components/MusicPlayer.vue'; // Import the component
+import { useTemaStore } from '@/stores/temaStore';
+import MusicPlayer from '@/components/MusicPlayer.vue';
 
 export default defineComponent({
   components: {
-    MusicPlayer // Register the component
+    MusicPlayer
   },
   setup() {
     const artistaStore = useArtistaStore();
     const albumStore = useAlbumStore();
     const playerStore = usePlayerStore();
+    const temaStore = useTemaStore();
 
     // Función para formatear la duración
     const formatDuration = (duration) => {
@@ -107,48 +131,79 @@ export default defineComponent({
       }
     };
 
-    // Limpiar las canciones al cambiar de artista
-    const selectArtist = (artistId) => {
-      artistaStore.fetchArtistData(artistId);
-      albumStore.clearSongs(); // Limpiar canciones anteriores
+    // Seleccionar un artista
+    const selectArtist = async (artistId) => {
+      // Limpiar datos anteriores
+      albumStore.clearSongs();
+      temaStore.clearTemas();
+      
+      // Cargar datos del artista
+      await artistaStore.fetchArtistData(artistId);
+      
+      // Cargar álbumes del artista
+      await albumStore.fetchAlbumsByArtist(artistId);
+      
+      // Cargar temas del artista
+      await temaStore.fetchTemasByCantante(artistId);
     };
 
-    // Seleccionar una canción (ahora usando playerStore directamente)
-    const selectSong = (song) => {
-      // Ensure the song has the artist name
-      if (song && artistaStore.selectedArtist) {
-        // If the song doesn't have an artista property, add it
-        if (!song.artista) {
-          song.artista = artistaStore.selectedArtist.name;
-        }
+    // Seleccionar un tema
+    const selectTema = (tema) => {
+      if (tema && artistaStore.selectedArtist) {
+        // Asegurarnos de que el tema tenga la propiedad artista
+        const temaWithArtist = {
+          ...tema,
+          artista: artistaStore.selectedArtist.name
+        };
+        
+        playerStore.setSong(temaWithArtist);
+        temaStore.setSelectedTema(tema);
       }
-      
-      playerStore.setSong(song);
-      // Opcionalmente, actualizar también el album store para mantener la referencia
-      albumStore.setSelectedSong(song);
+    };
+
+    // Seleccionar una canción
+    const selectSong = (song) => {
+      if (song && artistaStore.selectedArtist) {
+        // Asegurarnos de que la canción tenga la propiedad artista
+        const songWithArtist = {
+          ...song,
+          artista: artistaStore.selectedArtist.name
+        };
+        
+        playerStore.setSong(songWithArtist);
+        albumStore.setSelectedSong(song);
+      }
     };
 
     // Seleccionar un álbum
     const selectAlbum = (albumId) => {
-      albumStore.fetchAlbumSongs(albumId); // Cargar canciones del álbum
+      albumStore.fetchAlbumSongs(albumId);
     };
 
     onMounted(() => {
-      artistaStore.fetchAllArtists(); // Cargar todos los artistas cuando se monta
+      artistaStore.fetchAllArtists();
     });
 
     return {
       allArtists: computed(() => artistaStore.allArtists),
       selectedArtist: computed(() => artistaStore.selectedArtist),
+      artistaLoading: computed(() => artistaStore.loading),
+      artistaError: computed(() => artistaStore.error),
+      
       albums: computed(() => albumStore.albums),
       selectedAlbum: computed(() => albumStore.selectedAlbum),
       songs: computed(() => albumStore.songs),
-      selectedSong: computed(() => albumStore.selectedSong),
-      error: computed(() => albumStore.error),
-      loading: computed(() => albumStore.loading),
+      albumLoading: computed(() => albumStore.loading),
+      albumError: computed(() => albumStore.error),
+      
+      temas: computed(() => temaStore.temas),
+      temaLoading: computed(() => temaStore.loading),
+      temaError: computed(() => temaStore.error),
+      
       selectArtist,
       selectAlbum,
       selectSong,
+      selectTema,
       formatDuration,
     };
   },
@@ -161,7 +216,7 @@ export default defineComponent({
   min-height: 100vh;
   background: #121212;
   color: white;
-  overflow-x: hidden; /* Prevent horizontal scrolling at the page level */
+  overflow-x: hidden;
   max-width: 100vw;
   box-sizing: border-box;
 }
@@ -170,8 +225,8 @@ export default defineComponent({
   display: flex;
   flex: 1;
   width: 100%;
-  max-width: 100%; /* Ensure it doesn't overflow */
-  box-sizing: border-box; /* Include padding in width calculation */
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .artists-list {
@@ -190,6 +245,11 @@ export default defineComponent({
   padding: 10px;
   background: #222;
   border-radius: 10px;
+  transition: background-color 0.2s;
+}
+
+.artist-card:hover {
+  background-color: #333;
 }
 
 .artist-image {
@@ -202,6 +262,7 @@ export default defineComponent({
 .details-container {
   width: 70%;
   padding: 20px;
+  overflow-y: auto;
 }
 
 .artists-list::-webkit-scrollbar {
@@ -217,11 +278,7 @@ export default defineComponent({
   border-radius: 10px;
 }
 
-.artist-card {
-  padding: 20px;
-}
-
-/* Nuevos estilos para la cabecera con imagen y degradado */
+/* Cabecera con imagen y degradado */
 .artist-header {
   position: relative;
   width: 100%;
@@ -275,85 +332,119 @@ export default defineComponent({
   margin-bottom: 5px;
   text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
 }
-/* Fin de los nuevos estilos */
-
-.artist-description {
-  margin-top: 20px;
-  font-size: 14px;
-  color: gray;
-}
 
 .albums {
   display: flex;
-  gap: 10px;
+  gap: 20px;
   flex-wrap: wrap;
+  margin-top: 20px;
+  margin-bottom: 40px;
 }
 
 .album-card {
   cursor: pointer;
   text-align: center;
+  transition: transform 0.2s;
+  width: 200px;
+}
+
+.album-card:hover {
+  transform: scale(1.05);
 }
 
 .album-cover {
-  width: 200px;
+  width: 100%;
   height: 200px;
   border-radius: 10px;
+  object-fit: cover;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.album-card p {
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+/* Estilos para las listas de canciones/temas */
+.songs-list {
+  list-style-type: none;
+  padding: 0;
+  margin: 0 0 40px 0;
 }
 
 .song-card {
   display: flex;
   align-items: center;
-  padding: 10px;
-  border-bottom: 1px solid #333;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  background-color: rgba(255, 255, 255, 0.05);
   justify-content: space-between;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.song-card:hover {
+  background-color: rgba(255, 81, 0, 0.2);
 }
 
 .song-info-container {
   display: flex;
   align-items: center;
+  max-width: 80%;
 }
 
 .song-image {
-  width: 60px;
-  height: 60px;
-  border-radius: 10px;
-  margin-right: 10px;
-  margin-left: -50px;
+  width: 50px;
+  height: 50px;
+  border-radius: 6px;
+  margin-right: 16px;
+  object-fit: cover;
 }
 
 .song-info {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  overflow: hidden;
 }
 
 .song-title {
   font-weight: bold;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .song-artist {
   font-size: 13px;
-  opacity: 0.5;
-  margin-top: 8px;
+  opacity: 0.6;
+  margin-top: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .song-duration {
-  opacity: 0.8;
+  opacity: 0.7;
+  font-size: 14px;
 }
 
-.artists-list::-webkit-scrollbar {
-  height: 6px;
-  width: 6px;
+.details-container h2 {
+  font-size: 24px;
+  margin: 30px 0 20px 0;
+  position: relative;
+  padding-bottom: 10px;
 }
 
-.artists-list::-webkit-scrollbar-thumb {
-  background: #ff5100;
-  border-radius: 10px;
-}
-
-.artists-list::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 10px;
+.details-container h2::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 50px;
+  height: 3px;
+  background-color: #ff5100;
+  border-radius: 3px;
 }
 
 @media screen and (max-width: 992px) {
@@ -367,7 +458,6 @@ export default defineComponent({
     overflow-x: auto;
     overflow-y: hidden;
     display: flex;
-    flex-direction: row;
     padding: 15px;
     gap: 12px;
   }
@@ -377,11 +467,6 @@ export default defineComponent({
     min-width: 120px;
     margin-right: 0;
     text-align: center;
-    transition: transform 0.2s;
-  }
-  
-  .artist-card:hover {
-    transform: scale(1.05);
   }
   
   .artist-image {
@@ -401,11 +486,8 @@ export default defineComponent({
   
   .details-container {
     width: 100%;
-    padding: 20px 15px 20px 15px; 
-    box-sizing: border-box;
   }
   
-  /* Ajuste para el header con imagen en tabletas */
   .artist-header {
     height: 250px;
   }
@@ -414,31 +496,10 @@ export default defineComponent({
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
     gap: 20px;
-    margin-top: 15px;
   }
   
   .album-card {
-    transition: transform 0.2s;
-    margin-bottom: 10px;
-  }
-  
-  .album-card:hover {
-    transform: scale(1.05);
-  }
-  
-  .album-cover {
     width: 100%;
-    aspect-ratio: 1/1;
-    object-fit: cover;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-  }
-  
-  .album-card p {
-    margin-top: 8px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
   }
 }
 
@@ -458,7 +519,6 @@ export default defineComponent({
     height: 60px;
   }
   
-  /* Ajuste para el header con imagen en móviles */
   .artist-header {
     height: 200px;
   }
@@ -467,111 +527,30 @@ export default defineComponent({
     font-size: 24px;
   }
   
-  .details-container {
-    padding: 20px 15px; 
-    overflow-x: hidden; 
-  }
-  
-  ul {
-    padding: 0 5px 0 0; 
-    list-style-type: none;
-  }
-  
-  .song-card {
-    margin-bottom: 8px;
-    padding: 12px 10px;
-    border-radius: 8px;
-    background-color: rgba(255, 255, 255, 0.05);
-    transition: background-color 0.2s;
-    width: calc(100% - 10px); 
-    box-sizing: border-box;
-  }
-  
-  .song-card:hover {
-    background-color: rgba(255, 81, 0, 0.2);
-  }
-  
-  .song-info-container {
-    max-width: 75%;
-  }
-  
   .song-image {
     width: 45px;
     height: 45px;
-    margin-left: 0;
-    margin-right: 12px;
-  }
-  
-  .song-info {
-    max-width: calc(100% - 55px);
   }
   
   .song-title {
     font-size: 14px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
   }
   
   .song-artist {
     font-size: 12px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  
-  .song-duration {
-    font-size: 12px;
   }
   
   .albums {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
     gap: 15px;
-    width: 100%;
-    box-sizing: border-box;
-  }
-  
-  .details-container h1 {
-    font-size: 24px;
-    margin-bottom: 5px;
-  }
-  
-  .details-container h2 {
-    font-size: 20px;
-    margin: 25px 0 15px 0;
-    position: relative;
-  }
-  
-  .details-container h2::after {
-    content: '';
-    position: absolute;
-    bottom: -8px;
-    left: 0;
-    width: 50px;
-    height: 3px;
-    background-color: #ff5100;
-    border-radius: 3px;
   }
 }
 
 @media screen and (max-width: 400px) {
-  .details-container {
-    padding: 20px 15px 20px 20px; 
-  }
-  
   .albums {
     grid-template-columns: repeat(2, 1fr);
   }
   
-  .song-image {
-    width: 40px;
-    height: 40px;
-  }
-  
-  .artist-card {
-    min-width: 85px;
-  }
-  
-  /* Ajustes adicionales para el header en móviles muy pequeños */
   .artist-header {
     height: 180px;
   }
