@@ -1,6 +1,6 @@
 <template>
   <div class="music-app">
-    <h2 class="section-title">Novedades</h2>
+    <h2 class="section-title">What's New</h2>
     
     <!-- Carousel for Featured Cards -->
     <div class="carousel-container">
@@ -41,7 +41,7 @@
     </div>
 
     <div class="section-header">
-      <h2 class="section-title">Canciones mas escuchadas en España</h2>
+      <h2 class="section-title">Most Played Songs in Spain</h2>
       <span class="section-more"></span>
     </div>
     <div class="songs-grid">
@@ -57,7 +57,7 @@
       </div>
     </div>
     <div class="section-header">
-      <h2 class="section-title">Nuevos lanzamientos</h2>
+      <h2 class="section-title">New Releases</h2>
     </div>
     <div class="albums-grid">
       <div v-for="(album, index) in newAlbums.slice(0, 12)" :key="`album-${index}`" class="album-item">
@@ -67,16 +67,17 @@
   </div>
   <footer class="footer">
     <div class="footer-content">
-      <p class="footer-text">© 2025 Hibiki. Todos los derechos reservados.</p>
+      <p class="footer-text">© 2025 Hibiki. All rights reserved.</p>
       <div class="footer-links">
-        <a href="/politica" class="footer-link">Política de Privacidad</a>
-        <a href="/terminos" class="footer-link">Términos y Condiciones</a>
-        <a href="/cookies" class="footer-link">Política de Cookies</a>
-        <a href="/infoanuncios" class="footer-link">Información de anuncios</a>
+        <a href="/politica" class="footer-link">Privacy Policy</a>
+        <a href="/terminos" class="footer-link">Terms and Conditions</a>
+        <a href="/cookies" class="footer-link">Cookie Policy</a>
+        <a href="/infoanuncios" class="footer-link">Ad Information</a>
       </div>
     </div>
   </footer>
 </template>
+
 
 <script>
 export default {
@@ -87,46 +88,46 @@ export default {
       cardsPerSlide: 3,
       featuredCards: [
         {
-          label: 'NUEVO ALBUM DE ELADIO CARRION',
+          label: 'NEW ALBUM BY ELADIO CARRION',
           title: 'DON KBRN',
           subtitle: 'Hibiki Music',
           image: 'https://s1.ppllstatics.com/canarias7/www/multimedia/2024/01/26/Eladio%20Carrin-kpu--1200x840@Canarias7.jpg',
-          description: 'Descubre las nuevas canciones de Eladio Carrion.'
+          description: 'Discover the latest songs by Eladio Carrion.'
         },
         {
           label: 'DESTINO 2014 TOUR',
-          title: 'Gira del nuevo album de Raul Clyde',
+          title: 'Tour of the new album by Raul Clyde',
           subtitle: 'Hibiki Music',
           image: 'https://www.laguiago.com/wp-content/uploads/2025/01/raul-clyde.jpg',
-          description: 'El valenciano hará este 2025 un tour por toda España.'
+          description: 'The Valencian artist will tour all over Spain in 2025.'
         },
         {
-          label: 'DESCUBRE NUEVOS ARTISTAS',
+          label: 'DISCOVER NEW ARTISTS',
           title: 'Gabs',
           subtitle: 'Hibiki Music',
           image: 'https://i.scdn.co/image/ab6761670000ecd4f3386d596841d955168ba350',
-          description: 'El español es una de las promesas para este 2025'
+          description: 'This Spanish artist is one of the top up-and-coming talents for 2025.'
         },
         {
           label: 'PURO LATINO',
-          title: 'Descubre la playlist de Puro Latino en Hibiki',
+          title: 'Discover the Puro Latino playlist on Hibiki',
           subtitle: 'Hibiki Music',
           image: 'https://cd1.taquilla.com/data/images/t/4c/puro-latino-fest-2024.webp',
-          description: 'La playlist de los artistas mas pegados del momento.'
+          description: 'The playlist featuring today’s hottest Latin artists.'
         },
         {
-          label: 'PLAYLIST ACTUALIZADA',
-          title: 'Novedades diarias',
+          label: 'UPDATED PLAYLIST',
+          title: 'Daily highlights',
           subtitle: 'Hibiki Music',
           image: 'https://www.clarin.com/img/2023/04/27/ebOFOAW8i_2000x1500__1.jpg',
-          description: 'Los éxitos del momento recién salidos'
+          description: 'The freshest hits just released.'
         },
         {
-          label: 'DALE REGGAETON',
-          title: 'Hibiki Music Urbano Latino',
+          label: 'TURN UP THE REGGAETON',
+          title: 'Hibiki Urban Latin Music',
           subtitle: 'Hibiki Music',
           image: 'https://imgs.elpais.com.uy/dims4/default/9eb21d4/2147483647/strip/true/crop/982x675+179+0/resize/1440x990!/quality/90/?url=https%3A%2F%2Fel-pais-uruguay-production-web.s3.us-east-1.amazonaws.com%2Fbrightspot%2F6d%2Fc7%2F4f39909f4a759354589abb8c2818%2Fanuel.jpg',
-          description: 'La mejor playlist de reggaeton del momento'
+          description: 'The best reggaeton playlist right now.'
         },
         {
           label: 'ARTISTA DEL MES',

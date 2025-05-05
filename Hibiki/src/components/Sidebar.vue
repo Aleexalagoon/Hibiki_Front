@@ -47,17 +47,17 @@ const logout = () => {
       
       <!-- Mostrar Inicio solo si no es premium o no está autenticado -->
       <router-link v-if="!isPremium || !isAuthenticated" to="/inicio" class="menu-item" active-class="active" @click="$emit('update:visible', false)">Inicio</router-link>
-      <router-link to="/novedades" class="menu-item" active-class="active" @click="$emit('update:visible', false)">Novedades</router-link>
+      <router-link to="/novedades" class="menu-item" active-class="active" @click="$emit('update:visible', false)">News</router-link>
       
       <div v-if="isAuthenticated">
-        <router-link to="/artista" class="menu-item" active-class="active" @click="$emit('update:visible', false)">Artistas</router-link>
+        <router-link to="/artista" class="menu-item" active-class="active" @click="$emit('update:visible', false)">Artists</router-link>
         <router-link to="/playlist" class="menu-item" active-class="active" @click="$emit('update:visible', false)">Playlists</router-link>
         <router-link to="/premium" class="menu-item" active-class="active" @click="$emit('update:visible', false)">Premium</router-link>
       </div>
     </nav>
     
     <div v-if="isAuthenticated" class="auth-buttons">
-      <button class="logout-button" @click="logout">Cerrar Sesión</button>
+      <button class="logout-button" @click="logout">Sign Out</button>
     </div>
   </aside>
 

@@ -6,74 +6,74 @@
           <span class="logo-text">H</span>
         </div>
       </div>
-      <h1>Política de Cookies - Hibiki</h1>
+      <h1>Cookies Policy - Hibiki</h1>
       <div class="header-line"></div>
     </header>
 
     <section class="content">
       <p class="intro">
-        Esta política explica cómo <span class="highlight">Hibiki</span> utiliza cookies y tecnologías similares para mejorar tu experiencia al utilizar nuestra aplicación de música en streaming. Al usar Hibiki, aceptas el uso de cookies de acuerdo con esta política.
+        This policy explains how <span class="highlight">Hibiki</span> uses cookies and similar technologies to enhance your experience when using our music streaming application. By using Hibiki, you agree to the use of cookies in accordance with this policy.
       </p>
 
       <div class="policy-card">
-        <h2><span class="number">01</span> ¿Qué son las cookies?</h2>
+        <h2><span class="number">01</span> What are cookies?</h2>
         <div class="card-content">
           <p>
-            Las cookies son pequeños archivos de texto que se almacenan en tu dispositivo cuando visitas una página web o usas una aplicación. Las cookies permiten a la aplicación reconocer tu dispositivo y recordar tus preferencias o acciones durante un periodo de tiempo.
+            Cookies are small text files that are stored on your device when you visit a website or use an application. Cookies allow the application to recognize your device and remember your preferences or actions over a period of time.
           </p>
         </div>
       </div>
 
       <div class="policy-card">
-        <h2><span class="number">02</span> Tipos de cookies que usamos</h2>
+        <h2><span class="number">02</span> Types of cookies we use</h2>
         <div class="card-content">
           <p>
-            En Hibiki, usamos los siguientes tipos de cookies:
+            At Hibiki, we use the following types of cookies:
           </p>
           <ul>
-            <li><strong class="highlight-text">Cookies esenciales:</strong> Son necesarias para el funcionamiento básico de la aplicación, como la autenticación de usuario y la gestión de sesiones.</li>
-            <li><strong class="highlight-text">Cookies de rendimiento:</strong> Nos ayudan a analizar el uso de la aplicación y mejorar su rendimiento, como el seguimiento de la velocidad de carga y el comportamiento de los usuarios.</li>
-            <li><strong class="highlight-text">Cookies de funcionalidad:</strong> Estas cookies permiten que la aplicación recuerde tus preferencias y opciones, como el idioma y las configuraciones de visualización.</li>
-            <li><strong class="highlight-text">Cookies de publicidad y marketing:</strong> Utilizamos estas cookies para mostrarte anuncios más relevantes y medir la efectividad de las campañas publicitarias.</li>
+            <li><strong class="highlight-text">Essential cookies:</strong> These are necessary for the basic operation of the app, such as user authentication and session management.</li>
+            <li><strong class="highlight-text">Performance cookies:</strong> These help us analyze app usage and improve performance, such as tracking load times and user behavior.</li>
+            <li><strong class="highlight-text">Functionality cookies:</strong> These allow the app to remember your preferences and choices, like language and display settings.</li>
+            <li><strong class="highlight-text">Advertising and marketing cookies:</strong> We use these to show you more relevant ads and measure the effectiveness of advertising campaigns.</li>
           </ul>
         </div>
       </div>
 
       <div class="policy-card">
-        <h2><span class="number">03</span> ¿Cómo puedes controlar las cookies?</h2>
+        <h2><span class="number">03</span> How can you control cookies?</h2>
         <div class="card-content">
           <p>
-            Tienes el derecho de decidir si aceptas o no las cookies. Puedes gestionar tus preferencias de cookies a través de las opciones de configuración de tu dispositivo o navegador. La mayoría de los navegadores permiten controlar las cookies a través de sus opciones de configuración, donde puedes bloquear o eliminar las cookies.
+            You have the right to decide whether to accept cookies. You can manage your cookie preferences through your device or browser settings. Most browsers allow you to control cookies via their settings, where you can block or delete them.
           </p>
           <p>
-            Ten en cuenta que si decides deshabilitar las cookies, algunas funcionalidades de la aplicación pueden no estar disponibles o no funcionar correctamente.
-          </p>
-        </div>
-      </div>
-
-      <div class="policy-card">
-        <h2><span class="number">04</span> Cookies de terceros</h2>
-        <div class="card-content">
-          <p>
-            En algunos casos, permitimos que terceros (como proveedores de servicios de análisis, redes sociales o plataformas publicitarias) utilicen cookies en nuestra aplicación. Estas cookies son gestionadas por terceros y están sujetas a sus propias políticas de privacidad y cookies.
+            Keep in mind that disabling cookies may cause some features of the app to be unavailable or not function properly.
           </p>
         </div>
       </div>
 
       <div class="policy-card">
-        <h2><span class="number">05</span> Cambios en la política de cookies</h2>
+        <h2><span class="number">04</span> Third-party cookies</h2>
         <div class="card-content">
           <p>
-            Podemos actualizar esta política de cookies de vez en cuando para reflejar cambios en nuestras prácticas de cookies. Te notificaremos de los cambios importantes a través de la aplicación o por correo electrónico.
+            In some cases, we allow third parties (such as analytics providers, social media, or advertising platforms) to use cookies in our app. These cookies are managed by third parties and are subject to their own privacy and cookie policies.
           </p>
         </div>
       </div>
 
       <div class="policy-card">
-        <h2><span class="number">06</span> Contacto</h2>
+        <h2><span class="number">05</span> Changes to the cookies policy</h2>
         <div class="card-content">
           <p>
-            Si tienes alguna pregunta sobre nuestra política de cookies, no dudes en contactarnos en soporte@hibiki.com.
+            We may update this cookies policy from time to time to reflect changes in our cookie practices. We will notify you of any significant changes through the app or via email.
+          </p>
+        </div>
+      </div>
+
+      <div class="policy-card">
+        <h2><span class="number">06</span> Contact</h2>
+        <div class="card-content">
+          <p>
+            If you have any questions about our cookies policy, feel free to contact us at soporte@hibiki.com.
           </p>
         </div>
       </div>
@@ -82,15 +82,16 @@
     <footer class="cookies-footer">
       <div class="footer-line"></div>
       <div class="contact-info">
-        <p>Gracias por utilizar Hibiki.</p>
+        <p>Thank you for using Hibiki.</p>
         <a href="mailto:soporte@hibiki.com" class="email-link">soporte@hibiki.com</a>
       </div>
       <div class="copyright">
-        <p>&copy; 2025 Hibiki. Todos los derechos reservados.</p>
+        <p>&copy; 2025 Hibiki. All rights reserved.</p>
       </div>
     </footer>
   </div>
 </template>
+
 
 <style scoped>
 body {

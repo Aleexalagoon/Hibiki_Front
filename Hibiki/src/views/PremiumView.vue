@@ -81,50 +81,50 @@ export default {
     <canvas ref="backgroundCanvas" class="background-canvas"></canvas>
     <section class="promo-section">
       <div class="promo-text">
-        <h1 v-if="!isPremium">Disfruta de tu contenido favorito sin límites.</h1>
-        <h1 v-else>¡Ya estás disfrutando de Premium!</h1>
-        <h2 v-if="!isPremium">Prueba Premium Individual durante 2 meses por 0 €.</h2>
-        <h2 v-else>Continúa disfrutando de todas las ventajas premium.</h2>
+        <h1 v-if="!isPremium">Enjoy your favorite content without limits.</h1>
+        <h1 v-else>You're already enjoying Premium!</h1>
+        <h2 v-if="!isPremium">Try Premium Individual for 2 months for 0 €.</h2>
+        <h2 v-else>Continue enjoying all the premium advantages.</h2>
       </div>
     </section>
     <section class="comparison-section">
-      <h2 class="section-title">¿Por qué elegir Premium?</h2> 
+      <h2 class="section-title">Why choose Premium?</h2> 
       <table class="comparison-table">
         <thead>
           <tr>
-            <th>Características</th>
+            <th>Features</th>
             <th>Premium</th>
-            <th>No Premium</th>
+            <th>Non-Premium</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td>Escucha tu música favorita sin anuncios</td>
+            <td>Listen to your favorite music without ads</td>
             <td class="tick">✓</td>
             <td></td>
           </tr>
           <tr>
-            <td>Descarga de canciones para disfrutarlas sin conexión</td>
+            <td>Download songs to enjoy offline</td>
             <td class="tick">✓</td>
             <td></td>
           </tr>
           <tr>
-            <td>Escucha canciones en cualquier orden</td>
+            <td>Listen to songs in any order</td>
             <td class="tick">✓</td>
             <td></td>
           </tr>
           <tr>
-            <td>Descargar contenido</td>
+            <td>Download content</td>
             <td class="tick">✓</td>
             <td></td>
           </tr>
           <tr>
-            <td>Acceso a contenido offline</td>
+            <td>Access offline content</td>
             <td class="tick">✓</td>
             <td></td>
           </tr>
           <tr>
-            <td>Acceso limitado a algunas canciones</td>
+            <td>Limited access to some songs</td>
             <td></td>
             <td class="tick">✓</td>
           </tr>
@@ -132,19 +132,20 @@ export default {
       </table>
       <div class="plan-card">
         <div v-if="!isPremium">
-          <button class="plan-button" @click="startSubscription">Seleccionar</button>
+          <button class="plan-button" @click="startSubscription">Select</button>
         </div>
         <div v-else class="premium-status">
           <div class="premium-badge">
             <span class="premium-icon">★</span>
-            <span>PREMIUM ACTIVO</span>
+            <span>ACTIVE PREMIUM</span>
           </div>
-          <p class="premium-message">Ya estás disfrutando de todas las ventajas premium</p>
+          <p class="premium-message">You're already enjoying all the premium advantages</p>
         </div>
       </div>
     </section>
   </div>
 </template>
+
   
 <style scoped>
 .premium-view {

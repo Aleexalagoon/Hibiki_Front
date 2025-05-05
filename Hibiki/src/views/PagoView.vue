@@ -72,30 +72,30 @@ const handlePayment = async (event) => {
           </div>
           <div>
             <h2>Premium Individual</h2>
-            <p class="subtitle">1 cuenta Premium</p>
+            <p class="subtitle">1 Premium account</p>
           </div>
         </div>
         <div class="plan-price">
           <p class="price">0,00 €</p>
-          <p class="subtitle">Por 1 mes</p>
+          <p class="subtitle">For 1 month</p>
         </div>
       </div>
       <div class="plan-details">
-        <p>• Hoy: 1 mes por 0,00 €</p>
-        <p>• A partir del 10 abr 2025: 10,99 €/mes</p>
-        <p>• Te enviaremos un recordatorio 7 días antes del cobro.</p>
-        <p>• Cancela cuando quieras online. <a href="/politica" class="orange-link">Consulta las condiciones</a></p>
+        <p>• Today: 1 month for 0,00 €</p>
+        <p>• Starting from Apr 10, 2025: 10.99 €/month</p>
+        <p>• We will send you a reminder 7 days before the charge.</p>
+        <p>• Cancel anytime online. <a href="/politica" class="orange-link">Check the terms</a></p>
       </div>
     </div>  
     <div class="section">
-      <h2>Forma de pago</h2>
+      <h2>Payment method</h2>
       <div class="payment-options">
         <div class="payment-option selected">
           <div class="option-header">
             <label class="radio-container">
               <input type="radio" name="payment" checked>
               <span class="radio-checkmark"></span>
-              <span class="payment-label">Tarjeta de crédito o débito</span>
+              <span class="payment-label">Credit or debit card</span>
             </label>
           </div>
           <div class="card-icons">
@@ -108,16 +108,16 @@ const handlePayment = async (event) => {
               {{ errorMessage }}
             </div>
             <div class="form-group">
-              <label for="cardNumber">Número de tarjeta *</label>
+              <label for="cardNumber">Card number *</label>
               <input type="text" id="cardNumber" placeholder="0000 0000 0000 0000" class="form-control" required>
             </div>
             <div class="form-row">
               <div class="form-group half">
-                <label for="expiryDate">Fecha de caducidad *</label>
-                <input type="text" id="expiryDate" placeholder="MM/AA" class="form-control" required>
+                <label for="expiryDate">Expiry date *</label>
+                <input type="text" id="expiryDate" placeholder="MM/YY" class="form-control" required>
               </div>
               <div class="form-group half">
-                <label for="securityCode">Código de seguridad *</label>
+                <label for="securityCode">Security code *</label>
                 <div class="security-code-wrapper">
                   <input type="text" id="securityCode" class="form-control" required>
                   <div class="help-icon">?</div>
@@ -125,9 +125,9 @@ const handlePayment = async (event) => {
               </div>
             </div>
             <div class="section summary-section">
-              <h2>Resumen</h2>
+              <h2>Summary</h2>
               <div class="summary-content">
-                <div class="summary-header">Artículos</div>
+                <div class="summary-header">Items</div>
                 <div class="summary-item">
                   <div class="item-info">
                     <div class="item-icon"></div>
@@ -137,23 +137,24 @@ const handlePayment = async (event) => {
                 </div>
                 
                 <div class="summary-details">
-                  <p>• Hoy: 1 mes por 0,00 €</p>
-                  <p>• A partir del 10 abr 2025: 10,99 €/mes</p>
+                  <p>• Today: 1 month for 0,00 €</p>
+                  <p>• Starting from Apr 10, 2025: 10.99 €/month</p>
                 </div>
                 
                 <div class="summary-total">
-                  <span>Total ahora</span>
+                  <span>Total now</span>
                   <span class="total-price">0,00 €</span>
                 </div>
               </div>
             </div>
-            <button type="submit" class="payment-button">Pagar ahora</button>
+            <button type="submit" class="payment-button">Pay now</button>
           </form>
         </div>
       </div>
     </div>
   </div>
 </template>
+
 
 <style scoped>
 .payment-form {

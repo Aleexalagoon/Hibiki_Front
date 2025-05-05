@@ -2,7 +2,7 @@
   <div class="artist-page">
     <div class="main-container">
       <div class="artists-list">
-        <h2>Artistas</h2>
+        <h2>Artists</h2>
         <div
           v-for="artist in allArtists"
           :key="artist.cantanteId"
@@ -16,7 +16,6 @@
 
       <div class="details-container">
         <div v-if="selectedArtist">
-          <!-- Cabecera con imagen y degradado -->
           <div class="artist-header">
             <div class="artist-image-container">
               <img :src="selectedArtist.image" alt="Artist Image" class="artist-header-image" />
@@ -24,13 +23,12 @@
             </div>
             <div class="artist-info">
               <h1 class="artist-name">{{ selectedArtist.name }}</h1>
-              <p>{{ selectedArtist.monthlyListeners }} oyentes mensuales</p>
+              <p>{{ selectedArtist.monthlyListeners }} monthly listeners</p>
             </div>
           </div>
 
-          <!-- Sección de Temas -->
-          <h2>Populares</h2>
-          <p v-if="temaLoading">Cargando temas...</p>
+          <h2>Popular</h2>
+          <p v-if="temaLoading">Loading songs...</p>
           <p v-if="temaError">{{ temaError }}</p>
           
           <div v-if="temas.length > 0" class="songs-list">
@@ -41,7 +39,7 @@
               @click="selectTema(tema)"
             >
               <div class="song-info-container">
-                <img :src="tema.image || '/default-song.jpg'" alt="Tema Image" class="song-image" />
+                <img :src="tema.image || '/default-song.jpg'" alt="Song Image" class="song-image" />
                 <div class="song-info">
                   <span class="song-title">{{ tema.nombre }}</span>
                   <span class="song-artist">{{ selectedArtist.name }}</span>
@@ -51,11 +49,10 @@
             </div>
           </div>
           <div v-else-if="!temaLoading">
-            <p>No hay temas disponibles para este artista.</p>
+            <p>No songs available for this artist.</p>
           </div>
 
-          <!-- Sección de Álbumes -->
-          <h2>Discografía</h2>
+          <h2>Discography</h2>
           <div v-if="albums.length > 0" class="albums">
             <div
               v-for="album in albums"
@@ -68,13 +65,13 @@
             </div>
           </div>
           <div v-else>
-            <p>No hay álbumes disponibles para este artista.</p>
+            <p>No albums available for this artist.</p>
           </div>
         </div>
 
         <div v-if="selectedAlbum">
-          <h2>Canciones de {{ selectedAlbum.name }}</h2>
-          <p v-if="albumLoading">Cargando canciones...</p>
+          <h2>Songs from {{ selectedAlbum.name }}</h2>
+          <p v-if="albumLoading">Loading songs...</p>
           <p v-if="albumError">{{ albumError }}</p>
           <ul v-if="songs.length > 0" class="songs-list">
             <li
@@ -93,7 +90,7 @@
               <span class="song-duration">{{ formatDuration(song.duracion) }}</span>
             </li>
           </ul>
-          <p v-else-if="!albumLoading">No hay canciones disponibles en este álbum.</p>
+          <p v-else-if="!albumLoading">No songs available in this album.</p>
         </div>
       </div>
     </div>
@@ -118,12 +115,9 @@ export default defineComponent({
     const playerStore = usePlayerStore();
     const temaStore = useTemaStore();
 
-    // Función para formatear la duración
     const formatDuration = (duration) => {
       if (!duration) return '0m 0s';
-      
       const [hours, minutes, seconds] = duration.split(':').map(Number);
-
       if (hours > 0) {
         return `${hours}h ${minutes}m ${seconds}s`;
       } else {
@@ -131,51 +125,36 @@ export default defineComponent({
       }
     };
 
-    // Seleccionar un artista
     const selectArtist = async (artistId) => {
-      // Limpiar datos anteriores
       albumStore.clearSongs();
       temaStore.clearTemas();
-      
-      // Cargar datos del artista
       await artistaStore.fetchArtistData(artistId);
-      
-      // Cargar álbumes del artista
       await albumStore.fetchAlbumsByArtist(artistId);
-      
-      // Cargar temas del artista
       await temaStore.fetchTemasByCantante(artistId);
     };
 
-    // Seleccionar un tema
     const selectTema = (tema) => {
       if (tema && artistaStore.selectedArtist) {
-        // Asegurarnos de que el tema tenga la propiedad artista
         const temaWithArtist = {
           ...tema,
           artista: artistaStore.selectedArtist.name
         };
-        
         playerStore.setSong(temaWithArtist);
         temaStore.setSelectedTema(tema);
       }
     };
 
-    // Seleccionar una canción
     const selectSong = (song) => {
       if (song && artistaStore.selectedArtist) {
-        // Asegurarnos de que la canción tenga la propiedad artista
         const songWithArtist = {
           ...song,
           artista: artistaStore.selectedArtist.name
         };
-        
         playerStore.setSong(songWithArtist);
         albumStore.setSelectedSong(song);
       }
     };
 
-    // Seleccionar un álbum
     const selectAlbum = (albumId) => {
       albumStore.fetchAlbumSongs(albumId);
     };
@@ -189,17 +168,14 @@ export default defineComponent({
       selectedArtist: computed(() => artistaStore.selectedArtist),
       artistaLoading: computed(() => artistaStore.loading),
       artistaError: computed(() => artistaStore.error),
-      
       albums: computed(() => albumStore.albums),
       selectedAlbum: computed(() => albumStore.selectedAlbum),
       songs: computed(() => albumStore.songs),
       albumLoading: computed(() => albumStore.loading),
       albumError: computed(() => albumStore.error),
-      
       temas: computed(() => temaStore.temas),
       temaLoading: computed(() => temaStore.loading),
       temaError: computed(() => temaStore.error),
-      
       selectArtist,
       selectAlbum,
       selectSong,

@@ -3,7 +3,7 @@
     <div class="main-container">
       <div class="playlists-list">
         <h2>Playlists</h2>
-        <p v-if="loading">Cargando playlists...</p>
+        <p v-if="loading">Loading playlists...</p>
         <p v-if="error" class="error">{{ error }}</p>
         
         <div 
@@ -20,13 +20,13 @@
       <div class="details-container">
         <div v-if="selectedPlaylist">
           <h1 class="playlist-name">{{ selectedPlaylist.nombre }}</h1>
-          <p><strong>Descripción:</strong> {{ selectedPlaylist.descripcion }}</p>
+          <p><strong>Description:</strong> {{ selectedPlaylist.descripcion }}</p>
 
           <p v-if="selectedPlaylist.creador">
-            <strong>Creador:</strong> {{ selectedPlaylist.creador.nombre }}
+            <strong>Creator:</strong> {{ selectedPlaylist.creador.nombre }}
           </p>
 
-          <h2>Canciones</h2>
+          <h2>Songs</h2>
           <ul v-if="selectedPlaylist.canciones && selectedPlaylist.canciones.length > 0">
             <li
               v-for="song in selectedPlaylist.canciones"
@@ -44,12 +44,13 @@
               <span class="song-duration">{{ formatDuration(song.duracion) }}</span>
             </li>
           </ul>
-          <p v-else>No hay canciones en esta playlist.</p>
+          <p v-else>No songs in this playlist.</p>
         </div>
       </div>
     </div>
   </div>
 </template>
+
 
 <script>
 import { defineComponent, computed, onMounted } from 'vue';

@@ -6,80 +6,80 @@
           <span class="logo-text">H</span>
         </div>
       </div>
-      <h1>Política de Privacidad - Hibiki</h1>
+      <h1>Privacy Policy - Hibiki</h1>
       <div class="header-line"></div>
     </header>
 
     <section class="content">
       <p class="intro">
-        En <span class="highlight">Hibiki</span>, nos comprometemos a proteger tu privacidad. Esta política de privacidad explica cómo recopilamos, usamos, compartimos y protegemos tus datos personales cuando usas nuestra aplicación de música en streaming.
+        At <span class="highlight">Hibiki</span>, we are committed to protecting your privacy. This privacy policy explains how we collect, use, share, and protect your personal data when you use our music streaming app.
       </p>
 
       <div class="policy-card">
-        <h2><span class="number">01</span> Información que recopilamos</h2>
+        <h2><span class="number">01</span> Information We Collect</h2>
         <div class="card-content">
           <p>
-            Recopilamos diferentes tipos de información cuando usas nuestra aplicación, incluyendo:
+            We collect different types of information when you use our app, including:
           </p>
           <ul>
-            <li><strong class="highlight-text">Información personal:</strong> Cuando te registras en Hibiki, recopilamos tu nombre, dirección de correo electrónico y detalles de pago.</li>
-            <li><strong class="highlight-text">Datos de uso:</strong> Recopilamos información sobre cómo interactúas con la aplicación, como las canciones que escuchas, tus listas de reproducción y tus preferencias.</li>
-            <li><strong class="highlight-text">Información de dispositivo:</strong> Recopilamos detalles del dispositivo que usas para acceder a Hibiki, como el modelo, sistema operativo, dirección IP y tipo de navegador.</li>
+            <li><strong class="highlight-text">Personal Information:</strong> When you sign up for Hibiki, we collect your name, email address, and payment details.</li>
+            <li><strong class="highlight-text">Usage Data:</strong> We collect information about how you interact with the app, such as the songs you listen to, your playlists, and your preferences.</li>
+            <li><strong class="highlight-text">Device Information:</strong> We collect details about the device you use to access Hibiki, such as model, operating system, IP address, and browser type.</li>
           </ul>
         </div>
       </div>
 
       <div class="policy-card">
-        <h2><span class="number">02</span> Cómo usamos la información</h2>
+        <h2><span class="number">02</span> How We Use the Information</h2>
         <div class="card-content">
           <p>
-            Usamos la información recopilada para los siguientes fines:
+            We use the collected information for the following purposes:
           </p>
           <ul>
-            <li>Personalizar tu experiencia y mostrarte contenido relevante.</li>
-            <li>Mejorar nuestros servicios y la calidad de la app.</li>
-            <li>Procesar pagos y suscripciones.</li>
-            <li>Comunicarte sobre actualizaciones de la aplicación, nuevas funciones y promociones.</li>
+            <li>Personalize your experience and show you relevant content.</li>
+            <li>Improve our services and app quality.</li>
+            <li>Process payments and subscriptions.</li>
+            <li>Communicate with you about app updates, new features, and promotions.</li>
           </ul>
         </div>
       </div>
 
       <div class="policy-card">
-        <h2><span class="number">03</span> Compartir tu información</h2>
+        <h2><span class="number">03</span> Sharing Your Information</h2>
         <div class="card-content">
           <p>
-            No vendemos ni compartimos tu información personal con terceros, excepto en los siguientes casos:
+            We do not sell or share your personal information with third parties, except in the following cases:
           </p>
           <ul>
-            <li>Proveedores de servicios que nos ayudan a operar la aplicación (por ejemplo, procesadores de pagos, servicios de almacenamiento en la nube).</li>
-            <li>Para cumplir con obligaciones legales, como cuando lo exigen las autoridades gubernamentales.</li>
+            <li>Service providers who help us operate the app (e.g., payment processors, cloud storage services).</li>
+            <li>To comply with legal obligations, such as when required by government authorities.</li>
           </ul>
         </div>
       </div>
 
       <div class="policy-card">
-        <h2><span class="number">04</span> Seguridad de la información</h2>
+        <h2><span class="number">04</span> Information Security</h2>
         <div class="card-content">
           <p>
-            Implementamos medidas de seguridad para proteger tus datos personales, pero no podemos garantizar una seguridad absoluta en línea. Te recomendamos que tomes precauciones al usar la aplicación y protejas tu cuenta con una contraseña segura.
+            We implement security measures to protect your personal data, but we cannot guarantee absolute online security. We recommend that you take precautions when using the app and protect your account with a strong password.
           </p>
         </div>
       </div>
 
       <div class="policy-card">
-        <h2><span class="number">05</span> Tus derechos</h2>
+        <h2><span class="number">05</span> Your Rights</h2>
         <div class="card-content">
           <p>
-            Tienes derecho a acceder, corregir o eliminar tus datos personales. Para hacerlo, puedes ponerte en contacto con nosotros a través de los canales de soporte disponibles en la app.
+            You have the right to access, correct, or delete your personal data. To do so, you can contact us through the support channels available in the app.
           </p>
         </div>
       </div>
 
       <div class="policy-card">
-        <h2><span class="number">06</span> Cambios en esta política</h2>
+        <h2><span class="number">06</span> Changes to This Policy</h2>
         <div class="card-content">
           <p>
-            Esta política de privacidad puede actualizarse de vez en cuando. Te notificaremos sobre cualquier cambio importante a través de la aplicación o por correo electrónico.
+            This privacy policy may be updated from time to time. We will notify you about any important changes through the app or by email.
           </p>
         </div>
       </div>
@@ -88,15 +88,16 @@
     <footer class="privacy-footer">
       <div class="footer-line"></div>
       <div class="contact-info">
-        <p>Si tienes alguna pregunta sobre nuestra política de privacidad, contáctanos en:</p>
+        <p>If you have any questions about our privacy policy, contact us at:</p>
         <a href="mailto:soporte@hibiki.com" class="email-link">soporte@hibiki.com</a>
       </div>
       <div class="copyright">
-        <p>&copy; 2025 Hibiki. Todos los derechos reservados.</p>
+        <p>&copy; 2025 Hibiki. All rights reserved.</p>
       </div>
     </footer>
   </div>
 </template>
+
 
 <style scoped>
 body {

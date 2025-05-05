@@ -6,97 +6,97 @@
           <span class="logo-text">H</span>
         </div>
       </div>
-      <h1>Términos y Condiciones - Hibiki</h1>
+      <h1>Terms and Conditions - Hibiki</h1>
       <div class="header-line"></div>
     </header>
 
     <section class="content">
       <p class="intro">
-        Bienvenido a <span class="highlight">Hibiki</span>. Al acceder o utilizar nuestra aplicación, aceptas los siguientes términos y condiciones. Si no estás de acuerdo con estos términos, no debes usar la aplicación.
+        Welcome to <span class="highlight">Hibiki</span>. By accessing or using our application, you agree to the following terms and conditions. If you do not agree with these terms, you should not use the application.
       </p>
 
       <div class="term-card">
-        <h2><span class="number">01</span> Uso de la Aplicación</h2>
+        <h2><span class="number">01</span> Use of the Application</h2>
         <div class="card-content">
           <p>
-            Hibiki es una plataforma de música en streaming que te permite escuchar música en línea. Al usar nuestros servicios, te comprometes a no:
+            Hibiki is a streaming music platform that allows you to listen to music online. By using our services, you agree not to:
           </p>
           <ul>
-            <li>Violar cualquier ley o regulación aplicable.</li>
-            <li>Distribuir, reproducir o modificar el contenido de la aplicación sin el permiso adecuado.</li>
-            <li>Realizar actividades que puedan interferir con el funcionamiento de la aplicación o sus servidores.</li>
+            <li>Violate any applicable laws or regulations.</li>
+            <li>Distribute, reproduce, or modify the content of the application without proper authorization.</li>
+            <li>Engage in activities that may interfere with the operation of the application or its servers.</li>
           </ul>
         </div>
       </div>
 
       <div class="term-card">
-        <h2><span class="number">02</span> Cuenta de Usuario</h2>
+        <h2><span class="number">02</span> User Account</h2>
         <div class="card-content">
           <p>
-            Para utilizar Hibiki, necesitas crear una cuenta. Eres responsable de mantener la confidencialidad de tu cuenta y contraseña. Además, eres responsable de todas las actividades que ocurran bajo tu cuenta. Asegúrate de proporcionar información precisa y actualizada.
+            To use Hibiki, you need to create an account. You are responsible for maintaining the confidentiality of your account and password. Additionally, you are responsible for all activities that occur under your account. Make sure to provide accurate and up-to-date information.
           </p>
         </div>
       </div>
 
       <div class="term-card">
-        <h2><span class="number">03</span> Suscripción y Pagos</h2>
+        <h2><span class="number">03</span> Subscription and Payments</h2>
         <div class="card-content">
           <p>
-            Hibiki ofrece planes de suscripción mensuales y anuales. Al suscribirte a nuestros servicios de pago, aceptas los cargos recurrentes según el plan que selecciones. Puedes cancelar tu suscripción en cualquier momento a través de la configuración de la cuenta.
+            Hibiki offers monthly and yearly subscription plans. By subscribing to our paid services, you agree to the recurring charges based on the plan you select. You can cancel your subscription at any time through your account settings.
           </p>
         </div>
       </div>
 
       <div class="term-card">
-        <h2><span class="number">04</span> Propiedad Intelectual</h2>
+        <h2><span class="number">04</span> Intellectual Property</h2>
         <div class="card-content">
           <p>
-            Todo el contenido disponible en Hibiki, incluyendo música, imágenes, logotipos y software, es propiedad de Hibiki o de sus licenciantes y está protegido por derechos de autor y otras leyes de propiedad intelectual. No debes copiar, distribuir ni reproducir ningún contenido sin autorización.
+            All content available on Hibiki, including music, images, logos, and software, is the property of Hibiki or its licensors and is protected by copyright and other intellectual property laws. You may not copy, distribute, or reproduce any content without authorization.
           </p>
         </div>
       </div>
 
       <div class="term-card">
-        <h2><span class="number">05</span> Privacidad</h2>
+        <h2><span class="number">05</span> Privacy</h2>
         <div class="card-content">
           <p>
-            Tu privacidad es importante para nosotros. La recopilación, uso y protección de tu información personal está regida por nuestra <a href="/politica" class="privacy-link">Política de Privacidad</a>.
+            Your privacy is important to us. The collection, use, and protection of your personal information are governed by our <a href="/privacy" class="privacy-link">Privacy Policy</a>.
           </p>
         </div>
       </div>
 
       <div class="term-card">
-        <h2><span class="number">06</span> Terminación de la Cuenta</h2>
+        <h2><span class="number">06</span> Account Termination</h2>
         <div class="card-content">
           <p>
-            Podemos suspender o terminar tu cuenta en cualquier momento si consideramos que has violado estos términos o si se determina que tu uso de la aplicación es inapropiado. En caso de terminación, tu acceso a la aplicación será revocado y no podrás recuperar ningún contenido o suscripción asociada con tu cuenta.
+            We may suspend or terminate your account at any time if we believe you have violated these terms or if your use of the application is deemed inappropriate. In the event of termination, your access to the application will be revoked, and you will not be able to recover any content or subscriptions associated with your account.
           </p>
         </div>
       </div>
 
       <div class="term-card">
-        <h2><span class="number">07</span> Responsabilidad</h2>
+        <h2><span class="number">07</span> Liability</h2>
         <div class="card-content">
           <p>
-            Hibiki no se hace responsable por cualquier daño directo, indirecto, incidental, especial o consecuente que pueda resultar del uso de la aplicación, incluyendo, pero no limitado a, la pérdida de datos, interrupción del servicio o cualquier otro daño relacionado con el acceso o uso de la aplicación.
+            Hibiki is not responsible for any direct, indirect, incidental, special, or consequential damages that may result from the use of the application, including but not limited to data loss, service interruption, or any other damage related to accessing or using the application.
           </p>
         </div>
       </div>
 
       <div class="term-card">
-        <h2><span class="number">08</span> Cambios en los Términos</h2>
+        <h2><span class="number">08</span> Changes to the Terms</h2>
         <div class="card-content">
           <p>
-            Nos reservamos el derecho de modificar estos términos en cualquier momento. Los cambios serán efectivos cuando se publiquen en la aplicación o se te notifique de alguna manera. Al continuar usando la aplicación después de esos cambios, aceptas los nuevos términos.
+            We reserve the right to modify these terms at any time. Changes will be effective when posted in the application or otherwise notified to you. By continuing to use the application after such changes, you agree to the new terms.
           </p>
         </div>
       </div>
 
       <div class="term-card">
-        <h2><span class="number">09</span> Ley Aplicable</h2>
+        <h2><span class="number">09</span> Governing Law</h2>
         <div class="card-content">
           <p>
-            Estos términos estarán regidos por las leyes del país en el que Hibiki opera. Cualquier disputa que surja de estos términos será resuelta ante los tribunales competentes de esa jurisdicción.
+            These terms will be governed by the laws of the country in which Hibiki operates. Any dispute arising from these terms will be resolved in the competent courts of that jurisdiction.
           </p>
         </div>
       </div>
@@ -105,11 +105,11 @@
     <footer class="terms-footer">
       <div class="footer-line"></div>
       <div class="contact-info">
-        <p>Si tienes alguna pregunta o inquietud acerca de nuestros Términos y Condiciones, puedes contactarnos en:</p>
-        <a href="mailto:soporte@hibiki.com" class="email-link">soporte@hibiki.com</a>
+        <p>If you have any questions or concerns about our Terms and Conditions, you can contact us at:</p>
+        <a href="mailto:support@hibiki.com" class="email-link">support@hibiki.com</a>
       </div>
       <div class="copyright">
-        <p>&copy; 2025 Hibiki. Todos los derechos reservados.</p>
+        <p>&copy; 2025 Hibiki. All rights reserved.</p>
       </div>
     </footer>
   </div>

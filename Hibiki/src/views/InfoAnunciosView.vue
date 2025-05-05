@@ -6,110 +6,110 @@
           <span class="logo-text">H</span>
         </div>
       </div>
-      <h1>Política de Anuncios - Hibiki</h1>
+      <h1>Ads Policy - Hibiki</h1>
       <div class="header-line"></div>
     </header>
 
     <section class="content">
       <p class="intro">
-        En <span class="highlight">Hibiki</span>, ofrecemos anuncios como parte de la experiencia gratuita de nuestra aplicación de música en streaming. Esta política explica cómo utilizamos los anuncios y cómo se manejan los datos relacionados con la publicidad.
+        At <span class="highlight">Hibiki</span>, we offer ads as part of the free experience in our music streaming app. This policy explains how we use ads and how we handle advertising-related data.
       </p>
 
       <div class="policy-card">
-        <h2><span class="number">01</span> ¿Por qué mostramos anuncios?</h2>
+        <h2><span class="number">01</span> Why do we show ads?</h2>
         <div class="card-content">
           <p>
-            Hibiki muestra anuncios para ofrecer una experiencia gratuita a nuestros usuarios. Los anuncios permiten a Hibiki financiar el servicio, lo que nos ayuda a mantener y mejorar la plataforma sin cobrar por el acceso a la música.
+            Hibiki displays ads to offer a free experience to our users. Ads allow Hibiki to fund the service, helping us maintain and improve the platform without charging for music access.
           </p>
         </div>
       </div>
 
       <div class="policy-card">
-        <h2><span class="number">02</span> Tipos de anuncios que mostramos</h2>
+        <h2><span class="number">02</span> Types of ads we display</h2>
         <div class="card-content">
           <p>
-            Los anuncios que se muestran en Hibiki pueden ser:
+            The ads shown on Hibiki may include:
           </p>
           <ul>
-            <li><strong class="highlight-text">Anuncios de audio:</strong> Anuncios que se reproducen durante la reproducción de música.</li>
-            <li><strong class="highlight-text">Anuncios visuales:</strong> Banners y anuncios gráficos que aparecen en la interfaz de la aplicación.</li>
-            <li><strong class="highlight-text">Anuncios interactivos:</strong> Anuncios que requieren una interacción por parte del usuario (por ejemplo, para obtener descuentos o participar en promociones).</li>
+            <li><strong class="highlight-text">Audio ads:</strong> Ads that play during music playback.</li>
+            <li><strong class="highlight-text">Visual ads:</strong> Banners and graphical ads shown in the app interface.</li>
+            <li><strong class="highlight-text">Interactive ads:</strong> Ads that require user interaction (e.g., to get discounts or join promotions).</li>
           </ul>
         </div>
       </div>
 
       <div class="policy-card">
-        <h2><span class="number">03</span> Uso de datos para la personalización de anuncios</h2>
+        <h2><span class="number">03</span> Use of data for ad personalization</h2>
         <div class="card-content">
           <p>
-            Para hacer los anuncios más relevantes y útiles, recopilamos ciertos datos de uso y comportamiento de la aplicación. Estos pueden incluir:
+            To make ads more relevant and useful, we collect certain usage and behavior data from the app. This may include:
           </p>
           <ul>
-            <li>Las canciones que escuchas y los géneros que prefieres.</li>
-            <li>Tu ubicación general (por ejemplo, ciudad o región) para mostrar anuncios locales o relevantes.</li>
-            <li>Tu interacción con los anuncios (si haces clic en ellos o si los ves por completo).</li>
+            <li>The songs you listen to and your preferred genres.</li>
+            <li>Your general location (e.g., city or region) to show local or relevant ads.</li>
+            <li>Your interaction with ads (whether you click or fully view them).</li>
           </ul>
           <p>
-            Usamos esta información para ofrecerte anuncios más adecuados a tus intereses y mejorar la efectividad de nuestras campañas publicitarias.
+            We use this information to deliver more relevant ads and to improve the effectiveness of our advertising campaigns.
           </p>
         </div>
       </div>
 
       <div class="policy-card">
-        <h2><span class="number">04</span> Cookies y tecnologías de seguimiento</h2>
+        <h2><span class="number">04</span> Cookies and tracking technologies</h2>
         <div class="card-content">
           <p>
-            Para personalizar los anuncios y hacer el seguimiento de su efectividad, Hibiki utiliza cookies y otras tecnologías de seguimiento. Estas tecnologías nos permiten analizar el comportamiento de los usuarios y ofrecer anuncios más específicos.
+            To personalize ads and track their performance, Hibiki uses cookies and other tracking technologies. These tools allow us to analyze user behavior and provide more targeted advertisements.
           </p>
           <p>
-            Si deseas obtener más información sobre cómo usamos las cookies, puedes consultar nuestra <a href="/cookies" class="policy-link">Política de Cookies</a>.
+            If you'd like to learn more about how we use cookies, you can read our <a href="/cookies" class="policy-link">Cookies Policy</a>.
           </p>
         </div>
       </div>
 
       <div class="policy-card">
-        <h2><span class="number">05</span> Proveedores de anuncios y terceros</h2>
+        <h2><span class="number">05</span> Ad providers and third parties</h2>
         <div class="card-content">
           <p>
-            Hibiki trabaja con proveedores de servicios de publicidad de terceros para mostrar anuncios dentro de la aplicación. Estos proveedores pueden utilizar cookies y tecnologías similares para recopilar datos sobre tus actividades y ofrecerte anuncios más relevantes.
+            Hibiki partners with third-party advertising service providers to display ads within the app. These providers may use cookies and similar technologies to collect data about your activities and show you more relevant ads.
           </p>
           <p>
-            Algunos de los proveedores de anuncios con los que trabajamos pueden incluir:
+            Some of the ad providers we work with include:
           </p>
           <ul>
             <li>Google AdSense</li>
             <li>Facebook Audience Network</li>
-            <li>Otros proveedores de redes publicitarias</li>
+            <li>Other ad network providers</li>
           </ul>
           <p>
-            Ten en cuenta que estos proveedores de anuncios están sujetos a sus propias políticas de privacidad y cookies. Te recomendamos que las revises para comprender cómo gestionan tus datos.
+            Please note that these ad providers are subject to their own privacy and cookie policies. We recommend reviewing them to understand how your data is handled.
           </p>
         </div>
       </div>
 
       <div class="policy-card">
-        <h2><span class="number">06</span> Control de los anuncios</h2>
+        <h2><span class="number">06</span> Ad control</h2>
         <div class="card-content">
           <p>
-            Si prefieres no ver anuncios personalizados, puedes ajustar tus preferencias de publicidad en tu dispositivo o navegador. Sin embargo, ten en cuenta que aún podrías seguir viendo anuncios generales que no estén personalizados para ti.
+            If you prefer not to see personalized ads, you can adjust your ad preferences on your device or browser. However, keep in mind that you may still see general ads that are not tailored to you.
           </p>
         </div>
       </div>
 
       <div class="policy-card">
-        <h2><span class="number">07</span> Cambios en la política de anuncios</h2>
+        <h2><span class="number">07</span> Changes to the ad policy</h2>
         <div class="card-content">
           <p>
-            Podemos actualizar esta política de anuncios de vez en cuando. Te notificaremos sobre cualquier cambio importante a través de la aplicación o por correo electrónico.
+            We may update this ads policy from time to time. We'll notify you of any significant changes via the app or by email.
           </p>
         </div>
       </div>
 
       <div class="policy-card">
-        <h2><span class="number">08</span> Contacto</h2>
+        <h2><span class="number">08</span> Contact</h2>
         <div class="card-content">
           <p>
-            Si tienes alguna pregunta sobre nuestra política de anuncios, no dudes en contactarnos en soporte@hibiki.com.
+            If you have any questions about our ads policy, feel free to contact us at soporte@hibiki.com.
           </p>
         </div>
       </div>
@@ -118,15 +118,16 @@
     <footer class="ads-footer">
       <div class="footer-line"></div>
       <div class="contact-info">
-        <p>Gracias por disfrutar de la música en Hibiki.</p>
+        <p>Thank you for enjoying music on Hibiki.</p>
         <a href="mailto:soporte@hibiki.com" class="email-link">soporte@hibiki.com</a>
       </div>
       <div class="copyright">
-        <p>&copy; 2025 Hibiki. Todos los derechos reservados.</p>
+        <p>&copy; 2025 Hibiki. All rights reserved.</p>
       </div>
     </footer>
   </div>
 </template>
+
 
 <style scoped>
 body {

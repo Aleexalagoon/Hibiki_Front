@@ -15,11 +15,10 @@ const handleButtonClick = () => {
   }
 };
 </script>
-
 <template>
   <div class="container">
     <h1 class="title">HIBIKI</h1>
-    <h2 class="subtitle">Descubre nueva<br>música cada día</h2>
+    <h2 class="subtitle">Discover new<br>music every day</h2>
     <div class="icon">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" width="250" height="250">
         <g class="logo-group">
@@ -32,10 +31,10 @@ const handleButtonClick = () => {
       </svg>
     </div>
     <p class="description">
-      Obtén playlists y álbumes inspirados en los artistas y géneros que escuchas. 1 mes gratis y luego, 10,99 € al mes.
+      Get playlists and albums inspired by the artists and genres you listen to. 1 month free, then €10.99/month.
     </p>
     <button @click="handleButtonClick" class="button">
-      {{ isAuthenticated ? 'Ver Premium' : 'Probar gratis' }}
+      {{ isAuthenticated ? 'View Premium' : 'Try for Free' }}
     </button>
   </div>
 </template>

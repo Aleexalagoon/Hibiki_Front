@@ -7,10 +7,10 @@
           <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z" fill="white" />
         </svg>
       </div>
-      <h1>¡Pago Completado!</h1>
-      <p>Tu transacción se ha procesado correctamente.</p>      
+      <h1>Payment Completed!</h1>
+      <p>Your transaction has been processed successfully</p>      
       <router-link to="/novedades" class="boton-volver">
-        Volver a inicio
+        Back to homepage
       </router-link>
     </div>
   </div>
