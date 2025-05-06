@@ -5,6 +5,7 @@
       </div>
       <form @submit.prevent="loginUser">
         <h1 class="login-title">LOG IN</h1>
+        <ThemeToggle />
         
         <div class="input-group">
           <label>Email</label>
@@ -50,6 +51,7 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
+import ThemeToggle from '@/components/ThemeToggle.vue';  // Importar el componente
 
 const email = ref('');
 const password = ref('');
@@ -79,35 +81,41 @@ const loginWithGoogle = async () => {
 </script>
 
 <style scoped>
+/* Transición suave entre temas */
+body {
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Estilos para el login */
 .login-container {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background-color: #121212;
+  background-color: var(--background-primary);
   font-family: 'Helvetica', 'Arial', sans-serif;
 }
 
 .login-card {
   width: 100%;
-  max-width: 700px; /* Aumentado de 500px a 700px */
-  padding: 3rem; /* Aumentado de 2.5rem a 3rem */
-  background: #1e1e1e;
+  max-width: 700px;
+  padding: 3rem;
+  background: var(--background-secondary);
   border-radius: 16px;
   box-shadow: 0 12px 36px rgba(0, 0, 0, 0.4);
-  border-top: 4px solid #ff5100;
+  border-top: 4px solid var(--accent-color);
 }
 
 .logo-container {
   display: flex;
   justify-content: center;
-  margin-bottom: 30px; /* Aumentado de 20px a 30px */
+  margin-bottom: 30px;
 }
 
 .logo {
-  font-size: 38px; /* Aumentado de 32px a 38px */
+  font-size: 38px;
   font-weight: 800;
-  color: #ff5100;
+  color: var(--accent-color);
   letter-spacing: 2px;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
@@ -115,15 +123,15 @@ const loginWithGoogle = async () => {
 form {
   display: flex;
   flex-direction: column;
-  gap: 25px; /* Aumentado de 22px a 25px */
+  gap: 25px;
 }
 
 .login-title {
-  font-size: 32px; /* Aumentado de 28px a 32px */
+  font-size: 32px;
   font-weight: 700;
-  margin-bottom: 30px; /* Aumentado de 24px a 30px */
+  margin-bottom: 30px;
   text-align: center;
-  color: #ffffff;
+  color: var(--text-primary);
   letter-spacing: 1px;
 }
 
@@ -134,31 +142,31 @@ form {
 
 .input-group label {
   display: block;
-  margin-bottom: 10px; /* Aumentado de 8px a 10px */
-  color: #aaaaaa;
-  font-size: 16px; /* Aumentado de 14px a 16px */
+  margin-bottom: 10px;
+  color: var(--text-secondary);
+  font-size: 16px;
   font-weight: 500;
 }
 
 input {
   width: 94%;
-  padding: 18px; /* Aumentado de 16px a 18px */
-  background-color: #2c2c2c;
-  border: 2px solid #333333;
-  border-radius: 10px; /* Aumentado de 8px a 10px */
-  font-size: 18px; /* Aumentado de 16px a 18px */
-  color: #ffffff;
+  padding: 18px;
+  background-color: var(--background-tertiary);
+  border: 2px solid var(--border-color);
+  border-radius: 10px;
+  font-size: 18px;
+  color: var(--text-primary);
   transition: all 0.3s ease;
 }
 
 input:focus {
-  border-color: #ff5100;
+  border-color: var(--accent-color);
   outline: none;
-  box-shadow: 0 0 0 3px rgba(255, 81, 0, 0.2); /* Aumentado de 2px a 3px */
+  box-shadow: 0 0 0 3px rgba(255, 81, 0, 0.2);
 }
 
 input::placeholder {
-  color: #777777;
+  color: var(--text-secondary);
 }
 
 .forgot-password {
@@ -167,24 +175,24 @@ input::placeholder {
 }
 
 .forgot-password a {
-  color: #aaaaaa;
-  font-size: 15px; /* Aumentado de 14px a 15px */
+  color: var(--text-secondary);
+  font-size: 15px;
   text-decoration: none;
   transition: color 0.3s;
 }
 
 .forgot-password a:hover {
-  color: #ff5100;
+  color: var(--accent-color);
 }
 
 .login-button {
-  padding: 18px; /* Aumentado de 16px a 18px */
-  background-color: #ff5100;
-  color: white;
-  font-size: 20px; /* Aumentado de 18px a 20px */
+  padding: 18px;
+  background-color: var(--accent-color);
+  color: var(--text-primary);
+  font-size: 20px;
   font-weight: 600;
   border: none;
-  border-radius: 10px; /* Aumentado de 8px a 10px */
+  border-radius: 10px;
   cursor: pointer;
   transition: all 0.3s ease;
   letter-spacing: 0.5px;
@@ -204,70 +212,70 @@ input::placeholder {
   display: flex;
   align-items: center;
   text-align: center;
-  margin: 20px 0; /* Aumentado de 16px a 20px */
+  margin: 20px 0;
 }
 
 .divider::before,
 .divider::after {
   content: '';
   flex: 1;
-  border-bottom: 1px solid #333333;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .divider span {
-  padding: 0 20px; /* Aumentado de 16px a 20px */
-  color: #777777;
-  font-size: 16px; /* Aumentado de 14px a 16px */
+  padding: 0 20px;
+  color: var(--text-secondary);
+  font-size: 16px;
 }
 
 .google-button {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 15px; /* Aumentado de 12px a 15px */
-  padding: 18px; /* Aumentado de 16px a 18px */
-  background-color: #2c2c2c;
-  color: #ffffff;
-  border: 2px solid #333333;
-  border-radius: 10px; /* Aumentado de 8px a 10px */
-  font-size: 18px; /* Aumentado de 16px a 18px */
+  gap: 15px;
+  padding: 18px;
+  background-color: var(--background-tertiary);
+  color: var(--text-primary);
+  border: 2px solid var(--border-color);
+  border-radius: 10px;
+  font-size: 18px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .google-button:hover {
-  background-color: #333333;
-  border-color: #444444;
+  background-color: var(--background-tertiary);
+  border-color: var(--border-color);
 }
 
 .google-icon {
-  width: 28px; /* Aumentado de 24px a 28px */
-  height: 28px; /* Aumentado de 24px a 28px */
+  width: 28px;
+  height: 28px;
 }
 
 .links {
   display: flex;
   flex-direction: column;
-  gap: 20px; /* Aumentado de 16px a 20px */
-  margin-top: 30px; /* Aumentado de 24px a 30px */
+  gap: 20px;
+  margin-top: 30px;
   text-align: center;
 }
 
 .signup, .staff-login {
-  color: #aaaaaa;
+  color: var(--text-secondary);
   text-decoration: none;
-  font-size: 16px; /* Aumentado de 15px a 16px */
+  font-size: 16px;
   transition: color 0.3s;
 }
 
 .signup span, .staff-login span {
-  color: #ff5100;
+  color: var(--accent-color);
   font-weight: 500;
 }
 
 .signup:hover, .staff-login:hover {
-  color: #ffffff;
+  color: var(--text-primary);
 }
 
 .signup:hover span, .staff-login:hover span {
@@ -279,11 +287,11 @@ input::placeholder {
     max-width: 90%;
     padding: 2rem;
   }
-  
+
   .login-title {
     font-size: 28px;
   }
-  
+
   input, .login-button, .google-button {
     padding: 16px;
     font-size: 16px;

@@ -5,6 +5,7 @@
       </div>
       <form @submit.prevent="register">
         <h1 class="register-title">CREATE ACCOUNT</h1>
+        <ThemeToggle />
         
         <div class="input-group">
           <label>Username</label>
@@ -56,8 +57,13 @@
 </template>
 
 <script>
+import ThemeToggle from '@/components/ThemeToggle.vue';
+
 export default {
   name: 'RegisterView',
+  components: {
+    ThemeToggle
+  },
   data() {
     return {
       username: '',
@@ -122,13 +128,14 @@ export default {
 };
 </script>
 
+
 <style scoped>
 .register-container {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background-color: #121212;
+  background-color: var(--background-primary);
   font-family: 'Helvetica', 'Arial', sans-serif;
 }
 
@@ -136,10 +143,10 @@ export default {
   width: 100%;
   max-width: 700px;
   padding: 3rem;
-  background: #1e1e1e;
+  background: var(--background-secondary);
   border-radius: 16px;
   box-shadow: 0 12px 36px rgba(0, 0, 0, 0.4);
-  border-top: 4px solid #ff5100;
+  border-top: 4px solid var(--accent-color);
 }
 
 .logo-container {
@@ -151,7 +158,7 @@ export default {
 .logo {
   font-size: 38px;
   font-weight: 800;
-  color: #ff5100;
+  color: var(--accent-color);
   letter-spacing: 2px;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
@@ -167,7 +174,7 @@ form {
   font-weight: 700;
   margin-bottom: 30px;
   text-align: center;
-  color: #ffffff;
+  color: var(--text-primary);
   letter-spacing: 1px;
 }
 
@@ -179,7 +186,7 @@ form {
 .input-group label {
   display: block;
   margin-bottom: 10px;
-  color: #aaaaaa;
+  color: var(--text-secondary);
   font-size: 16px;
   font-weight: 500;
 }
@@ -187,22 +194,22 @@ form {
 input {
   width: 94%;
   padding: 18px;
-  background-color: #2c2c2c;
-  border: 2px solid #333333;
+  background-color: var(--input-background);
+  border: 2px solid var(--border-color);
   border-radius: 10px;
   font-size: 18px;
-  color: #ffffff;
+  color: var(--text-primary);
   transition: all 0.3s ease;
 }
 
 input:focus {
-  border-color: #ff5100;
+  border-color: var(--accent-color);
   outline: none;
   box-shadow: 0 0 0 3px rgba(255, 81, 0, 0.2);
 }
 
 input::placeholder {
-  color: #777777;
+  color: var(--text-placeholder);
 }
 
 input[type="checkbox"] {
@@ -217,12 +224,12 @@ input[type="checkbox"] {
 .terms-container {
   display: flex;
   align-items: center;
-  color: #aaaaaa;
+  color: var(--text-secondary);
   font-size: 15px;
 }
 
 .terms-link {
-  color: #ff5100;
+  color: var(--accent-color);
   text-decoration: none;
   transition: color 0.3s;
 }
@@ -233,8 +240,8 @@ input[type="checkbox"] {
 
 .register-button {
   padding: 18px;
-  background-color: #ff5100;
-  color: white;
+  background-color: var(--accent-color);
+  color: var(--text-primary);
   font-size: 20px;
   font-weight: 600;
   border: none;
@@ -265,12 +272,12 @@ input[type="checkbox"] {
 .divider::after {
   content: '';
   flex: 1;
-  border-bottom: 1px solid #333333;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .divider span {
   padding: 0 20px;
-  color: #777777;
+  color: var(--text-placeholder);
   font-size: 16px;
 }
 
@@ -280,9 +287,9 @@ input[type="checkbox"] {
   justify-content: center;
   gap: 15px;
   padding: 18px;
-  background-color: #2c2c2c;
-  color: #ffffff;
-  border: 2px solid #333333;
+  background-color: var(--input-background);
+  color: var(--text-primary);
+  border: 2px solid var(--border-color);
   border-radius: 10px;
   font-size: 18px;
   font-weight: 500;
@@ -291,8 +298,8 @@ input[type="checkbox"] {
 }
 
 .google-button:hover {
-  background-color: #333333;
-  border-color: #444444;
+  background-color: var(--input-background-hover);
+  border-color: var(--border-color-hover);
 }
 
 .google-icon {
@@ -309,19 +316,19 @@ input[type="checkbox"] {
 }
 
 .login {
-  color: #aaaaaa;
+  color: var(--text-secondary);
   text-decoration: none;
   font-size: 16px;
   transition: color 0.3s;
 }
 
 .login span {
-  color: #ff5100;
+  color: var(--accent-color);
   font-weight: 500;
 }
 
 .login:hover {
-  color: #ffffff;
+  color: var(--text-primary);
 }
 
 .login:hover span {
