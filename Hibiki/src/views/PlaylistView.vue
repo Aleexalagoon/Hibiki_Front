@@ -2,6 +2,7 @@
   <div class="playlist-page">
     <div class="main-container">
       <div class="playlists-list">
+      <ThemeToggle />
         <h2>Playlists</h2>
         <p v-if="loading">Loading playlists...</p>
         <p v-if="error" class="error">{{ error }}</p>
@@ -56,8 +57,12 @@
 import { defineComponent, computed, onMounted } from 'vue';
 import { usePlaylistStore } from '@/stores/PlaylistStore';
 import { usePlayerStore } from '@/stores/player';
+import ThemeToggle from '@/components/ThemeToggle.vue';
 
 export default defineComponent({
+  components: {
+    ThemeToggle,
+  },
   setup() {
     const playlistStore = usePlaylistStore();
     const playerStore = usePlayerStore();
@@ -100,8 +105,8 @@ export default defineComponent({
 .playlist-page {
   display: flex;
   min-height: 100vh;
-  background: #121212;
-  color: white;
+  background: var(--background-primary);
+  color: var(--text-primary);
 }
 
 .main-container {
@@ -113,7 +118,7 @@ export default defineComponent({
 .playlists-list {
   width: 30%;
   padding: 20px;
-  background: #181818;
+  background: var(--background-tertiary);
   overflow-y: auto;
   max-height: 110vh;
 }
@@ -122,6 +127,7 @@ export default defineComponent({
   font-size: 1.5rem;
   margin-bottom: 20px;
   position: relative;
+  color: var(--text-primary);
 }
 
 .playlists-list::-webkit-scrollbar {
@@ -129,11 +135,11 @@ export default defineComponent({
 }
 
 .playlists-list::-webkit-scrollbar-track {
-  background: #222;
+  background: var(--background-tertiary);
 }
 
 .playlists-list::-webkit-scrollbar-thumb {
-  background: #ff5100;
+  background: var(--accent-color);
   border-radius: 10px;
 }
 
@@ -150,13 +156,13 @@ export default defineComponent({
   cursor: pointer;
   margin-bottom: 10px;
   padding: 10px;
-  background: #222;
+  background: var(--background-secondary);
   border-radius: 10px;
   transition: all 0.3s ease;
 }
 
 .playlist-card:hover {
-  background: #333;
+  background: var(--hover-overlay);
   transform: translateY(-2px);
 }
 
@@ -172,6 +178,7 @@ export default defineComponent({
   font-size: 1rem;
   font-weight: 600;
   margin: 0;
+  color: var(--text-primary);
 }
 
 .details-container {
@@ -183,22 +190,35 @@ h1.playlist-name {
   font-size: 24px;
   font-weight: bold;
   margin-bottom: 20px;
+  color: var(--text-primary);
 }
 
 .details-container p {
   margin-bottom: 15px;
   line-height: 1.5;
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--text-secondary);
 }
 
 .details-container p strong {
-  color: white;
+  color: var(--text-primary);
 }
 
 .details-container h2 {
   font-size: 1.5rem;
   margin: 30px 0 20px;
   position: relative;
+  color: var(--text-primary);
+}
+
+.details-container h2::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  width: 50px;
+  height: 3px;
+  background-color: var(--accent-color);
+  border-radius: 3px;
 }
 
 ul {
@@ -211,7 +231,7 @@ ul {
   display: flex;
   align-items: center;
   padding: 10px;
-  border-bottom: 1px solid #333;
+  border-bottom: 1px solid var(--border-color);
   justify-content: space-between;
   transition: all 0.3s ease;
   border-radius: 5px;
@@ -219,7 +239,7 @@ ul {
 }
 
 .song-card:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--hover-overlay);
 }
 
 .song-info-container {
@@ -232,6 +252,7 @@ ul {
   height: 60px;
   border-radius: 10px;
   margin-right: 10px;
+  object-fit: cover;
 }
 
 .song-info {
@@ -242,18 +263,19 @@ ul {
 
 .song-title {
   font-weight: bold;
+  color: var(--text-primary);
 }
 
 .song-artist {
   font-size: 13px;
-  opacity: 0.5;
+  color: var(--text-secondary);
   margin-top: 8px;
 }
 
 .song-duration {
+  color: var(--text-secondary);
   opacity: 0.8;
 }
-
 @media (max-width: 900px) {
   .main-container {
     flex-direction: column;

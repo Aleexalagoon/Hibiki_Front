@@ -1,8 +1,12 @@
 <script>
 import { computed } from 'vue';
 import { useAuthStore } from '@/stores/auth';
+import ThemeToggle from '@/components/ThemeToggle.vue'; // Import the ThemeToggle component
 
 export default {
+  components: {
+    ThemeToggle, // Register ThemeToggle as a component
+  },
   setup() {
     const authStore = useAuthStore();
     const isPremium = computed(() => authStore.isPremium);
@@ -43,7 +47,7 @@ export default {
           ctx.restore();
           letter.x += letter.speedX;
           letter.y += letter.speedY;
-        })
+        });
         requestAnimationFrame(animate);
       };
       
@@ -78,6 +82,7 @@ export default {
 
 <template>
   <div class="premium-view">
+  <ThemeToggle />
     <canvas ref="backgroundCanvas" class="background-canvas"></canvas>
     <section class="promo-section">
       <div class="promo-text">
@@ -154,8 +159,8 @@ export default {
   flex-direction: column;
   align-items: center;
   min-height: 100vh;
-  background: linear-gradient(180deg, rgb(12, 12, 12) 0%, rgb(0, 0, 0) 100%);
-  color: rgb(255, 255, 255);
+  background: linear-gradient(180deg, var(--background-primary) 0%, var(--background-secondary) 100%);
+  color: var(--text-primary);
   padding: 2rem;
 }
 
@@ -184,18 +189,20 @@ export default {
 .promo-text h1 {
   font-size: 2.5rem;
   margin-bottom: 1rem;
+  color: var(--text-primary);
 }
 
 .promo-text h2 {
   font-size: 1.75rem;
   margin-bottom: 1rem;
+  color: var(--text-primary);
 }
 
 .section-title {
   font-size: 1.8rem;
   margin-bottom: 1.5rem;
   text-align: center;
-  color: #ff5100;
+  color: var(--accent-color);
 }
 
 .comparison-section {
@@ -214,12 +221,12 @@ export default {
 .comparison-table td {
   padding: 10px 15px;
   text-align: left;
-  border-bottom: 1px solid #333;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .comparison-table th {
-  background-color: #ff5100;
-  color: white;
+  background-color: var(--accent-color);
+  color: var(--text-primary);
   font-weight: bold;
 }
 
@@ -228,7 +235,7 @@ export default {
 }
 
 .tick {
-  color: #ff5100;
+  color: var(--accent-color);
   font-weight: bold;
 }
 
@@ -238,8 +245,8 @@ export default {
 }
 
 .plan-button {
-  background-color: #ff5100;
-  color: white;
+  background-color: var(--accent-color);
+  color: var(--text-primary);
   border: none;
   padding: 12px 30px;
   font-size: 1rem;
@@ -253,13 +260,12 @@ export default {
   background-color: #ca3900;
 }
 
-/* Nuevos estilos para usuario premium */
 .premium-status {
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 1.5rem;
-  border: 2px solid #ff5100;
+  border: 2px solid var(--accent-color);
   border-radius: 10px;
   background-color: rgba(255, 81, 0, 0.1);
 }
@@ -267,8 +273,8 @@ export default {
 .premium-badge {
   display: flex;
   align-items: center;
-  background-color: #ff5100;
-  color: white;
+  background-color: var(--accent-color);
+  color: var(--text-primary);
   padding: 8px 16px;
   border-radius: 20px;
   font-weight: bold;
@@ -283,5 +289,6 @@ export default {
 .premium-message {
   font-size: 1.1rem;
   margin: 0;
+  color: var(--text-primary);
 }
 </style>

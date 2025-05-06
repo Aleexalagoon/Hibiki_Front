@@ -2,6 +2,7 @@
   <div class="artist-page">
     <div class="main-container">
       <div class="artists-list">
+      <ThemeToggle />
         <h2>Artists</h2>
         <div
           v-for="artist in allArtists"
@@ -104,17 +105,19 @@ import { useAlbumStore } from '@/stores/albumStore';
 import { usePlayerStore } from '@/stores/player';
 import { useTemaStore } from '@/stores/temaStore';
 import MusicPlayer from '@/components/MusicPlayer.vue';
+import ThemeToggle from '@/components/ThemeToggle.vue';
 
 export default defineComponent({
   components: {
-    MusicPlayer
+    MusicPlayer,
+    ThemeToggle
   },
   setup() {
     const artistaStore = useArtistaStore();
     const albumStore = useAlbumStore();
     const playerStore = usePlayerStore();
     const temaStore = useTemaStore();
-
+    
     const formatDuration = (duration) => {
       if (!duration) return '0m 0s';
       const [hours, minutes, seconds] = duration.split(':').map(Number);
@@ -124,7 +127,7 @@ export default defineComponent({
         return `${minutes}m ${seconds}s`;
       }
     };
-
+    
     const selectArtist = async (artistId) => {
       albumStore.clearSongs();
       temaStore.clearTemas();
@@ -132,7 +135,7 @@ export default defineComponent({
       await albumStore.fetchAlbumsByArtist(artistId);
       await temaStore.fetchTemasByCantante(artistId);
     };
-
+    
     const selectTema = (tema) => {
       if (tema && artistaStore.selectedArtist) {
         const temaWithArtist = {
@@ -143,7 +146,7 @@ export default defineComponent({
         temaStore.setSelectedTema(tema);
       }
     };
-
+    
     const selectSong = (song) => {
       if (song && artistaStore.selectedArtist) {
         const songWithArtist = {
@@ -154,15 +157,15 @@ export default defineComponent({
         albumStore.setSelectedSong(song);
       }
     };
-
+    
     const selectAlbum = (albumId) => {
       albumStore.fetchAlbumSongs(albumId);
     };
-
+    
     onMounted(() => {
       artistaStore.fetchAllArtists();
     });
-
+    
     return {
       allArtists: computed(() => artistaStore.allArtists),
       selectedArtist: computed(() => artistaStore.selectedArtist),
@@ -185,13 +188,16 @@ export default defineComponent({
   },
 });
 </script>
-
 <style scoped>
+body {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
 .artist-page {
   display: flex;
   min-height: 100vh;
-  background: #121212;
-  color: white;
+  background: var(--background-primary);
+  color: var(--text-primary);
   overflow-x: hidden;
   max-width: 100vw;
   box-sizing: border-box;
@@ -208,7 +214,7 @@ export default defineComponent({
 .artists-list {
   width: 30%;
   padding: 20px;
-  background: #181818;
+  background: var(--background-tertiary);
   overflow-y: auto;
   max-height: 110vh;
 }
@@ -219,13 +225,13 @@ export default defineComponent({
   cursor: pointer;
   margin-bottom: 10px;
   padding: 10px;
-  background: #222;
+  background: var(--background-secondary);
   border-radius: 10px;
   transition: background-color 0.2s;
 }
 
 .artist-card:hover {
-  background-color: #333;
+  background-color: var(--hover-overlay);
 }
 
 .artist-image {
@@ -246,11 +252,11 @@ export default defineComponent({
 }
 
 .artists-list::-webkit-scrollbar-track {
-  background: #222;
+  background: var(--background-tertiary);
 }
 
 .artists-list::-webkit-scrollbar-thumb {
-  background: #ff5100;
+  background: var(--accent-color);
   border-radius: 10px;
 }
 
@@ -299,7 +305,7 @@ export default defineComponent({
   bottom: 20px;
   left: 20px;
   z-index: 2;
-  color: white;
+  color: var(--text-primary);
 }
 
 .artist-name {
@@ -307,6 +313,7 @@ export default defineComponent({
   font-weight: bold;
   margin-bottom: 5px;
   text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
+  color:white;
 }
 
 .albums {
@@ -354,7 +361,7 @@ export default defineComponent({
   padding: 12px 16px;
   border-radius: 8px;
   margin-bottom: 8px;
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: var(--background-secondary);
   justify-content: space-between;
   cursor: pointer;
   transition: background-color 0.2s;
@@ -389,6 +396,7 @@ export default defineComponent({
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  color: var(--text-primary);
 }
 
 .song-artist {
@@ -398,11 +406,13 @@ export default defineComponent({
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  color: var(--text-secondary);
 }
 
 .song-duration {
   opacity: 0.7;
   font-size: 14px;
+  color: var(--text-secondary);
 }
 
 .details-container h2 {
@@ -410,6 +420,7 @@ export default defineComponent({
   margin: 30px 0 20px 0;
   position: relative;
   padding-bottom: 10px;
+  color: var(--text-primary);
 }
 
 .details-container h2::after {
@@ -419,9 +430,9 @@ export default defineComponent({
   left: 0;
   width: 50px;
   height: 3px;
-  background-color: #ff5100;
+  background-color: var(--accent-color);
   border-radius: 3px;
-}
+  }
 
 @media screen and (max-width: 992px) {
   .main-container {
@@ -501,6 +512,7 @@ export default defineComponent({
   
   .artist-name {
     font-size: 24px;
+    color:white;
   }
   
   .song-image {

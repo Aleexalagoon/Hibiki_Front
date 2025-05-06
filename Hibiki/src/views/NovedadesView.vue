@@ -1,7 +1,7 @@
 <template>
   <div class="music-app">
+  <ThemeToggle />
     <h2 class="section-title">What's New</h2>
-    
     <!-- Carousel for Featured Cards -->
     <div class="carousel-container">
       <button class="carousel-nav carousel-prev" @click="prevSlide">&lt;</button>
@@ -80,8 +80,13 @@
 
 
 <script>
+import ThemeToggle from '@/components/ThemeToggle.vue';
+
 export default {
   name: 'MusicApp',
+  components: {
+    ThemeToggle
+  },
   data() {
     return {
       currentSlide: 0,
@@ -237,17 +242,17 @@ export default {
 .music-app {
   margin: 0 auto;
   padding: 20px;
-  background-color: #121212;
-  color: white;
+  background-color: var(--background-primary);
+  color: var(--text-primary);
 }
 
 .section-title {
   font-size: 24px;
   font-weight: bold;
   margin-bottom: 16px;
-  border-bottom: 1px solid #333;
+  border-bottom: 1px solid var(--border-color);
   padding-bottom: 10px;
-  color: white;
+  color: var(--text-primary);
 }
 
 /* Carousel Container */
@@ -262,7 +267,7 @@ export default {
   top: 50%;
   transform: translateY(-50%);
   background-color: rgba(0, 0, 0, 0.7);
-  color: white;
+  color: var(--text-primary);
   border: none;
   border-radius: 50%;
   width: 40px;
@@ -299,14 +304,14 @@ export default {
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background-color: #555;
+  background-color: var(--border-color);
   margin: 0 5px;
   cursor: pointer;
   transition: background-color 0.3s;
 }
 
 .carousel-dot.active {
-  background-color: #ff5100;
+  background-color: var(--accent-color);
 }
 
 /* Carousel Slides */
@@ -325,7 +330,7 @@ export default {
   flex: 0 0 calc(100% / 3); /* Default for desktop */
   display: flex;
   flex-direction: column;
-  background-color: #181818;
+  background-color: var(--background-secondary);
   border-radius: 8px;
   padding: 15px;
   margin: 0 10px;
@@ -334,12 +339,12 @@ export default {
 }
 
 .featured-card:hover {
-  background-color: #282828;
+  background-color: var(--hover-overlay);
 }
 
 .card-label {
   font-size: 12px;
-  color: #ff5100;
+  color: var(--accent-color);
   margin-bottom: 4px;
   text-transform: uppercase;
 }
@@ -348,12 +353,12 @@ export default {
   font-size: 18px;
   font-weight: bold;
   margin-bottom: 4px;
-  color: white;
+  color: var(--text-primary);
 }
 
 .card-subtitle {
   font-size: 14px;
-  color: #b3b3b3;
+  color: var(--text-secondary);
   margin-bottom: 10px;
 }
 
@@ -381,7 +386,7 @@ export default {
   right: 0;
   padding: 16px;
   background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
-  color: white;
+  color:white;
   font-size: 14px;
 }
 
@@ -394,13 +399,13 @@ export default {
 }
 
 .section-more {
-  color: #ff5100; 
+  color: var(--accent-color);
   font-size: 14px;
   cursor: pointer;
 }
 
 .orange-button {
-  background-color: #ff5100; 
+  background-color: var(--accent-color);
   color: white;
   border: none;
   border-radius: 5px;
@@ -411,7 +416,8 @@ export default {
 }
 
 .orange-button:hover {
-  background-color: #ff5100; 
+  background-color: var(--accent-color);
+  opacity: 0.9;
 }
 
 /* Canciones recién llegadas */
@@ -428,11 +434,11 @@ export default {
   padding: 8px;
   border-radius: 4px;
   transition: background-color 0.2s;
-  background-color: #181818;
+  background-color: var(--background-tertiary);
 }
 
 .song-item:hover {
-  background-color: #282828;
+  background-color: var(--hover-overlay);
 }
 
 .song-image-container {
@@ -460,12 +466,12 @@ export default {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  color: white;
+  color: var(--text-primary);
 }
 
 .song-artist {
   font-size: 12px;
-  color: #b3b3b3;
+  color: var(--text-secondary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -474,7 +480,7 @@ export default {
 .more-options-btn {
   background: none;
   border: none;
-  color: #ff5100; 
+  color: var(--accent-color);
   font-size: 16px;
   cursor: pointer;
   padding: 4px;
@@ -494,7 +500,7 @@ export default {
   padding-bottom: 100%;
   overflow: hidden;
   border-radius: 8px;
-  background-color: #181818;
+  background-color: var(--background-secondary);
 }
 
 .album-image {
@@ -512,9 +518,9 @@ export default {
 }
 
 .footer {
-  background-color: #181818;
+  background-color: var(--background-tertiary);
   padding: 20px 0;
-  border-top: 1px solid #ff5100;
+  border-top: 1px solid var(--accent-color);
 }
 
 .footer-content {
@@ -528,7 +534,7 @@ export default {
 }
 
 .footer-text {
-  color: white;
+  color: var(--text-primary);
   font-size: 14px;
   margin-bottom: 15px;
 }
@@ -541,17 +547,16 @@ export default {
 }
 
 .footer-link {
-  color: #ff5100; 
+  color: var(--accent-color);
   font-size: 14px;
   text-decoration: none;
   transition: color 0.2s;
 }
 
 .footer-link:hover {
-  color: white;
+  color: var(--text-primary);
   text-decoration: underline;
 }
-
 /* Responsive */
 @media (max-width: 1200px) {
   .albums-grid {

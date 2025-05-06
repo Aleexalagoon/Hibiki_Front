@@ -1,0 +1,98 @@
+/* Variables para temas */
+:root {
+    /* Tema oscuro (por defecto) */
+    --background-primary: #121212;
+    --background-secondary: #181818;
+    --background-tertiary: #282828;
+    --text-primary: white;
+    --text-secondary: #b3b3b3;
+    --accent-color: #ff5100;
+    --border-color: #333;
+    --hover-overlay: rgba(255, 255, 255, 0.1);
+  }
+  
+  /* Tema claro */
+  .light-theme {
+    --background-primary: #f5f5f5;
+    --background-secondary: #ffffff;
+    --background-tertiary: #e8e8e8;
+    --text-primary: #121212;
+    --text-secondary: #555555;
+    --accent-color: #ff5100;
+    --border-color: #dadada;
+    --hover-overlay: rgba(0, 0, 0, 0.05);
+  }
+  
+  /* Tema oscuro (explícito) */
+  .dark-theme {
+    --background-primary: #121212;
+    --background-secondary: #181818;
+    --background-tertiary: #282828;
+    --text-primary: white;
+    --text-secondary: #b3b3b3;
+    --accent-color: #ff5100;
+    --border-color: #333;
+    --hover-overlay: rgba(255, 255, 255, 0.1);
+  }
+  
+  /* Transición suave entre temas */
+  body {
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  
+  /* Estilos básicos que usan las variables */
+  body {
+    background-color: var(--background-primary);
+    color: var(--text-primary);
+  }
+  
+  /* Estilos para elementos específicos */
+  .music-app {
+    background-color: var(--background-primary);
+    color: var(--text-primary);
+  }
+  
+  .section-title {
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border-color);
+  }
+  
+  .featured-card, 
+  .song-item, 
+  .footer {
+    background-color: var(--background-secondary);
+  }
+  
+  .featured-card:hover, 
+  .song-item:hover {
+    background-color: var(--background-tertiary);
+  }
+  
+  .card-subtitle, 
+  .song-artist {
+    color: var(--text-secondary);
+  }
+  
+  .card-title, 
+  .song-title {
+    color: var(--text-primary);
+  }
+  
+  .card-label, 
+  .section-more, 
+  .more-options-btn, 
+  .footer-link {
+    color: var(--accent-color);
+  }
+  
+  .footer {
+    border-top: 1px solid var(--accent-color);
+  }
+  
+  .footer-text {
+    color: var(--text-primary);
+  }
+  
+  .footer-link:hover {
+    color: var(--text-primary);
+  }
