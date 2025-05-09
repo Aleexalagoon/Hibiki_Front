@@ -305,7 +305,7 @@ body {
   bottom: 20px;
   left: 20px;
   z-index: 2;
-  color: var(--text-primary);
+  color: white;
 }
 
 .artist-name {
