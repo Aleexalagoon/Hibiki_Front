@@ -93,11 +93,11 @@ export default {
       cardsPerSlide: 3,
       featuredCards: [
         {
-          label: 'NEW ALBUM BY ELADIO CARRION',
-          title: 'DON KBRN',
+          label: 'NEW ALBUM BY MORA',
+          title: 'LO MISMO DE SIEMPRE',
           subtitle: 'Hibiki Music',
-          image: 'https://s1.ppllstatics.com/canarias7/www/multimedia/2024/01/26/Eladio%20Carrin-kpu--1200x840@Canarias7.jpg',
-          description: 'Discover the latest songs by Eladio Carrion.'
+          image: 'https://images.genius.com/9b4acd648c12aa172b1b4ec9f8eaf4da.1000x1000x1.png',
+          description: 'Discover the latest songs by Mora.'
         },
         {
           label: 'DESTINO 2014 TOUR',
