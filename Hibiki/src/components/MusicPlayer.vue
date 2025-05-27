@@ -2,7 +2,13 @@
   <div v-if="playerStore.currentSong" class="music-player" :class="{ 'minimized': isMinimized }">
     <div class="player-content">
       <div class="player-info">
-        <img :src="playerStore.currentSong?.image || 'default-cover.jpg'" alt="Cover" class="song-cover" />
+        <img 
+          :src="playerStore.currentSong?.image || 'default-cover.jpg'" 
+          alt="Cover" 
+          class="song-cover" 
+          @click="openImageModal"
+          style="cursor: pointer;"
+        />
         <div class="song-details">
           <h3 class="song-title">{{ playerStore.currentSong?.nombre || 'Selecciona una canción' }}</h3>
           <p class="song-time">{{ playerStore.formatDuration(playerStore.currentTime) }} / {{ playerStore.formatDuration(playerStore.duration) }}</p>
@@ -49,6 +55,41 @@
     <button @click="isMinimized = !isMinimized" class="minimize-button">
       {{ isMinimized ? '▲' : '▼' }}
     </button>
+
+    <!-- Modal de imagen -->
+    <div v-if="showImageModal" class="image-modal" @click="closeImageModal">
+      <div class="modal-content" @click.stop>
+        <button class="close-button" @click="closeImageModal">×</button>
+        <div class="modal-image-container">
+          <img 
+            :src="playerStore.currentSong?.image || 'default-cover.jpg'" 
+            alt="Cover" 
+            class="modal-image"
+          />
+        </div>
+        <div class="modal-info">
+          <h2 class="modal-song-title">{{ playerStore.currentSong?.nombre || 'Selecciona una canción' }}</h2>
+          <div class="modal-controls">
+            <button @click="previousSong" aria-label="Canción anterior" class="modal-control-btn">⥢</button>
+            <button @click="togglePlay" :aria-label="playerStore.isPlaying ? 'Pausar' : 'Reproducir'" 
+                    class="modal-play-button">{{ playerStore.isPlaying ? '⥮' : '▶' }}</button>
+            <button @click="nextSong" aria-label="Siguiente canción" class="modal-control-btn">⥤</button>
+          </div>
+          <div class="modal-progress">
+            <span class="time-display">{{ playerStore.formatDuration(playerStore.currentTime) }}</span>
+            <input
+              type="range"
+              :value="playerStore.currentTime"
+              @input="seek"
+              min="0"
+              :max="playerStore.duration || 1"
+              class="modal-progress-bar"
+            />
+            <span class="time-display">{{ playerStore.formatDuration(playerStore.duration) }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
   <div v-else-if="!playerStore.isUserInteracted" class="music-player-placeholder" @click="handleFirstInteraction">
     <p>Haz clic aquí para activar el reproductor de música</p>
@@ -80,6 +121,7 @@ export default {
     const albumStore = useAlbumStore();
     const isMinimized = ref(false);
     const prevVolume = ref(1); // Para recordar el volumen antes de silenciar
+    const showImageModal = ref(false); // Estado del modal
 
     // Computed property para el icono de volumen
     const volumeIcon = computed(() => {
@@ -99,6 +141,17 @@ export default {
       }
       return [];
     });
+
+    // Funciones para el modal
+    const openImageModal = () => {
+      showImageModal.value = true;
+      document.body.style.overflow = 'hidden'; // Prevenir scroll del body
+    };
+
+    const closeImageModal = () => {
+      showImageModal.value = false;
+      document.body.style.overflow = 'unset';
+    };
 
     // Función para manejar la primera interacción del usuario
     const handleFirstInteraction = () => {
@@ -205,7 +258,10 @@ export default {
       handleFirstInteraction,
       changeVolume,
       toggleMute,
-      volumeIcon
+      volumeIcon,
+      showImageModal,
+      openImageModal,
+      closeImageModal
     };
   },
 };
@@ -277,6 +333,11 @@ export default {
   height: 50px;
   border-radius: 6px;
   margin-right: 15px;
+  transition: transform 0.2s ease;
+}
+
+.song-cover:hover {
+  transform: scale(1.05);
 }
 
 .song-details {
@@ -423,8 +484,187 @@ button:hover {
   transform: none !important;
 }
 
-
 .minimized .volume-container {
   display: flex;
+}
+
+/* Estilos del modal */
+.image-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+  backdrop-filter: blur(10px);
+}
+
+.modal-content {
+  position: relative;
+  background: linear-gradient(135deg, #2a2a2a, #1a1a1a);
+  border-radius: 20px;
+  padding: 30px;
+  max-width: 90vw;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.close-button {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  font-size: 30px;
+  color: #fff;
+  background: none;
+  border: none;
+  cursor: pointer;
+  z-index: 1;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.close-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: scale(1.1);
+  color: #ff5100;
+}
+
+.modal-image-container {
+  margin-bottom: 20px;
+}
+
+.modal-image {
+  width: 300px;
+  height: 300px;
+  border-radius: 15px;
+  object-fit: cover;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+.modal-info {
+  text-align: center;
+  color: white;
+  width: 100%;
+  max-width: 400px;
+}
+
+.modal-song-title {
+  font-size: 1.5rem;
+  margin: 0 0 20px 0;
+  color: white;
+  font-weight: 600;
+}
+
+.modal-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.modal-control-btn {
+  font-size: 24px;
+  padding: 10px;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.modal-play-button {
+  font-size: 28px;
+  padding: 15px;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ff5100;
+  transition: all 0.3s ease;
+}
+
+.modal-control-btn:hover,
+.modal-play-button:hover {
+  transform: scale(1.1);
+  background: #ff5100;
+}
+
+.modal-progress {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  width: 100%;
+}
+
+.time-display {
+  font-size: 0.9rem;
+  color: #ccc;
+  min-width: 45px;
+}
+
+.modal-progress-bar {
+  flex: 1;
+  height: 6px;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  background: #4d4d4d;
+  border-radius: 3px;
+  outline: none;
+}
+
+.modal-progress-bar::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  background: #ff5100;
+  border-radius: 50%;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.modal-progress-bar::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  background: #ff5100;
+  border-radius: 50%;
+  border: none;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .modal-image {
+    width: 250px;
+    height: 250px;
+  }
+  
+  .modal-song-title {
+    font-size: 1.2rem;
+  }
+  
+  .modal-content {
+    padding: 20px;
+    margin: 20px;
+  }
 }
 </style>

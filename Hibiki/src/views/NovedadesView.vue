@@ -56,6 +56,27 @@
         <button class="more-options-btn">•••</button>
       </div>
     </div>
+
+    <div class="section-header">
+      <h2 class="section-title">Featured Themes</h2>
+      <span class="section-more"></span>
+    </div>
+    <div class="themes-grid">
+      <div v-for="(tema, index) in recentTemas.slice(0, 8)" :key="`tema-${index}`" class="theme-item">
+        <div class="theme-image-container">
+          <img :src="tema.image" :alt="tema.nombre" class="theme-image">
+          <div class="theme-overlay">
+          </div>
+        </div>
+        <div class="theme-content">
+          <div class="theme-info">
+            <div class="theme-title">{{ tema.nombre }}</div>
+            <div class="theme-title">{{ tema.artista }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="section-header">
       <h2 class="section-title">New Releases</h2>
     </div>
@@ -114,32 +135,19 @@ export default {
           description: 'This Spanish artist is one of the top up-and-coming talents for 2025.'
         },
         {
-          label: 'PURO LATINO',
-          title: 'Discover the Puro Latino playlist on Hibiki',
-          subtitle: 'Hibiki Music',
-          image: 'https://cd1.taquilla.com/data/images/t/4c/puro-latino-fest-2024.webp',
-          description: 'The playlist featuring today’s hottest Latin artists.'
-        },
-        {
           label: 'UPDATED PLAYLIST',
           title: 'Daily highlights',
           subtitle: 'Hibiki Music',
           image: 'https://www.clarin.com/img/2023/04/27/ebOFOAW8i_2000x1500__1.jpg',
           description: 'The freshest hits just released.'
         },
+   
         {
-          label: 'TURN UP THE REGGAETON',
-          title: 'Hibiki Urban Latin Music',
+          label: 'World Tour',
+          title: 'Bad Bunny',
           subtitle: 'Hibiki Music',
-          image: 'https://imgs.elpais.com.uy/dims4/default/9eb21d4/2147483647/strip/true/crop/982x675+179+0/resize/1440x990!/quality/90/?url=https%3A%2F%2Fel-pais-uruguay-production-web.s3.us-east-1.amazonaws.com%2Fbrightspot%2F6d%2Fc7%2F4f39909f4a759354589abb8c2818%2Fanuel.jpg',
-          description: 'The best reggaeton playlist right now.'
-        },
-        {
-          label: 'ARTISTA DEL MES',
-          title: 'C. Tangana',
-          subtitle: 'Hibiki Music',
-          image: '/api/placeholder/400/320',
-          description: 'Descubre toda la discografía del madrileño con acceso premium.'
+          image: 'https://yt3.googleusercontent.com/Ys37SrZ6B7RUW8_X3YvQet7VCFNnWa5C5PXe09OgIoY9UkTt1GpP_zap1-w2VF5gZcyS5xQmbJs=s900-c-k-c0x00ffffff-no-rj',
+          description: 'DeBÍ TiRAR MáS FOToS World Tour'
         },
         {
           label: 'EN CONCIERTO',
@@ -164,6 +172,7 @@ export default {
         }
       ],
       recentSongs: [],
+      recentTemas: [],
       newAlbums: []
     }
   },
@@ -178,6 +187,7 @@ export default {
   },
   mounted() {
     this.fetchRecentSongs();
+    this.fetchRecentTemas();
     this.fetchNewAlbums();
     this.setupCarousel();
     window.addEventListener('resize', this.setupCarousel);
@@ -223,6 +233,15 @@ export default {
         this.recentSongs = data;
       } catch (error) {
         console.error('Error fetching recent songs:', error);
+      }
+    },
+    async fetchRecentTemas() {
+      try {
+        const response = await fetch('https://localhost:7295/api/Tema');
+        const data = await response.json();
+        this.recentTemas = data;
+      } catch (error) {
+        console.error('Error fetching recent temas:', error);
       }
     },
     async fetchNewAlbums() {
@@ -486,6 +505,114 @@ export default {
   padding: 4px;
 }
 
+/* Temas Grid - Diseño más serio y profesional */
+.themes-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  margin-bottom: 50px;
+}
+
+.theme-item {
+  background-color: var(--background-secondary);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.theme-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  border-color: var(--accent-color);
+}
+
+.theme-image-container {
+  position: relative;
+  height: 180px;
+  overflow: hidden;
+}
+
+.theme-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.theme-item:hover .theme-image {
+  transform: scale(1.05);
+}
+
+.theme-overlay {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+}
+
+.theme-duration {
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.theme-content {
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.theme-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.theme-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.theme-path {
+  font-size: 13px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: 'Courier New', monospace;
+}
+
+.theme-action-btn {
+  background-color: var(--accent-color);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-left: 12px;
+  flex-shrink: 0;
+}
+
+.theme-action-btn:hover {
+  background-color: var(--accent-color);
+  opacity: 0.9;
+  transform: scale(1.1);
+}
+
 /* Nuevos lanzamientos */
 .albums-grid {
   display: grid;
@@ -559,6 +686,10 @@ export default {
 }
 /* Responsive */
 @media (max-width: 1200px) {
+  .themes-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
   .albums-grid {
     grid-template-columns: repeat(4, 1fr);
   }
@@ -569,6 +700,10 @@ export default {
     grid-template-columns: repeat(3, 1fr);
   }
   
+  .themes-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
   .featured-card {
     flex: 0 0 calc(100% / 2); /* 2 cards per slide on medium screens */
   }
@@ -577,6 +712,11 @@ export default {
 @media (max-width: 768px) {
   .songs-grid {
     grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .themes-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
   }
   
   .albums-grid {
@@ -590,6 +730,7 @@ export default {
 
 @media (max-width: 576px) {
   .songs-grid,
+  .themes-grid,
   .albums-grid {
     grid-template-columns: 1fr;
   }
@@ -607,4 +748,4 @@ export default {
     right: -10px;
   }
 }
-</style>
+</style scoped>
