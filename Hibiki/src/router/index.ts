@@ -21,6 +21,7 @@ import CancionZonaPrivada from "@/views/CancionZonaPrivada.vue";
 import CantanteZonaPrivada from "@/views/CantanteZonaPrivada.vue";
 import AlbumZonaPrivada from "@/views/AlbumZonaPrivada.vue";
 import ConciertosView from "@/views/ConciertosView.vue";
+import DescargaView from "@/views/DescargaView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -164,7 +165,14 @@ const router = createRouter({
       path: "/conciertos",
       name: "conciertos",
       component: ConciertosView,
+    },
+
+    {
+      path: "/descarga",
+      name: "descarga",
+      component: DescargaView,
     }
+
 
   ],
 });

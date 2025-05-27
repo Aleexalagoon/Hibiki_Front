@@ -38,7 +38,7 @@ const logout = () => {
 
 <template>
   <aside class="sidebar" :class="{ 'visible': visible }">
-    <div class="logo">HIBIKI</div>
+    <div class="logo">HIBIKI MUSIC</div>
     <nav class="menu">
       <div class="menu-search">
         <input type="text" placeholder="Buscar..." v-model="searchQuery" />
@@ -54,6 +54,7 @@ const logout = () => {
         <router-link to="/playlist" class="menu-item" active-class="active" @click="$emit('update:visible', false)">Playlists</router-link>
         <router-link to="/premium" class="menu-item" active-class="active" @click="$emit('update:visible', false)">Premium</router-link>
         <router-link to="/conciertos" class="menu-item" active-class="active" @click="$emit('update:visible', false)">Concerts</router-link>
+        <router-link to="/descarga" class="menu-item" active-class="active" @click="$emit('update:visible', false)">Download</router-link>
       </div>
     </nav>
     
