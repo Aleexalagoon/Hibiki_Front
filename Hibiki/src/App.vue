@@ -188,7 +188,7 @@ onUnmounted(() => {
       
       <!-- Sidebar integrado directamente -->
       <aside class="sidebar" :class="{ 'visible': sidebarVisible }">
-        <div class="logo">HIBIKI</div>
+        <div class="logo">HIBIKI MUSIC</div>
         <nav class="menu">
           <!-- Contenedor de búsqueda con estilos mejorados -->
           <div class="menu-search-container">
@@ -236,16 +236,15 @@ onUnmounted(() => {
             </div>
           </div>
           
-          <!-- Enlaces del menú -->
-          <router-link to="/inicio" class="menu-item" active-class="active" @click="sidebarVisible = false">Inicio</router-link>
-          <router-link to="/novedades" class="menu-item" active-class="active" @click="sidebarVisible = false">Novedades</router-link>
+           <!-- Mostrar Inicio solo si no es premium o no está autenticado -->
+            <router-link v-if="!isPremium || !isAuthenticated" to="/inicio" class="menu-item" active-class="active" @click="$emit('update:visible', false)">Home</router-link>
+            <router-link to="/novedades" class="menu-item" active-class="active" @click="$emit('update:visible', false)">News</router-link>
           
           <div v-if="isAuthenticated">
-            <router-link to="/artista" class="menu-item" active-class="active" @click="sidebarVisible = false">Artistas</router-link>
+            <router-link to="/artista" class="menu-item" active-class="active" @click="sidebarVisible = false">Artists</router-link>
             <router-link to="/playlist" class="menu-item" active-class="active" @click="sidebarVisible = false">Playlists</router-link>
             <router-link to="/premium" class="menu-item" active-class="active" @click="sidebarVisible = false">Premium</router-link>
             <router-link to="/conciertos" class="menu-item" active-class="active" @click="sidebarVisible = false">Concerts</router-link>
-            <router-link to="/descarga" class="menu-item" active-class="active" @click="sidebarVisible = false">Download</router-link>
           </div>
         </nav>
         
