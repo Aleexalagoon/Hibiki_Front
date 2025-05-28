@@ -4,17 +4,20 @@ import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 import { usePlayerStore } from '@/stores/player';
 import { useCancionesStore } from '@/stores/cancionesStore';
+import { useArtistaStore } from '@/stores/artistaStore';
 import MusicPlayer from '@/components/MusicPlayer.vue';
 import Swal from 'sweetalert2';
 import Perfil from '@/components/Perfil.vue';
-import Sidebar from '@/components/Sidebar.vue'; 
 
 const sidebarVisible = ref(false);
 const searchQuery = ref('');
+const searchResults = ref([]);
+const showSearchResults = ref(false);
 
 const authStore = useAuthStore();
 const playerStore = usePlayerStore();
 const cancionesStore = useCancionesStore();
+const artistaStore = useArtistaStore();
 const router = useRouter();
 
 const isAuthenticated = computed(() => authStore.isAuthenticated);
@@ -24,13 +27,82 @@ const allSongs = computed(() => cancionesStore.canciones || []);
 
 let adInterval: any = null;
 
-const handleSearch = (query: string) => {
-  searchQuery.value = query;
-  console.log('Buscando:', query);
+const toggleSidebar = () => sidebarVisible.value = !sidebarVisible.value;
+
+const search = () => {
+  if (!searchQuery.value.trim()) {
+    showSearchResults.value = false;
+    return;
+  }
+
+  const query = searchQuery.value.toLowerCase();
+  let songResults = [];
+  let artistResults = [];
+  
+  if (cancionesStore.canciones && Array.isArray(cancionesStore.canciones)) {
+    songResults = cancionesStore.canciones.filter(cancion => {
+      const nombre = cancion?.nombre ? cancion.nombre.toLowerCase() : '';
+      const artista = cancion?.artista ? cancion.artista.toLowerCase() : '';
+      return nombre.includes(query) || artista.includes(query);
+    });
+  }
+  
+  if (artistaStore.allArtists && Array.isArray(artistaStore.allArtists)) {
+    artistResults = artistaStore.allArtists.filter(artista => {
+      const nombre = artista?.nombre ? artista.nombre.toLowerCase() : '';
+      return nombre.includes(query);
+    });
+  }
+  
+  searchResults.value = [
+    ...songResults.map(song => ({
+      type: 'song',
+      id: song.cancionId || song.id,
+      title: song.nombre || 'Sin título',
+      artist: song.artista || 'Artista',
+      cover: song.image || '/default-cover.jpg'
+    })),
+    ...artistResults.map(artist => ({
+      type: 'artist',
+      id: artist.cantanteId || artist.id,
+      title: artist.nombre || 'Artista',
+      cover: artist.image || '/default-artist.jpg'
+    }))
+  ];
+  
+  showSearchResults.value = true;
+  if (window.innerWidth <= 768) {
+    sidebarVisible.value = false;
+  }
 };
 
+const navigateToResult = (result) => {
+  if (result.type === 'song') {
+    const song = cancionesStore.canciones.find(c => 
+      (c.cancionId === result.id) || (c.id === result.id)
+    );
+    
+    if (song) {
+      if (typeof playerStore.setSong === 'function') {
+        playerStore.setSong(song);
+      } else if (typeof playerStore.setCurrentSong === 'function') {
+        playerStore.setCurrentSong(song);
+      }
+    }
+  } else if (result.type === 'artist') {
+    if (typeof artistaStore.fetchArtistData === 'function') {
+      artistaStore.fetchArtistData(result.id);
+    }
+    router.push('/artista');
+  }
+  
+  searchQuery.value = '';
+  showSearchResults.value = false;
+};
 
-const handleLogout = () => {
+const closeSearchResults = () => showSearchResults.value = false;
+
+const logout = () => {
   if (adInterval) {
     clearInterval(adInterval);
     adInterval = null;
@@ -64,13 +136,25 @@ const startAdInterval = () => {
 
 onMounted(async () => {
   authStore.loadUserFromStorage();
-  await cancionesStore.fetchCanciones();
+  
+  await Promise.all([
+    cancionesStore.fetchCanciones(),
+    artistaStore.fetchAllArtists()
+  ]);
   
   sidebarVisible.value = window.innerWidth > 768;
   
   if (!isPremium.value && isAuthenticated.value) {
     startAdInterval();
   }
+  
+  // Event listener para cerrar resultados de búsqueda al hacer click fuera
+  document.addEventListener('click', (event) => {
+    const searchContainer = document.querySelector('.menu-search-container');
+    if (searchContainer && !searchContainer.contains(event.target)) {
+      closeSearchResults();
+    }
+  });
 });
 
 watchEffect(() => {
@@ -93,12 +177,82 @@ onUnmounted(() => {
 <template>
   <div class="app-container">
     <div class="app">
-      <!-- Sidebar component with v-model for visibility -->
-      <Sidebar 
-        v-model:visible="sidebarVisible"
-        @search="handleSearch"
-        @logout="handleLogout"
-      />
+      <!-- Botón de menú móvil -->
+      <div class="menu-toggle" @click="toggleSidebar">
+        <div class="menu-icon">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </div>
+      
+      <!-- Sidebar integrado directamente -->
+      <aside class="sidebar" :class="{ 'visible': sidebarVisible }">
+        <div class="logo">HIBIKI</div>
+        <nav class="menu">
+          <!-- Contenedor de búsqueda con estilos mejorados -->
+          <div class="menu-search-container">
+            <div class="menu-search">
+              <input 
+                type="text" 
+                placeholder="Buscar" 
+                v-model="searchQuery"
+                @keyup.enter="search"
+              />
+              <button @click="search">Buscar</button>
+            </div>
+            
+            <!-- Resultados de búsqueda -->
+            <div class="search-results" v-if="showSearchResults && searchResults.length > 0">
+              <div class="search-results-header">
+                <h3>Resultados de búsqueda</h3>
+                <button class="close-button" @click="showSearchResults = false">×</button>
+              </div>
+              
+              <div class="search-results-list">
+                <div 
+                  v-for="result in searchResults" 
+                  :key="`${result.type}-${result.id}`" 
+                  class="search-result-item"
+                  @click="navigateToResult(result)"
+                >
+                  <div class="result-image">
+                    <img :src="result.cover" :alt="result.title">
+                  </div>
+                  <div class="result-info">
+                    <div class="result-title">{{ result.title }}</div>
+                    <div class="result-subtitle">
+                      <span class="result-type">{{ result.type === 'song' ? 'Canción' : 'Artista' }}</span>
+                      <span v-if="result.type === 'song' && result.artist"> • {{ result.artist }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Sin resultados -->
+            <div class="search-results no-results" v-if="showSearchResults && searchResults.length === 0">
+              <p>No se encontraron resultados</p>
+            </div>
+          </div>
+          
+          <!-- Enlaces del menú -->
+          <router-link to="/inicio" class="menu-item" active-class="active" @click="sidebarVisible = false">Inicio</router-link>
+          <router-link to="/novedades" class="menu-item" active-class="active" @click="sidebarVisible = false">Novedades</router-link>
+          
+          <div v-if="isAuthenticated">
+            <router-link to="/artista" class="menu-item" active-class="active" @click="sidebarVisible = false">Artistas</router-link>
+            <router-link to="/playlist" class="menu-item" active-class="active" @click="sidebarVisible = false">Playlists</router-link>
+            <router-link to="/premium" class="menu-item" active-class="active" @click="sidebarVisible = false">Premium</router-link>
+            <router-link to="/conciertos" class="menu-item" active-class="active" @click="sidebarVisible = false">Concerts</router-link>
+            <router-link to="/descarga" class="menu-item" active-class="active" @click="sidebarVisible = false">Download</router-link>
+          </div>
+        </nav>
+        
+        <div v-if="isAuthenticated" class="auth-buttons">
+          <button class="logout-button" @click="logout">Cerrar Sesión</button>
+        </div>
+      </aside>
       
       <!-- Componente de perfil de usuario -->
       <div class="profile-container-p">
@@ -272,25 +426,37 @@ onUnmounted(() => {
   position: relative;
 }
 
+/* ESTILOS MEJORADOS DEL BUSCADOR */
+.menu-search-container {
+  position: relative;
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
 .menu-search {
   display: flex;
   align-items: center;
-  margin-bottom: 1rem;
 }
 
 .menu-search input {
   flex: 1;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  padding: 10px;
+  border: 1px solid #333;
+  border-radius: 4px 0 0 4px;
+  background-color: #222;
+  color: #fff;
+}
+
+.menu-search input::placeholder {
+  color: #888;
 }
 
 .menu-search button {
-  padding: 8px 12px;
+  padding: 10px 15px;
   background-color: #ff5100;
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 0 4px 4px 0;
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
@@ -298,6 +464,120 @@ onUnmounted(() => {
 .menu-search button:hover {
   background-color: #ca3900;
 }
+
+/* ESTILOS PARA LOS RESULTADOS DE BÚSQUEDA */
+.search-results {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  max-height: 400px;
+  overflow-y: auto;
+  background-color: #222;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 1010;
+  margin-top: 8px;
+}
+
+.search-results-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 15px;
+  border-bottom: 1px solid #333;
+}
+
+.search-results-header h3 {
+  margin: 0;
+  font-size: 14px;
+  color: #ccc;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  color: #777;
+  font-size: 18px;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.close-button:hover {
+  color: #fff;
+}
+
+.search-results-list {
+  padding: 10px 0;
+}
+
+.search-result-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 15px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.search-result-item:hover {
+  background-color: #333;
+}
+
+.result-image {
+  width: 40px;
+  height: 40px;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+.result-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.result-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.result-title {
+  font-size: 14px;
+  font-weight: bold;
+  color: #fff;
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.result-subtitle {
+  font-size: 12px;
+  color: #999;
+}
+
+.result-type {
+  background-color: #333;
+  color: #ccc;
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-size: 10px;
+  text-transform: uppercase;
+}
+
+.no-results {
+  padding: 15px;
+  text-align: center;
+  color: #999;
+}
+
+.no-results p {
+  margin: 0;
+}
+
+/* FIN DE ESTILOS DEL BUSCADOR */
 
 .auth-buttons {
   text-align: center;
@@ -391,6 +671,19 @@ onUnmounted(() => {
     content: '';
     position: fixed;
     top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+  }
+  
+  .sidebar.visible ~ .app:after {
+    opacity: 1;
+    visibility: visible;
   }
 }
 </style>

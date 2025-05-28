@@ -1,38 +1,39 @@
 <template>
   <div class="profile-container">
-    <!-- Sección de perfil de usuario -->
+    <!-- Header del perfil -->
     <div class="profile-header">
       <div class="profile-avatar">
-        <div v-if="profileStore.userData.avatar" class="avatar-image">
+        <div v-if="profileStore.userData?.avatar" class="avatar-image">
           <img :src="profileStore.userData.avatar" alt="Foto de perfil" />
         </div>
         <div v-else class="avatar-placeholder">
           <svg class="avatar-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M5.121 17.804A4 4 0 018.98 15h6.04a4 4 0 013.858 2.804M12 11a4 4 0 100-8 4 4 0 000 8z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
           </svg>
         </div>
       </div>
       
       <div class="profile-info">
         <span class="profile-label">Perfil</span>
-        <h1 class="profile-name">{{ profileStore.userData.name }}</h1>
+        <h1 class="profile-name">{{ profileStore.userName }}</h1>
         <p class="profile-stats">
-          {{ profileStore.userData.publicLists }} listas públicas • 
-          <span class="follow-text">Sigue a {{ profileStore.userData.following }} usuarios</span>
+          {{ profileStore.userData?.publicLists || 0 }} listas públicas • 1 seguidor • Sigue a {{ profileStore.userData?.following || 0 }} usuarios
         </p>
       </div>
       
       <div class="profile-options">
         <button class="options-button" @click="toggleOptions">
-          <span class="dot"></span>
-          <span class="dot"></span>
-          <span class="dot"></span>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <circle cx="12" cy="12" r="2"></circle>
+            <circle cx="4" cy="12" r="2"></circle>
+            <circle cx="20" cy="12" r="2"></circle>
+          </svg>
         </button>
         <div v-if="showOptions" class="options-dropdown">
           <ul>
             <li @click="editProfile">Editar perfil</li>
             <li @click="shareProfile">Compartir perfil</li>
-            <li @click="copyLink">Copiar enlace</li>
+            <li @click="copyLink">Copiar enlace del perfil</li>
           </ul>
         </div>
       </div>
@@ -52,26 +53,40 @@
     
     <div v-if="!profileStore.loading && !profileStore.error">
       <!-- Sección de artistas más escuchados -->
-      <div class="top-artists-section" v-if="profileStore.topArtists.length > 0">
+      <section class="top-artists-section" v-if="profileStore.hasTopArtists">
         <div class="section-header">
           <h2 class="section-title">Artistas más escuchados este mes</h2>
           <span class="section-visibility">Solo visibles para ti</span>
           <button class="show-all-button" @click="showAllArtists">Mostrar todos</button>
         </div>
         
-        <div class="artists-grid">
-          <div v-for="artist in profileStore.topArtists" :key="artist.id" class="artist-card" @click="navigateToArtist(String(artist.id))">
-            <div class="artist-image">
-              <img :src="artist.image" :alt="artist.name" />
+        <div class="artists-scroll-container">
+          <div class="artists-grid">
+            <div 
+              v-for="artist in profileStore.topArtists.slice(0, 8)" 
+              :key="artist.id" 
+              class="artist-card" 
+              @click="navigateToArtist(String(artist.id))"
+            >
+              <div class="artist-image">
+                <img :src="artist.image" :alt="artist.name" />
+                <div class="play-button-overlay">
+                  <button class="play-button" @click.stop="playArtist(artist.id)">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M8 5v14l11-7z"></path>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              <div class="artist-name">{{ artist.name }}</div>
+              <div class="artist-label">Artista</div>
             </div>
-            <div class="artist-name">{{ artist.name }}</div>
-            <div class="artist-label">Artista</div>
           </div>
         </div>
-      </div>
+      </section>
       
       <!-- Sección de canciones más escuchadas -->
-      <section class="top-tracks-section" v-if="profileStore.topTracks.length > 0">
+      <section class="top-tracks-section" v-if="profileStore.hasTopTracks">
         <div class="section-header">
           <h2 class="section-title">Canciones más escuchadas este mes</h2>
           <span class="section-visibility">Solo visibles para ti</span>
@@ -79,17 +94,22 @@
         </div>
         
         <div class="tracks-list">
-          <div v-for="(track, index) in profileStore.topTracks" :key="track.id" class="track-item">
+          <div 
+            v-for="(track, index) in profileStore.topTracks.slice(0, 5)" 
+            :key="track.id" 
+            class="track-item" 
+            @click="playTrack(String(track.id))"
+          >
             <div class="track-index">
-              <button v-if="index === 0 || (playingTrack === String(track.id))" class="play-button" @click="playTrack(String(track.id))">
-                <svg v-if="playingTrack !== String(track.id)" viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
+              <span class="index-number">{{ index + 1 }}</span>
+              <button class="play-button" @click.stop="playTrack(String(track.id))">
+                <svg v-if="playingTrack !== String(track.id)" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M8 5v14l11-7z"></path>
                 </svg>
-                <svg v-else viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
+                <svg v-else viewBox="0 0 24 24" fill="currentColor">
                   <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"></path>
                 </svg>
               </button>
-              <span v-else>{{ index + 1 }}</span>
             </div>
 
             <div class="track-image">
@@ -97,7 +117,7 @@
             </div>
 
             <div class="track-info">
-              <div class="track-title" :class="{ 'explicit': track.explicit }">
+              <div class="track-title">
                 {{ track.title }}
                 <span v-if="track.explicit" class="explicit-badge">E</span>
               </div>
@@ -107,11 +127,13 @@
             <div class="track-album">{{ track.album }}</div>
 
             <div class="track-liked">
-              <button @click.stop="toggleLike(track)">
-                <svg v-if="track.liked" viewBox="0 0 24 24" fill="red" width="20" height="20">
-                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path>
-                </svg>
-                <svg v-else viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" width="20" height="20">
+              <button @click.stop="toggleLike(track)" :class="{ 'liked': track.liked }">
+                <svg 
+                  viewBox="0 0 24 24" 
+                  :fill="track.liked ? '#1db954' : 'none'" 
+                  :stroke="track.liked ? 'none' : 'currentColor'" 
+                  stroke-width="2"
+                >
                   <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path>
                 </svg>
               </button>
@@ -121,8 +143,10 @@
 
             <div class="track-options">
               <button class="options-button" @click.stop="toggleTrackOptions(track.id)">
-                <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
-                  <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"></path>
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <circle cx="12" cy="12" r="2"></circle>
+                  <circle cx="4" cy="12" r="2"></circle>
+                  <circle cx="20" cy="12" r="2"></circle>
                 </svg>
               </button>
               <div v-if="activeTrackOptions === track.id" class="track-options-dropdown">
@@ -139,18 +163,33 @@
       </section>
       
       <!-- Sección de listas públicas -->
-      <section class="public-playlists-section" v-if="profileStore.publicPlaylists.length > 0">
+      <section class="public-playlists-section" v-if="profileStore.hasPublicPlaylists">
         <div class="section-header">
           <h2 class="section-title">Listas públicas</h2>
-          <button v-if="profileStore.publicPlaylists.length > 6" class="show-all-button" @click="showAllPlaylists">Mostrar todas</button>
+          <button v-if="profileStore.publicPlaylists.length > 6" class="show-all-button" @click="showAllPlaylists">
+            Mostrar todas
+          </button>
         </div>
         
         <div class="playlists-grid">
-          <div v-for="playlist in profileStore.publicPlaylists" :key="playlist.id" class="playlist-card" @click="navigateToPlaylist(playlist.id)">
+          <div 
+            v-for="playlist in profileStore.publicPlaylists.slice(0, 6)" 
+            :key="playlist.id" 
+            class="playlist-card" 
+            @click="navigateToPlaylist(playlist.id)"
+          >
             <div class="playlist-image">
               <img :src="playlist.image" :alt="playlist.title" />
+              <div class="play-button-overlay">
+                <button class="play-button" @click.stop="playPlaylist(playlist.id)">
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M8 5v14l11-7z"></path>
+                  </svg>
+                </button>
+              </div>
             </div>
             <div class="playlist-title">{{ playlist.title }}</div>
+            <div class="playlist-owner">De {{ profileStore.userName }}</div>
           </div>
         </div>
       </section>
@@ -159,198 +198,139 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
-import { useAuthStore } from '@/stores/auth';
-import { useProfileStore } from '@/stores/perfil';
+import { ref, onMounted, computed } from 'vue'
+import { useProfileStore } from '../stores/perfil'
 
-const router = useRouter();
-const authStore = useAuthStore();
-const profileStore = useProfileStore();
+// Inicializar el store
+const profileStore = useProfileStore()
 
-// Estados para la UI
-const showOptions = ref(false);
-const activeTrackOptions = ref<number | null>(null);
-const playingTrack = ref<string | null>(null);
+// Variables reactivas para el componente
+const showOptions = ref(false)
+const playingTrack = ref<string | null>(null)
+const activeTrackOptions = ref<number | null>(null)
 
-// Función para cargar los datos del usuario utilizando Pinia
-const loadUserData = async () => {
-  if (!authStore.isAuthenticated) {
-    router.push('/login');
-    return;
-  }
-  
-  // Utilizar el store para cargar todos los datos
-  await profileStore.fetchUserData(authStore.user.token);
-};
+// Computed para acceso seguro a userData
+const userData = computed(() => profileStore.userData)
 
-// Funciones de interacción con la UI
+// Funciones del componente
 const toggleOptions = () => {
-  showOptions.value = !showOptions.value;
-  // Cerrar menú de opciones de pista cuando se abre el menú principal
-  activeTrackOptions.value = null;
-};
+  showOptions.value = !showOptions.value
+}
 
 const toggleTrackOptions = (trackId: number) => {
-  if (activeTrackOptions.value === trackId) {
-    activeTrackOptions.value = null;
-  } else {
-    activeTrackOptions.value = trackId;
-  }
-  // Cerrar menú de opciones principal
-  showOptions.value = false;
-};
+  activeTrackOptions.value = activeTrackOptions.value === trackId ? null : trackId
+}
 
-const toggleLike = async (track: { id: number; liked: boolean }) => {
+const toggleLike = async (track: any) => {
   try {
-    const token = authStore.user.token;
-    const endpoint = track.liked ? 'unlike' : 'like';
-    
-    const response = await fetch(`https://localhost:7295/api/canciones/${track.id}/${endpoint}`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }
-    });
-
-    if (!response.ok) {
-      throw new Error(`No se pudo ${track.liked ? 'quitar' : 'dar'} me gusta`);
-    }
-    
-    // Actualizar el estado localmente
-    track.liked = !track.liked;
-  } catch (err) {
-    console.error('Error al interactuar con me gusta:', err);
-    // Para demo, actualizamos localmente aunque falle la API
-    track.liked = !track.liked;
+    // Aquí harías la llamada a la API para actualizar el like
+    profileStore.updateTrackLike(track.id, !track.liked)
+  } catch (error) {
+    console.error('Error al actualizar like:', error)
   }
-};
+}
 
-const playTrack = (trackId: string) => {
-  if (playingTrack.value === trackId) {
-    playingTrack.value = null; // Pausar
-  } else {
-    playingTrack.value = trackId; // Reproducir
+const loadUserData = async () => {
+  // Esta función debería obtener el token del usuario logueado
+  const token = localStorage.getItem('authToken') || ''
+  if (token) {
+    await profileStore.fetchUserData(token)
   }
-};
+}
 
-// Funciones de navegación
+// Funciones de navegación y acciones
 const navigateToArtist = (artistId: string) => {
-  router.push(`/artista/${artistId}`);
-};
+  console.log('Navigate to artist:', artistId)
+  // Implementar navegación
+}
 
 const navigateToPlaylist = (playlistId: number) => {
-  router.push(`/playlist/${playlistId}`);
-};
+  console.log('Navigate to playlist:', playlistId)
+  // Implementar navegación
+}
+
+const playArtist = (artistId: number) => {
+  console.log('Play artist:', artistId)
+  // Implementar reproducción
+}
+
+const playTrack = (trackId: string) => {
+  playingTrack.value = playingTrack.value === trackId ? null : trackId
+  console.log('Play track:', trackId)
+  // Implementar reproducción
+}
+
+const playPlaylist = (playlistId: number) => {
+  console.log('Play playlist:', playlistId)
+  // Implementar reproducción
+}
 
 const showAllArtists = () => {
-  router.push('/artistas');
-};
+  console.log('Show all artists')
+  // Implementar navegación a vista completa
+}
 
 const showAllTracks = () => {
-  router.push('/canciones');
-};
+  console.log('Show all tracks')
+  // Implementar navegación a vista completa
+}
 
 const showAllPlaylists = () => {
-  router.push('/playlists');
-};
+  console.log('Show all playlists')
+  // Implementar navegación a vista completa
+}
 
-// Funciones para el menú de opciones
 const editProfile = () => {
-  router.push('/perfil/editar');
-};
+  console.log('Edit profile')
+  showOptions.value = false
+}
 
 const shareProfile = () => {
-  if (navigator.share) {
-    navigator.share({
-      title: `Perfil de ${profileStore.userData.name}`,
-      url: window.location.href
-    }).catch(err => console.error('Error al compartir:', err));
-  } else {
-    alert('Compartir no está disponible en este navegador');
-  }
-};
+  console.log('Share profile')
+  showOptions.value = false
+}
 
 const copyLink = () => {
-  navigator.clipboard.writeText(window.location.href)
-    .then(() => {
-      alert('Enlace copiado al portapapeles');
-    })
-    .catch(err => {
-      console.error('Error al copiar enlace:', err);
-    });
-};
+  console.log('Copy profile link')
+  showOptions.value = false
+}
 
-// Funciones para opciones de pista
 const addToPlaylist = (trackId: number) => {
-  console.log('Añadir pista a una lista:', trackId);
-};
+  console.log('Add to playlist:', trackId)
+  activeTrackOptions.value = null
+}
 
 const goToArtist = (trackId: number) => {
-  const track = profileStore.topTracks.find(t => t.id === trackId);
-  if (track) {
-    router.push(`/buscar?q=${encodeURIComponent(track.artist)}`);
-  }
-};
+  console.log('Go to artist from track:', trackId)
+  activeTrackOptions.value = null
+}
 
 const goToAlbum = (trackId: number) => {
-  const track = profileStore.topTracks.find(t => t.id === trackId);
-  if (track) {
-    router.push(`/buscar?q=${encodeURIComponent(track.album)}`);
-  }
-};
+  console.log('Go to album from track:', trackId)
+  activeTrackOptions.value = null
+}
 
 const shareTrack = (trackId: number) => {
-  const track = profileStore.topTracks.find(t => t.id === trackId);
-  if (track) {
-    if (navigator.share) {
-      navigator.share({
-        title: track.title,
-        text: `Escucha ${track.title} de ${track.artist}`,
-        url: window.location.href
-      }).catch(err => console.error('Error al compartir:', err));
-    } else {
-      alert('Compartir no está disponible en este navegador');
-    }
-  }
-};
+  console.log('Share track:', trackId)
+  activeTrackOptions.value = null
+}
 
-// Inicializar el componente
+// Cargar datos al montar el componente
 onMounted(() => {
-  // Comprobar si el usuario está autenticado
-  if (!authStore.isAuthenticated) {
-    router.push('/login');
-    return;
-  }
-  
-  // Cargar los datos del usuario
-  loadUserData();
-  
-  // Cerrar los menús cuando se hace clic fuera de ellos
-  document.addEventListener('click', (event) => {
-    const target = event.target as HTMLElement | null;
-    if (showOptions.value && target && !target.closest('.profile-options')) {
-      showOptions.value = false;
-    }
-    if (activeTrackOptions.value !== null && target && !target.closest('.track-options')) {
-      activeTrackOptions.value = null;
-    }
-  });
-});
+  loadUserData()
+})
 </script>
 
 <style lang="scss" scoped>
 .profile-container {
-  min-height: 100%;
-  background: linear-gradient(180deg, #1e1e1e 0%, #121212 100%);
+  min-height: 100vh;
+  background: #121212;
   color: white;
-  padding: 24px;
+  padding: 0;
   width: 100%;
-  box-sizing: border-box;
 }
 
-// Loading spinner
+// Loading y error styles
 .loading-container {
   display: flex;
   flex-direction: column;
@@ -364,7 +344,7 @@ onMounted(() => {
     height: 40px;
     border: 3px solid rgba(255, 255, 255, 0.1);
     border-radius: 50%;
-    border-top-color: #ffffff;
+    border-top-color: #1db954;
     animation: spin 1s ease-in-out infinite;
     margin-bottom: 16px;
   }
@@ -374,82 +354,79 @@ onMounted(() => {
   }
   
   p {
-    color: #a7a7a7;
+    color: #b3b3b3;
     font-size: 14px;
   }
 }
 
-// Error message
 .error-message {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 40px;
-  background-color: rgba(255, 0, 0, 0.1);
-  border-radius: 8px;
-  margin: 20px 0;
+  margin: 20px;
   
   p {
-    color: #ff6b6b;
+    color: #f44336;
     font-size: 16px;
     margin-bottom: 16px;
   }
   
   .retry-button {
-    background-color: #ff5100;
+    background-color: #1db954;
     color: white;
     border: none;
-    padding: 8px 16px;
-    border-radius: 4px;
+    padding: 8px 24px;
+    border-radius: 20px;
     cursor: pointer;
-    font-weight: 500;
+    font-weight: 600;
     transition: background-color 0.2s;
     
     &:hover {
-      background-color: #ca3900;
+      background-color: #1ed760;
     }
   }
 }
 
-// Sección del encabezado del perfil
+// Header del perfil
 .profile-header {
   display: flex;
-  align-items: center;
-  padding-bottom: 48px;
+  align-items: flex-end;
+  padding: 60px 32px 24px;
+  background: linear-gradient(transparent 0, rgba(0,0,0,.5) 100%), #535353;
+  min-height: 340px;
   position: relative;
   
   @media (max-width: 768px) {
     flex-direction: column;
     align-items: flex-start;
+    padding: 40px 24px 24px;
+    min-height: auto;
     
     .profile-avatar {
-      margin-bottom: 24px;
-    }
-    
-    .profile-info {
-      margin-left: 0;
-      margin-bottom: 24px;
+      margin-bottom: 16px;
     }
   }
   
   .profile-avatar {
-    width: 180px;
-    height: 180px;
-    min-width: 180px;
+    width: 232px;
+    height: 232px;
+    min-width: 232px;
     border-radius: 50%;
-    background-color: #2a2a2a;
+    background-color: #333;
     overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-    border: 3px solid rgba(255, 255, 255, 0.05);
-    transition: transform 0.3s ease;
+    box-shadow: 0 4px 60px rgba(0,0,0,.5);
+    margin-right: 24px;
     
-    &:hover {
-      transform: scale(1.02);
-      border-color: rgba(255, 255, 255, 0.1);
+    @media (max-width: 768px) {
+      width: 144px;
+      height: 144px;
+      min-width: 144px;
+      margin-right: 0;
     }
     
     .avatar-image {
@@ -469,88 +446,79 @@ onMounted(() => {
       display: flex;
       align-items: center;
       justify-content: center;
+      background-color: #282828;
       
       .avatar-icon {
-        width: 60px;
-        height: 60px;
-        color: #6a6a6a;
+        width: 64px;
+        height: 64px;
+        color: #7f7f7f;
       }
     }
   }
   
   .profile-info {
-    margin-left: 24px;
     flex: 1;
-    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
     
     .profile-label {
-      display: block;
       font-size: 14px;
-      color: #a7a7a7;
+      font-weight: 500;
       margin-bottom: 8px;
     }
     
     .profile-name {
-      font-size: 72px;
-      font-weight: 700;
-      line-height: 1.1;
-      margin: 0;
-      background: linear-gradient(90deg, #ffffff, #a7a7a7);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+      font-size: 96px;
+      font-weight: 900;
+      line-height: 1;
+      margin: 0 0 16px;
+      letter-spacing: -0.04em;
       
-      @media (max-width: 1024px) {
-        font-size: 48px;
+      @media (max-width: 1200px) {
+        font-size: 72px;
       }
       
       @media (max-width: 768px) {
-        font-size: 36px;
+        font-size: 48px;
+      }
+      
+      @media (max-width: 480px) {
+        font-size: 32px;
       }
     }
     
     .profile-stats {
-      margin-top: 8px;
-      color: #a7a7a7;
+      color: #b3b3b3;
       font-size: 14px;
-      
-      .follow-text {
-        font-weight: 600;
-        color: #d9d9d9;
-      }
+      margin: 0;
     }
   }
   
   .profile-options {
-    position: relative;
+    position: absolute;
+    top: 24px;
+    right: 32px;
     
     @media (max-width: 768px) {
-      position: absolute;
-      top: 0;
-      right: 0;
+      right: 24px;
     }
     
     .options-button {
-      background: none;
+      background: rgba(0,0,0,.3);
       border: none;
       cursor: pointer;
-      display: flex;
       padding: 8px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #b3b3b3;
+      transition: all 0.2s;
       
-      .dot {
-        width: 5px;
-        height: 5px;
-        background-color: #a7a7a7;
-        border-radius: 50%;
-        margin: 0 2px;
-        transition: background-color 0.2s;
-      }
-      
-      &:hover .dot {
-        background-color: white;
+      &:hover {
+        background: rgba(0,0,0,.5);
+        color: white;
       }
     }
     
@@ -560,30 +528,24 @@ onMounted(() => {
       right: 0;
       background-color: #282828;
       border-radius: 4px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 16px 24px rgba(0,0,0,.3);
       z-index: 100;
-      min-width: 160px;
+      min-width: 196px;
+      margin-top: 4px;
       
       ul {
         list-style: none;
-        padding: 0;
+        padding: 4px;
         margin: 0;
         
         li {
-          padding: 10px 16px;
+          padding: 12px 16px;
           cursor: pointer;
-          transition: background-color 0.2s;
+          border-radius: 2px;
+          font-size: 14px;
           
           &:hover {
-            background-color: #333;
-          }
-          
-          &:first-child {
-            border-radius: 4px 4px 0 0;
-          }
-          
-          &:last-child {
-            border-radius: 0 0 4px 4px;
+            background-color: rgba(255,255,255,.1);
           }
         }
       }
@@ -591,39 +553,42 @@ onMounted(() => {
   }
 }
 
-// Estilo para las secciones principales
+// Secciones
+section {
+  padding: 24px 32px;
+  
+  @media (max-width: 768px) {
+    padding: 16px 24px;
+  }
+}
+
 .section-header {
   display: flex;
   align-items: center;
-  margin-bottom: 24px;
-  flex-wrap: wrap;
+  margin-bottom: 16px;
   
   .section-title {
     font-size: 24px;
     font-weight: 700;
     margin: 0;
     flex: 1;
-    min-width: 200px;
   }
   
   .section-visibility {
     font-size: 14px;
-    color: #a7a7a7;
+    color: #b3b3b3;
     margin: 0 16px;
-    
-    @media (max-width: 768px) {
-      margin: 8px 0;
-    }
   }
   
   .show-all-button {
     background: none;
     border: none;
-    color: #a7a7a7;
+    color: #b3b3b3;
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
-    transition: color 0.2s;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
     
     &:hover {
       color: white;
@@ -631,17 +596,26 @@ onMounted(() => {
   }
 }
 
-// Rejilla de artistas
-.artists-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 24px;
-  margin-bottom: 48px;
+// Artistas
+.artists-scroll-container {
+  overflow-x: auto;
+  margin: 0 -32px;
+  padding: 0 32px;
   
   @media (max-width: 768px) {
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: 16px;
+    margin: 0 -24px;
+    padding: 0 24px;
   }
+  
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.artists-grid {
+  display: flex;
+  gap: 24px;
+  padding-bottom: 8px;
   
   .artist-card {
     background-color: #181818;
@@ -649,22 +623,64 @@ onMounted(() => {
     padding: 16px;
     transition: background-color 0.3s;
     cursor: pointer;
+    min-width: 180px;
+    flex-shrink: 0;
     
     &:hover {
       background-color: #282828;
+      
+      .play-button-overlay {
+        opacity: 1;
+      }
     }
     
     .artist-image {
-      width: 100%;
-      aspect-ratio: 1;
+      position: relative;
+      width: 148px;
+      height: 148px;
       border-radius: 50%;
       overflow: hidden;
       margin-bottom: 16px;
+      box-shadow: 0 8px 24px rgba(0,0,0,.5);
       
       img {
         width: 100%;
         height: 100%;
         object-fit: cover;
+      }
+      
+      .play-button-overlay {
+        position: absolute;
+        bottom: 8px;
+        right: 8px;
+        opacity: 0;
+        transition: opacity 0.3s;
+        
+        .play-button {
+          width: 48px;
+          height: 48px;
+          background-color: #1db954;
+          border: none;
+          border-radius: 50%;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: black;
+          transition: all 0.1s;
+          box-shadow: 0 8px 8px rgba(0,0,0,.3);
+          
+          &:hover {
+            transform: scale(1.06);
+            background-color: #1ed760;
+          }
+          
+          svg {
+            width: 24px;
+            height: 24px;
+            margin-left: 2px;
+          }
+        }
       }
     }
     
@@ -678,26 +694,25 @@ onMounted(() => {
     }
     
     .artist-label {
-      color: #a7a7a7;
+      color: #b3b3b3;
       font-size: 14px;
     }
   }
 }
 
-// Lista de canciones
+// Canciones
 .tracks-list {
-  margin-bottom: 48px;
-  
   .track-item {
     display: grid;
-    grid-template-columns: 40px 56px 1fr 1fr auto auto auto;
+    grid-template-columns: 16px 56px 1fr minmax(120px, 1fr) 40px 40px 40px;
+    gap: 16px;
     align-items: center;
-    padding: 8px 16px;
+    padding: 8px 0;
     border-radius: 4px;
-    transition: background-color 0.2s;
+    cursor: pointer;
     
     @media (max-width: 1024px) {
-      grid-template-columns: 40px 56px 1fr auto auto auto;
+      grid-template-columns: 16px 56px 1fr 40px 40px 40px;
       
       .track-album {
         display: none;
@@ -705,7 +720,7 @@ onMounted(() => {
     }
     
     @media (max-width: 768px) {
-      grid-template-columns: 40px 56px 1fr auto auto;
+      grid-template-columns: 16px 56px 1fr 40px 40px;
       
       .track-duration {
         display: none;
@@ -713,37 +728,47 @@ onMounted(() => {
     }
     
     &:hover {
-      background-color: rgba(255, 255, 255, 0.1);
+      background-color: rgba(255,255,255,.1);
       
-      .track-index span {
-        display: none;
+      .track-index {
+        .index-number {
+          display: none;
+        }
+        
+        .play-button {
+          display: flex;
+        }
       }
       
-      .track-index .play-button {
-        display: flex;
+      .track-options .options-button {
+        color: white;
       }
     }
     
     .track-index {
-      width: 40px;
       text-align: center;
-      color: #a7a7a7;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      position: relative;
+      
+      .index-number {
+        color: #b3b3b3;
+        font-size: 16px;
+      }
       
       .play-button {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
         background: none;
         border: none;
         color: white;
         cursor: pointer;
         padding: 0;
         display: none;
-        align-items: center;
-        justify-content: center;
         
-        &:hover {
-          transform: scale(1.1);
+        svg {
+          width: 16px;
+          height: 16px;
         }
       }
     }
@@ -751,7 +776,6 @@ onMounted(() => {
     .track-image {
       width: 40px;
       height: 40px;
-      overflow: hidden;
       
       img {
         width: 100%;
@@ -762,31 +786,30 @@ onMounted(() => {
     
     .track-info {
       overflow: hidden;
-      margin-right: 16px;
-      padding: 0 8px;
       
       .track-title {
-        font-weight: 500;
+        font-size: 16px;
+        font-weight: 400;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        display: flex;
+        align-items: center;
+        gap: 8px;
         
-        &.explicit {
-          .explicit-badge {
-            display: inline-block;
-            background-color: rgba(255, 255, 255, 0.2);
-            color: #a7a7a7;
-            font-size: 10px;
-            padding: 1px 4px;
-            border-radius: 2px;
-            margin-left: 4px;
-            vertical-align: middle;
-          }
+        .explicit-badge {
+          background-color: rgba(255,255,255,.1);
+          color: #b3b3b3;
+          font-size: 9px;
+          padding: 2px 4px;
+          border-radius: 2px;
+          flex-shrink: 0;
+          font-weight: 600;
         }
       }
       
       .track-artist {
-        color: #a7a7a7;
+        color: #b3b3b3;
         font-size: 14px;
         white-space: nowrap;
         overflow: hidden;
@@ -795,34 +818,44 @@ onMounted(() => {
     }
     
     .track-album {
-      color: #a7a7a7;
+      color: #b3b3b3;
       font-size: 14px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      padding: 0 8px;
     }
     
     .track-liked {
-      margin-right: 8px;
-      
       button {
         background: none;
         border: none;
         cursor: pointer;
-        padding: 8px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        padding: 0;
+        color: #b3b3b3;
+        
+        &.liked {
+          color: #1db954;
+        }
+        
+        &:hover {
+          color: white;
+          
+          &.liked {
+            color: #1ed760;
+          }
+        }
+        
+        svg {
+          width: 16px;
+          height: 16px;
+        }
       }
     }
     
     .track-duration {
-      color: #a7a7a7;
+      color: #b3b3b3;
       font-size: 14px;
-      margin-right: 8px;
       text-align: right;
-      min-width: 40px;
     }
     
     .track-options {
@@ -832,14 +865,12 @@ onMounted(() => {
         background: none;
         border: none;
         cursor: pointer;
-        color: #a7a7a7;
-        padding: 8px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        color: transparent;
+        padding: 0;
         
-        &:hover {
-          color: white;
+        svg {
+          width: 16px;
+          height: 16px;
         }
       }
       
@@ -849,30 +880,24 @@ onMounted(() => {
         right: 0;
         background-color: #282828;
         border-radius: 4px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        box-shadow: 0 16px 24px rgba(0,0,0,.3);
         z-index: 100;
-        min-width: 160px;
+        min-width: 196px;
+        margin-top: 4px;
         
         ul {
           list-style: none;
-          padding: 0;
+          padding: 4px;
           margin: 0;
           
           li {
             padding: 12px 16px;
             cursor: pointer;
-            transition: background-color 0.2s;
+            border-radius: 2px;
+            font-size: 14px;
             
             &:hover {
-              background-color: #333;
-            }
-            
-            &:first-child {
-              border-radius: 4px 4px 0 0;
-            }
-            
-            &:last-child {
-              border-radius: 0 0 4px 4px;
+              background-color: rgba(255,255,255,.1);
             }
           }
         }
@@ -881,12 +906,11 @@ onMounted(() => {
   }
 }
 
-// Rejilla de playlists
+// Playlists
 .playlists-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   gap: 24px;
-  margin-bottom: 48px;
   
   .playlist-card {
     background-color: #181818;
@@ -897,26 +921,74 @@ onMounted(() => {
     
     &:hover {
       background-color: #282828;
+      
+      .play-button-overlay {
+        opacity: 1;
+      }
     }
     
     .playlist-image {
+      position: relative;
       width: 100%;
       aspect-ratio: 1;
-      border-radius: 4px;
+      border-radius: 8px;
       overflow: hidden;
       margin-bottom: 16px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 8px 24px rgba(0,0,0,.5);
       
       img {
         width: 100%;
         height: 100%;
         object-fit: cover;
       }
+      
+      .play-button-overlay {
+        position: absolute;
+        bottom: 8px;
+        right: 8px;
+        opacity: 0;
+        transition: opacity 0.3s;
+        
+        .play-button {
+          width: 48px;
+          height: 48px;
+          background-color: #1db954;
+          border: none;
+          border-radius: 50%;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: black;
+          transition: all 0.1s;
+          box-shadow: 0 8px 8px rgba(0,0,0,.3);
+          
+          &:hover {
+            transform: scale(1.06);
+            background-color: #1ed760;
+          }
+          
+          svg {
+            width: 24px;
+            height: 24px;
+            margin-left: 2px;
+          }
+        }
+      }
     }
     
     .playlist-title {
       font-weight: 600;
       font-size: 16px;
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .playlist-owner {
+      color: #b3b3b3;
+      font-size: 14px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
