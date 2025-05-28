@@ -32,6 +32,16 @@
           🎬
         </button>
 
+        <!-- NUEVO: Botón de letra -->
+        <button 
+          v-if="playerStore.currentSong?.letra" 
+          @click="toggleLyrics" 
+          :class="{ 'active': showLyrics }"
+          class="lyrics-button"
+          :aria-label="showLyrics ? 'Ocultar letra' : 'Ver letra'">
+          📝
+        </button>
+
         <!-- Control de volumen con iconos -->
         <div class="volume-container">
           <button @click="toggleMute" class="volume-icon" aria-label="Silenciar">
@@ -66,6 +76,49 @@
       {{ isMinimized ? '▲' : '▼' }}
     </button>
 
+    <!-- NUEVO: Modal de letra -->
+    <div v-if="showLyrics" class="lyrics-modal" @click="closeLyrics">
+      <div class="lyrics-content" @click.stop>
+        <div class="lyrics-header">
+          <div class="lyrics-song-info">
+            <img 
+              :src="playerStore.currentSong?.image || 'default-cover.jpg'" 
+              alt="Cover" 
+              class="lyrics-cover"
+            />
+            <div class="lyrics-details">
+              <h2 class="lyrics-song-title">{{ playerStore.currentSong?.nombre || playerStore.currentSong?.titulo }}</h2>
+              <p class="lyrics-artist">{{ playerStore.getArtistaDisplay }}</p>
+            </div>
+          </div>
+          <button class="close-lyrics-button" @click="closeLyrics">×</button>
+        </div>
+        
+        <div class="lyrics-body">
+          <div class="lyrics-text">
+            <pre>{{ playerStore.currentSong?.letra || 'Letra no disponible' }}</pre>
+          </div>
+        </div>
+
+        <div class="lyrics-controls">
+          <button @click="previousSong" aria-label="Canción anterior" class="lyrics-control-btn">⥢</button>
+          <button @click="togglePlay" :aria-label="playerStore.isPlaying ? 'Pausar' : 'Reproducir'" 
+                  class="lyrics-play-button">{{ playerStore.isPlaying ? '⥮' : '▶' }}</button>
+          <button @click="nextSong" aria-label="Siguiente canción" class="lyrics-control-btn">⥤</button>
+          
+          <!-- Botón de video en las letras -->
+          <button 
+            v-if="playerStore.currentSong?.videoUrl || playerStore.currentSong?.videoclip" 
+            @click="toggleVideo" 
+            :class="{ 'active': playerStore.showVideo }"
+            class="lyrics-video-btn"
+            :aria-label="playerStore.showVideo ? 'Cerrar video' : 'Ver video'">
+            🎬
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- Modal de imagen -->
     <div v-if="showImageModal" class="image-modal" @click="closeImageModal">
       <div class="modal-content" @click.stop>
@@ -93,6 +146,16 @@
               class="modal-video-btn"
               :aria-label="playerStore.showVideo ? 'Cerrar video' : 'Ver video'">
               🎬
+            </button>
+
+            <!-- NUEVO: Botón de letra en el modal de imagen -->
+            <button 
+              v-if="playerStore.currentSong?.letra" 
+              @click="toggleLyrics" 
+              :class="{ 'active': showLyrics }"
+              class="modal-lyrics-btn"
+              :aria-label="showLyrics ? 'Ocultar letra' : 'Ver letra'">
+              📝
             </button>
           </div>
           <div class="modal-progress">
@@ -142,6 +205,7 @@ export default {
     const isMinimized = ref(false);
     const prevVolume = ref(1); // Para recordar el volumen antes de silenciar
     const showImageModal = ref(false); // Estado del modal
+    const showLyrics = ref(false); // NUEVO: Estado del modal de letra
 
     // Computed property para el icono de volumen
     const volumeIcon = computed(() => {
@@ -162,7 +226,7 @@ export default {
       return [];
     });
 
-    // Funciones para el modal
+    // Funciones para el modal de imagen
     const openImageModal = () => {
       showImageModal.value = true;
       document.body.style.overflow = 'hidden'; // Prevenir scroll del body
@@ -170,6 +234,21 @@ export default {
 
     const closeImageModal = () => {
       showImageModal.value = false;
+      document.body.style.overflow = 'unset';
+    };
+
+    // NUEVAS: Funciones para el modal de letra
+    const toggleLyrics = () => {
+      showLyrics.value = !showLyrics.value;
+      if (showLyrics.value) {
+        document.body.style.overflow = 'hidden';
+      } else {
+        document.body.style.overflow = 'unset';
+      }
+    };
+
+    const closeLyrics = () => {
+      showLyrics.value = false;
       document.body.style.overflow = 'unset';
     };
 
@@ -209,6 +288,15 @@ export default {
         }
       },
       { deep: true }
+    );
+
+    // NUEVO: Watch para cerrar la letra cuando cambie la canción
+    watch(
+      () => playerStore.currentSong,
+      () => {
+        showLyrics.value = false;
+        document.body.style.overflow = 'unset';
+      }
     );
 
     // If a song is provided as a prop, set it
@@ -289,7 +377,11 @@ export default {
       volumeIcon,
       showImageModal,
       openImageModal,
-      closeImageModal
+      closeImageModal,
+      // NUEVAS funciones de letra
+      showLyrics,
+      toggleLyrics,
+      closeLyrics
     };
   },
 };
@@ -463,7 +555,7 @@ button {
   font-size: 22px;
 }
 
-.video-button {
+.video-button, .lyrics-button {
   font-size: 20px;
   background: #333 !important;
   border-radius: 4px;
@@ -471,13 +563,13 @@ button {
   transition: all 0.2s ease;
 }
 
-.video-button:hover {
+.video-button:hover, .lyrics-button:hover {
   background: #555 !important;
   transform: scale(1.1);
   color: white !important;
 }
 
-.video-button.active {
+.video-button.active, .lyrics-button.active {
   background: #ff5100 !important;
   color: white !important;
 }
@@ -535,7 +627,168 @@ button:hover {
   display: flex;
 }
 
-/* Estilos del modal */
+/* NUEVOS: Estilos para el modal de letra */
+.lyrics-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.95);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10001; /* Mayor que el modal de imagen */
+  backdrop-filter: blur(10px);
+}
+
+.lyrics-content {
+  position: relative;
+  background: linear-gradient(135deg, #1a1a1a, #0a0a0a);
+  border-radius: 20px;
+  padding: 0;
+  max-width: 90vw;
+  max-height: 90vh;
+  width: 600px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+}
+
+.lyrics-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 30px;
+  background: linear-gradient(135deg, #2a2a2a, #1a1a1a);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.lyrics-song-info {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.lyrics-cover {
+  width: 60px;
+  height: 60px;
+  border-radius: 10px;
+  margin-right: 15px;
+  object-fit: cover;
+}
+
+.lyrics-details {
+  color: white;
+}
+
+.lyrics-song-title {
+  margin: 0 0 5px 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: white;
+}
+
+.lyrics-artist {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #ccc;
+}
+
+.close-lyrics-button {
+  font-size: 30px;
+  color: #fff;
+  background: none;
+  border: none;
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.close-lyrics-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: scale(1.1);
+  color: #ff5100;
+}
+
+.lyrics-body {
+  flex: 1;
+  padding: 30px;
+  overflow-y: auto;
+  max-height: 400px;
+}
+
+.lyrics-text {
+  text-align: center;
+}
+
+.lyrics-text pre {
+  color: white;
+  font-family: 'Georgia', serif;
+  font-size: 1.1rem;
+  line-height: 1.8;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  margin: 0;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.lyrics-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  padding: 20px 30px;
+  background: linear-gradient(135deg, #2a2a2a, #1a1a1a);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.lyrics-control-btn, .lyrics-video-btn {
+  font-size: 24px;
+  padding: 10px;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.lyrics-play-button {
+  font-size: 28px;
+  padding: 15px;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ff5100;
+  transition: all 0.3s ease;
+}
+
+.lyrics-control-btn:hover,
+.lyrics-play-button:hover,
+.lyrics-video-btn:hover {
+  transform: scale(1.1);
+  background: #ff5100;
+}
+
+.lyrics-video-btn.active {
+  background: #ff5100;
+  color: white;
+}
+
+/* Estilos del modal de imagen (mantener los existentes) */
 .image-modal {
   position: fixed;
   top: 0;
@@ -623,7 +876,7 @@ button:hover {
   margin-bottom: 20px;
 }
 
-.modal-control-btn, .modal-video-btn {
+.modal-control-btn, .modal-video-btn, .modal-lyrics-btn {
   font-size: 24px;
   padding: 10px;
   border-radius: 50%;
@@ -651,12 +904,14 @@ button:hover {
 
 .modal-control-btn:hover,
 .modal-play-button:hover,
-.modal-video-btn:hover {
+.modal-video-btn:hover,
+.modal-lyrics-btn:hover {
   transform: scale(1.1);
   background: #ff5100;
 }
 
-.modal-video-btn.active {
+.modal-video-btn.active,
+.modal-lyrics-btn.active {
   background: #ff5100;
   color: white;
 }
@@ -724,7 +979,7 @@ button:hover {
     gap: 15px;
   }
   
-  .modal-control-btn, .modal-video-btn {
+  .modal-control-btn, .modal-video-btn, .modal-lyrics-btn {
     width: 45px;
     height: 45px;
     font-size: 20px;
@@ -735,5 +990,73 @@ button:hover {
     height: 55px;
     font-size: 24px;
   }
+
+  /* Responsive para letras */
+  .lyrics-content {
+    width: 95vw;
+    max-height: 95vh;
+  }
+  
+  .lyrics-header {
+    padding: 15px 20px;
+  }
+  
+  .lyrics-cover {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .lyrics-song-title {
+    font-size: 1rem;
+  }
+  
+  .lyrics-artist {
+    font-size: 0.8rem;
+  }
+  
+  .lyrics-body {
+    padding: 20px;
+  }
+  
+  .lyrics-text pre {
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+  
+  .lyrics-controls {
+    padding: 15px 20px;
+    gap: 15px;
+  }
+  
+  .lyrics-control-btn, .lyrics-video-btn {
+    width: 45px;
+    height: 45px;
+    font-size: 20px;
+  }
+  
+  .lyrics-play-button {
+    width: 55px;
+    height: 55px;
+    font-size: 24px;
+  }
+}
+
+/* Scrollbar personalizado para el área de letras */
+.lyrics-body::-webkit-scrollbar {
+  width: 8px;
+}
+
+.lyrics-body::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+.lyrics-body::-webkit-scrollbar-thumb {
+  background: #ff5100;
+  border-radius: 4px;
+}
+
+.lyrics-body::-webkit-scrollbar-thumb:hover {
+  background: #ca3900;
 }
 </style>

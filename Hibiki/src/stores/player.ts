@@ -2,13 +2,15 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 
-// Definir el tipo para una canción (actualizado con videoUrl)
+// Definir el tipo para una canción (actualizado con letra)
 export interface Song {
   nombre: string;
   artista: string;
   ruta: string;
   image: string;
-  videoUrl?: string; // NUEVO: Campo para videoclips
+  videoUrl?: string; // Campo para videoclips MP4
+  videoclip?: string; // Campo para videoclips de YouTube
+  letra?: string; // NUEVO: Campo para la letra de la canción
   [key: string]: any; // Para permitir propiedades adicionales
 }
 
@@ -23,7 +25,7 @@ export const usePlayerStore = defineStore('player', () => {
   const isUserInteracted = ref<boolean>(false);
   const volume = ref<number>(1);
 
-  // NUEVO: Estado para video
+  // Estado para video
   const showVideo = ref<boolean>(false);
   const currentVideoUrl = ref<string | null>(null);
   const isVideoMode = ref<boolean>(false);
@@ -70,14 +72,19 @@ export const usePlayerStore = defineStore('player', () => {
            "Artista desconocido";
   });
 
-  // NUEVO: Computed properties para video
-  const hasVideo = computed(() => !!currentSong.value?.videoUrl);
+  // Computed properties para video
+  const hasVideo = computed(() => !!currentSong.value?.videoUrl || !!currentSong.value?.videoclip);
   
   const canShowVideo = computed(() => 
     hasVideo.value && isVideoMode.value
   );
+
+  // NUEVO: Computed property para letra
+  const hasLyrics = computed(() => 
+    !!currentSong.value?.letra && currentSong.value.letra.trim() !== ''
+  );
   
-  // Función para normalizar una canción (actualizada con videoUrl)
+  // Función para normalizar una canción (actualizada con letra)
   const normalizeSong = (song: any): Song => {
     return {
       ...song,
@@ -85,11 +92,13 @@ export const usePlayerStore = defineStore('player', () => {
       artista: song.artista || song.artist || (song.cantante?.nombre) || 'Artista desconocido',
       ruta: song.ruta || song.path || `/music/${song.cancionId}.mp3`,
       image: song.image || song.coverImage || '/images/default-cover.jpg',
-      videoUrl: song.videoUrl || song.video_url || null // NUEVO: Normalizar videoUrl
+      videoUrl: song.videoUrl || song.video_url || null, // Video MP4
+      videoclip: song.videoclip || song.youtube_url || null, // Video YouTube
+      letra: song.letra || song.lyrics || null // NUEVO: Normalizar letra
     };
   };
   
-  // Función setSong actualizada para manejar video
+  // Función setSong actualizada para manejar letra
   const setSong = (song: Song | null, autoplay = true) => {
     if (!song) return;
     
@@ -109,9 +118,9 @@ export const usePlayerStore = defineStore('player', () => {
     currentSong.value = normalizedSong;
     audioPlayer.value.src = normalizedSong.ruta;
     
-    // NUEVO: Configurar video
-    currentVideoUrl.value = normalizedSong.videoUrl || null;
-    showVideo.value = isVideoMode.value && !!normalizedSong.videoUrl;
+    // Configurar video
+    currentVideoUrl.value = normalizedSong.videoUrl || normalizedSong.videoclip || null;
+    showVideo.value = isVideoMode.value && !!(normalizedSong.videoUrl || normalizedSong.videoclip);
     
     // Solo intentar reproducir si autoplay es true y el usuario ha interactuado o estaba reproduciendo
     if (autoplay && (isUserInteracted.value || wasPlaying)) {
@@ -241,11 +250,11 @@ export const usePlayerStore = defineStore('player', () => {
     volume.value = volumeValue;
   };
 
-  // NUEVAS: Funciones para manejar video
+  // Funciones para manejar video
   const toggleVideoMode = () => {
     isUserInteracted.value = true;
     isVideoMode.value = !isVideoMode.value;
-    showVideo.value = isVideoMode.value && !!currentSong.value?.videoUrl;
+    showVideo.value = isVideoMode.value && !!(currentSong.value?.videoUrl || currentSong.value?.videoclip);
   };
 
   const setShowVideo = (show: boolean) => {
@@ -279,7 +288,7 @@ export const usePlayerStore = defineStore('player', () => {
     volume,
     audioPlayer,
     
-    // NUEVO: Estado de video
+    // Estado de video
     showVideo,
     currentVideoUrl,
     isVideoMode,
@@ -287,9 +296,10 @@ export const usePlayerStore = defineStore('player', () => {
     // Getters existentes
     getArtistaDisplay,
     
-    // NUEVOS: Getters de video
+    // Getters de video y letra
     hasVideo,
     canShowVideo,
+    hasLyrics, // NUEVO: Getter para saber si tiene letra
     
     // Acciones existentes
     setSong,
@@ -302,7 +312,7 @@ export const usePlayerStore = defineStore('player', () => {
     formatDuration,
     normalizeSong,
     
-    // NUEVAS: Acciones de video
+    // Acciones de video
     toggleVideoMode,
     setShowVideo,
     toggleVideo
