@@ -160,7 +160,7 @@ stream
 BT
 /F1 12 Tf
 50 750 Td
-(Hibiki Music Guide - Your Complete Music Experience) Tj
+(UN 10 MINIMO) Tj
 ET
 endstream
 endobj

@@ -54,7 +54,6 @@ const logout = () => {
         <router-link to="/playlist" class="menu-item" active-class="active" @click="$emit('update:visible', false)">Playlists</router-link>
         <router-link to="/premium" class="menu-item" active-class="active" @click="$emit('update:visible', false)">Premium</router-link>
         <router-link to="/conciertos" class="menu-item" active-class="active" @click="$emit('update:visible', false)">Concerts</router-link>
-        <router-link to="/descarga" class="menu-item" active-class="active" @click="$emit('update:visible', false)">Download</router-link>
       </div>
     </nav>
     

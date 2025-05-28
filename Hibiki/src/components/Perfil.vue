@@ -41,6 +41,16 @@ const logout = () => {
   dropdownVisible.value = false;
 };
 
+const help = () => {
+  router.push('/ayuda');
+  dropdownVisible.value = false;
+};
+
+const descarga = () => {
+  router.push('/descarga');
+  dropdownVisible.value = false;
+};
+
 onMounted(() => {
   document.addEventListener('click', handleClickOutside);
 });
@@ -82,7 +92,23 @@ onUnmounted(() => {
             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
             <circle cx="12" cy="7" r="4"></circle>
           </svg>
-          <span>Perfil</span>
+          <span>Profile</span>
+        </div>
+        <div class="dropdown-item" @click="help">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+            <path d="m12 17 .01 0"></path>
+        </svg>
+          <span>Help</span>
+        </div>
+      <div class="dropdown-item" @click="descarga">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M8 12l4 4 4-4"></path>
+            <path d="M12 8v8"></path>
+        </svg>
+          <span>Download</span>
         </div>
         <div class="dropdown-item" @click="logout">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -90,7 +116,7 @@ onUnmounted(() => {
             <polyline points="16 17 21 12 16 7"></polyline>
             <line x1="21" y1="12" x2="9" y2="12"></line>
           </svg>
-          <span>Cerrar Sesión</span>
+          <span>Logout</span>
         </div>
       </div>
     </div>
