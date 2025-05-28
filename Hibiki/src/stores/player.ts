@@ -2,17 +2,18 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 
-// Definir el tipo para una canción
+// Definir el tipo para una canción (actualizado con videoUrl)
 export interface Song {
   nombre: string;
   artista: string;
   ruta: string;
   image: string;
+  videoUrl?: string; // NUEVO: Campo para videoclips
   [key: string]: any; // Para permitir propiedades adicionales
 }
 
 export const usePlayerStore = defineStore('player', () => {
-  // Estado
+  // Estado existente
   const isPlaying = ref<boolean>(false);
   const currentSong = ref<Song | null>(null);
   const currentTime = ref<number>(0);
@@ -20,9 +21,14 @@ export const usePlayerStore = defineStore('player', () => {
   const audioPlayer = ref<HTMLAudioElement>(new Audio());
   const currentPlaylist = ref<Song[]>([]);
   const isUserInteracted = ref<boolean>(false);
-  const volume = ref<number>(1); // Añadimos el estado para el volumen
+  const volume = ref<number>(1);
 
-  // Inicializar eventos del reproductor
+  // NUEVO: Estado para video
+  const showVideo = ref<boolean>(false);
+  const currentVideoUrl = ref<string | null>(null);
+  const isVideoMode = ref<boolean>(false);
+
+  // Inicializar eventos del reproductor (mantienes tu lógica existente)
   const initializeAudioEvents = () => {
     // Evento para actualizar el tiempo actual
     audioPlayer.value.addEventListener('timeupdate', () => {
@@ -55,7 +61,7 @@ export const usePlayerStore = defineStore('player', () => {
   // Inicializar eventos al crear el store
   initializeAudioEvents();
   
-  // Computed properties
+  // Computed properties existentes
   const getArtistaDisplay = computed(() => {
     // Check for artista in different possible formats
     return currentSong.value?.artista || 
@@ -63,19 +69,27 @@ export const usePlayerStore = defineStore('player', () => {
            (currentSong.value?.cantante?.nombre) || 
            "Artista desconocido";
   });
+
+  // NUEVO: Computed properties para video
+  const hasVideo = computed(() => !!currentSong.value?.videoUrl);
   
-  // Función para normalizar una canción y asegurar que tenga todos los campos necesarios
+  const canShowVideo = computed(() => 
+    hasVideo.value && isVideoMode.value
+  );
+  
+  // Función para normalizar una canción (actualizada con videoUrl)
   const normalizeSong = (song: any): Song => {
     return {
       ...song,
       nombre: song.nombre || song.title || 'Unknown',
       artista: song.artista || song.artist || (song.cantante?.nombre) || 'Artista desconocido',
       ruta: song.ruta || song.path || `/music/${song.cancionId}.mp3`,
-      image: song.image || song.coverImage || '/images/default-cover.jpg'
+      image: song.image || song.coverImage || '/images/default-cover.jpg',
+      videoUrl: song.videoUrl || song.video_url || null // NUEVO: Normalizar videoUrl
     };
   };
   
-  // Funciones
+  // Función setSong actualizada para manejar video
   const setSong = (song: Song | null, autoplay = true) => {
     if (!song) return;
     
@@ -95,6 +109,10 @@ export const usePlayerStore = defineStore('player', () => {
     currentSong.value = normalizedSong;
     audioPlayer.value.src = normalizedSong.ruta;
     
+    // NUEVO: Configurar video
+    currentVideoUrl.value = normalizedSong.videoUrl || null;
+    showVideo.value = isVideoMode.value && !!normalizedSong.videoUrl;
+    
     // Solo intentar reproducir si autoplay es true y el usuario ha interactuado o estaba reproduciendo
     if (autoplay && (isUserInteracted.value || wasPlaying)) {
       playSong();
@@ -104,6 +122,7 @@ export const usePlayerStore = defineStore('player', () => {
     }
   };
   
+  // Mantener todas tus funciones existentes sin cambios
   const playSong = async () => {
     if (!currentSong.value) return;
     
@@ -205,7 +224,7 @@ export const usePlayerStore = defineStore('player', () => {
     }
   };
   
-  // Función para cambiar el volumen
+  // Función para cambiar el volumen (mantienes tu lógica)
   const changeVolume = (newVolume: number) => {
     // Marcar que el usuario ha interactuado
     isUserInteracted.value = true;
@@ -221,7 +240,27 @@ export const usePlayerStore = defineStore('player', () => {
     // Actualizar el estado
     volume.value = volumeValue;
   };
+
+  // NUEVAS: Funciones para manejar video
+  const toggleVideoMode = () => {
+    isUserInteracted.value = true;
+    isVideoMode.value = !isVideoMode.value;
+    showVideo.value = isVideoMode.value && !!currentSong.value?.videoUrl;
+  };
+
+  const setShowVideo = (show: boolean) => {
+    if (hasVideo.value) {
+      showVideo.value = show;
+    }
+  };
+
+  const toggleVideo = () => {
+    if (hasVideo.value) {
+      showVideo.value = !showVideo.value;
+    }
+  };
   
+  // Mantener tu función existente
   const formatDuration = (seconds: number) => {
     if (isNaN(seconds) || seconds < 0) return "0:00";
     const minutes = Math.floor(seconds / 60);
@@ -230,7 +269,7 @@ export const usePlayerStore = defineStore('player', () => {
   };
   
   return {
-    // Estado
+    // Estado existente
     isPlaying,
     currentSong,
     currentTime,
@@ -240,10 +279,19 @@ export const usePlayerStore = defineStore('player', () => {
     volume,
     audioPlayer,
     
-    // Getters
+    // NUEVO: Estado de video
+    showVideo,
+    currentVideoUrl,
+    isVideoMode,
+    
+    // Getters existentes
     getArtistaDisplay,
     
-    // Acciones
+    // NUEVOS: Getters de video
+    hasVideo,
+    canShowVideo,
+    
+    // Acciones existentes
     setSong,
     togglePlay,
     previousSong,
@@ -252,6 +300,11 @@ export const usePlayerStore = defineStore('player', () => {
     seek,
     changeVolume,
     formatDuration,
-    normalizeSong
+    normalizeSong,
+    
+    // NUEVAS: Acciones de video
+    toggleVideoMode,
+    setShowVideo,
+    toggleVideo
   };
 });

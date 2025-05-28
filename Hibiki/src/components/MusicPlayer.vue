@@ -10,7 +10,7 @@
           style="cursor: pointer;"
         />
         <div class="song-details">
-          <h3 class="song-title">{{ playerStore.currentSong?.nombre || 'Selecciona una canción' }}</h3>
+          <h3 class="song-title">{{ playerStore.currentSong?.nombre || playerStore.currentSong?.titulo || 'Selecciona una canción' }}</h3>
           <p class="song-time">{{ playerStore.formatDuration(playerStore.currentTime) }} / {{ playerStore.formatDuration(playerStore.duration) }}</p>
         </div>
       </div>
@@ -21,6 +21,16 @@
                 class="play-button">{{ playerStore.isPlaying ? '⥮' : '▶' }}</button>
         <button @click="nextSong" aria-label="Siguiente canción">⥤</button>
         <button @click="randomSong" aria-label="Reproducir aleatoriamente">⤨</button>
+
+        <!-- Botón de video (solo si la canción tiene video MP4 o YouTube) -->
+        <button 
+          v-if="playerStore.currentSong?.videoUrl || playerStore.currentSong?.videoclip" 
+          @click="toggleVideo" 
+          :class="{ 'active': playerStore.showVideo }"
+          class="video-button"
+          :aria-label="playerStore.showVideo ? 'Cerrar video' : 'Ver video'">
+          🎬
+        </button>
 
         <!-- Control de volumen con iconos -->
         <div class="volume-container">
@@ -68,12 +78,22 @@
           />
         </div>
         <div class="modal-info">
-          <h2 class="modal-song-title">{{ playerStore.currentSong?.nombre || 'Selecciona una canción' }}</h2>
+          <h2 class="modal-song-title">{{ playerStore.currentSong?.nombre || playerStore.currentSong?.titulo || 'Selecciona una canción' }}</h2>
           <div class="modal-controls">
             <button @click="previousSong" aria-label="Canción anterior" class="modal-control-btn">⥢</button>
             <button @click="togglePlay" :aria-label="playerStore.isPlaying ? 'Pausar' : 'Reproducir'" 
                     class="modal-play-button">{{ playerStore.isPlaying ? '⥮' : '▶' }}</button>
             <button @click="nextSong" aria-label="Siguiente canción" class="modal-control-btn">⥤</button>
+            
+            <!-- Botón de video en el modal -->
+            <button 
+              v-if="playerStore.currentSong?.videoUrl || playerStore.currentSong?.videoclip" 
+              @click="toggleVideo" 
+              :class="{ 'active': playerStore.showVideo }"
+              class="modal-video-btn"
+              :aria-label="playerStore.showVideo ? 'Cerrar video' : 'Ver video'">
+              🎬
+            </button>
           </div>
           <div class="modal-progress">
             <span class="time-display">{{ playerStore.formatDuration(playerStore.currentTime) }}</span>
@@ -225,6 +245,13 @@ export default {
       playerStore.togglePlay();
     };
 
+    // Toggle video mode
+    const toggleVideo = () => {
+      if (playerStore.currentSong?.videoUrl || playerStore.currentSong?.videoclip) {
+        playerStore.showVideo = !playerStore.showVideo;
+      }
+    };
+
     // Change the song (next/previous)
     const previousSong = () => {
       playerStore.previousSong(availableSongs.value);
@@ -249,6 +276,7 @@ export default {
       playerStore,
       albumStore,
       togglePlay,
+      toggleVideo,
       previousSong,
       nextSong,
       randomSong,
@@ -435,6 +463,25 @@ button {
   font-size: 22px;
 }
 
+.video-button {
+  font-size: 20px;
+  background: #333 !important;
+  border-radius: 4px;
+  padding: 4px 6px;
+  transition: all 0.2s ease;
+}
+
+.video-button:hover {
+  background: #555 !important;
+  transform: scale(1.1);
+  color: white !important;
+}
+
+.video-button.active {
+  background: #ff5100 !important;
+  color: white !important;
+}
+
 button:hover {
   transform: scale(1.2);
   color: #ff5100;
@@ -576,7 +623,7 @@ button:hover {
   margin-bottom: 20px;
 }
 
-.modal-control-btn {
+.modal-control-btn, .modal-video-btn {
   font-size: 24px;
   padding: 10px;
   border-radius: 50%;
@@ -603,9 +650,15 @@ button:hover {
 }
 
 .modal-control-btn:hover,
-.modal-play-button:hover {
+.modal-play-button:hover,
+.modal-video-btn:hover {
   transform: scale(1.1);
   background: #ff5100;
+}
+
+.modal-video-btn.active {
+  background: #ff5100;
+  color: white;
 }
 
 .modal-progress {
@@ -665,6 +718,22 @@ button:hover {
   .modal-content {
     padding: 20px;
     margin: 20px;
+  }
+  
+  .modal-controls {
+    gap: 15px;
+  }
+  
+  .modal-control-btn, .modal-video-btn {
+    width: 45px;
+    height: 45px;
+    font-size: 20px;
+  }
+  
+  .modal-play-button {
+    width: 55px;
+    height: 55px;
+    font-size: 24px;
   }
 }
 </style>

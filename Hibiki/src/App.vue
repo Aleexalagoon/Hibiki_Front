@@ -6,6 +6,7 @@ import { usePlayerStore } from '@/stores/player';
 import { useCancionesStore } from '@/stores/cancionesStore';
 import { useArtistaStore } from '@/stores/artistaStore';
 import MusicPlayer from '@/components/MusicPlayer.vue';
+import VideoPlayer from '@/components/VideoPlayer.vue'; // NUEVO: Importar VideoPlayer
 import Swal from 'sweetalert2';
 import Perfil from '@/components/Perfil.vue';
 
@@ -102,6 +103,11 @@ const navigateToResult = (result) => {
 
 const closeSearchResults = () => showSearchResults.value = false;
 
+const handleSearch = (query: string) => {
+  searchQuery.value = query;
+  search();
+};
+
 const logout = () => {
   if (adInterval) {
     clearInterval(adInterval);
@@ -110,6 +116,10 @@ const logout = () => {
   
   authStore.logout();
   router.push('/login');
+};
+
+const handleLogout = () => {
+  logout();
 };
 
 const startAdInterval = () => {
@@ -236,9 +246,9 @@ onUnmounted(() => {
             </div>
           </div>
           
-           <!-- Mostrar Inicio solo si no es premium o no está autenticado -->
-            <router-link v-if="!isPremium || !isAuthenticated" to="/inicio" class="menu-item" active-class="active" @click="$emit('update:visible', false)">Home</router-link>
-            <router-link to="/novedades" class="menu-item" active-class="active" @click="$emit('update:visible', false)">News</router-link>
+          <!-- Mostrar Inicio solo si no es premium o no está autenticado -->
+          <router-link v-if="!isPremium || !isAuthenticated" to="/inicio" class="menu-item" active-class="active" @click="sidebarVisible = false">Home</router-link>
+          <router-link to="/novedades" class="menu-item" active-class="active" @click="sidebarVisible = false">News</router-link>
           
           <div v-if="isAuthenticated">
             <router-link to="/artista" class="menu-item" active-class="active" @click="sidebarVisible = false">Artists</router-link>
@@ -263,7 +273,11 @@ onUnmounted(() => {
       </main>
     </div>
     
+    <!-- Reproductor de música (siempre visible en la parte inferior) -->
     <MusicPlayer :songs="allSongs" />
+    
+    <!-- NUEVO: Reproductor de video (overlay que aparece cuando sea necesario) -->
+    <VideoPlayer />
   </div>
 </template>
 

@@ -6,6 +6,7 @@ interface Cancion {
   id?: number;
   titulo?: string;
   artista?: string;
+  videoURL?: string;
 }
 
 export const useCancionesStore = defineStore('canciones', () => {
