@@ -6,7 +6,7 @@ import { usePlayerStore } from '@/stores/player';
 import { useCancionesStore } from '@/stores/cancionesStore';
 import { useArtistaStore } from '@/stores/artistaStore';
 import MusicPlayer from '@/components/MusicPlayer.vue';
-import VideoPlayer from '@/components/VideoPlayer.vue'; // NUEVO: Importar VideoPlayer
+import VideoPlayer from '@/components/VideoPlayer.vue';
 import Swal from 'sweetalert2';
 import Perfil from '@/components/Perfil.vue';
 
@@ -25,6 +25,9 @@ const isAuthenticated = computed(() => authStore.isAuthenticated);
 const isPremium = computed(() => authStore.isPremium);
 
 const allSongs = computed(() => cancionesStore.canciones || []);
+
+// NUEVO: Computed para saber si el video está visible
+const isVideoVisible = computed(() => playerStore.showVideo);
 
 let adInterval: any = null;
 
@@ -186,7 +189,7 @@ onUnmounted(() => {
 
 <template>
   <div class="app-container">
-    <div class="app">
+    <div class="app" :class="{ 'video-visible': isVideoVisible }">
       <!-- Botón de menú móvil -->
       <div class="menu-toggle" @click="toggleSidebar">
         <div class="menu-icon">
@@ -268,15 +271,18 @@ onUnmounted(() => {
         <Perfil />
       </div>
       
-      <main class="content">
+      <!-- NUEVO: Contenedor principal con margen dinámico -->
+      <main class="content" :class="{ 'with-video': isVideoVisible }">
         <RouterView />
       </main>
     </div>
     
     <!-- Reproductor de música (siempre visible en la parte inferior) -->
-    <MusicPlayer :songs="allSongs" />
+    <div class="music-player-container" :class="{ 'with-video': isVideoVisible }">
+      <MusicPlayer :songs="allSongs" />
+    </div>
     
-    <!-- NUEVO: Reproductor de video (overlay que aparece cuando sea necesario) -->
+    <!-- Reproductor de video (panel lateral) -->
     <VideoPlayer />
   </div>
 </template>
@@ -295,6 +301,12 @@ onUnmounted(() => {
   height: 100%;
   overflow: hidden;
   position: relative;
+  transition: all 0.3s ease; /* NUEVO: Transición suave */
+}
+
+/* NUEVO: Clase para cuando el video está visible */
+.app.video-visible {
+  margin-right: 400px; /* Espacio para el panel de video */
 }
 
 /* Nuevo contenedor para el perfil */
@@ -303,6 +315,12 @@ onUnmounted(() => {
   top: 15px;
   right: 15px;
   z-index: 1100;
+  transition: all 0.3s ease; /* NUEVO: Transición suave */
+}
+
+/* NUEVO: Ajustar posición del perfil cuando el video está visible */
+.app.video-visible .profile-container-p {
+  right: 415px; /* 400px del video + 15px de margen */
 }
 
 .header-profile-container {
@@ -406,6 +424,7 @@ onUnmounted(() => {
   padding: 1rem;
   overflow-y: auto;
   z-index: 1000;
+  transition: all 0.3s ease; /* NUEVO: Transición suave */
 }
 
 .logo {
@@ -433,10 +452,25 @@ onUnmounted(() => {
   border-radius: 8px;
 }
 
+/* NUEVO: Contenido principal con margen dinámico */
 .content {
   flex: 1;
   background-color: #ffffff;
   position: relative;
+  transition: all 0.3s ease; /* Transición suave */
+}
+
+.content.with-video {
+  margin-right: 0; /* Sin margen extra aquí, ya se maneja en .app */
+}
+
+/* NUEVO: Contenedor del reproductor de música con margen dinámico */
+.music-player-container {
+  transition: all 0.3s ease;
+}
+
+.music-player-container.with-video {
+  margin-right: 400px; /* Espacio para el panel de video */
 }
 
 /* ESTILOS MEJORADOS DEL BUSCADOR */
@@ -656,6 +690,21 @@ onUnmounted(() => {
   top: 16px;
 }
 
+/* NUEVO: Responsive design mejorado */
+@media screen and (max-width: 1200px) {
+  .app.video-visible {
+    margin-right: 350px; /* Menos espacio en pantallas medianas */
+  }
+  
+  .app.video-visible .profile-container-p {
+    right: 365px;
+  }
+  
+  .music-player-container.with-video {
+    margin-right: 350px;
+  }
+}
+
 @media screen and (max-width: 768px) {
   .menu-toggle {
     display: flex;
@@ -678,6 +727,19 @@ onUnmounted(() => {
   .content {
     width: 100%;
     padding-top: 60px;
+  }
+  
+  /* NUEVO: En móvil, el video no desplaza contenido */
+  .app.video-visible {
+    margin-right: 0;
+  }
+  
+  .app.video-visible .profile-container-p {
+    right: 15px; /* Mantener posición original en móvil */
+  }
+  
+  .music-player-container.with-video {
+    margin-right: 0; /* Sin desplazamiento en móvil */
   }
   
   .app:after {

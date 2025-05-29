@@ -3,7 +3,10 @@
        class="video-sidebar-panel">
     <div class="video-container">
       <div class="video-header">
-        <h3>{{ playerStore.currentSong?.titulo || playerStore.currentSong?.nombre }}</h3>
+        <div class="video-title-section">
+          <h1 class="video-song-title">{{ playerStore.currentSong?.titulo || playerStore.currentSong?.nombre }}</h1>
+          <h2 class="video-artist-name">{{ playerStore.getArtistaDisplay }}</h2>
+        </div>
         <div class="video-header-controls">
           <button @click="toggleFullscreen" class="fullscreen-button" :title="isFullscreen ? 'Salir de pantalla completa' : 'Pantalla completa'">
             {{ isFullscreen ? '🗗' : '⛶' }}
@@ -13,12 +16,14 @@
       </div>
       
       <div class="video-wrapper">
-        <!-- Video MP4 directo -->
+        <!-- Video MP4 directo con bucle automático -->
         <video
           v-if="isValidVideo && currentVideoType === 'mp4'"
           ref="videoElement"
           :src="getCurrentVideoUrl()"
           muted
+          loop
+          autoplay
           preload="metadata"
           @loadedmetadata="onVideoLoadedMetadata"
           @timeupdate="onVideoTimeUpdate"
@@ -29,6 +34,7 @@
           @seeked="onVideoSeeked"
           @canplay="onVideoCanPlay"
           @loadstart="onVideoLoadStart"
+          @ended="onVideoEnded"
           class="video-element"
         >
           <source :src="getCurrentVideoUrl()" type="video/mp4">
@@ -47,6 +53,14 @@
           allowfullscreen
           class="video-element"
         ></iframe>
+
+        <!-- NUEVO: Overlay con información de la canción -->
+        <div v-if="isValidVideo" class="video-overlay-info">
+          <div class="overlay-content">
+            <h1 class="overlay-song-title">{{ playerStore.currentSong?.titulo || playerStore.currentSong?.nombre }}</h1>
+            <h2 class="overlay-artist-name">{{ playerStore.getArtistaDisplay }}</h2>
+          </div>
+        </div>
 
         <!-- Error de carga del video -->
         <div v-else class="video-error">
@@ -69,13 +83,13 @@
       </div>
       
       <div class="video-controls">
-        <!-- Botones para cambiar tipo de video -->
+        <!-- Solo botones para cambiar tipo de video -->
         <button 
           v-if="playerStore.currentVideoUrl" 
           @click="switchToMP4" 
           :class="{ 'active': currentVideoType === 'mp4' }"
           class="video-type-button"
-          title="Ver video MP4 sincronizado">
+          title="Ver video MP4">
           📹 MP4
         </button>
         
@@ -87,46 +101,6 @@
           title="Ver videoclip de YouTube">
           📺 YouTube
         </button>
-
-        <!-- Controles de sincronización (solo para MP4) -->
-        <template v-if="currentVideoType === 'mp4'">
-          <button @click="syncVideoManually" class="sync-button" title="Sincronizar video con audio">
-            🔄
-          </button>
-          
-          <button @click="toggleVideoMute" :class="{ 'active': !isVideoMuted }" :title="isVideoMuted ? 'Activar audio del video' : 'Silenciar video'">
-            {{ isVideoMuted ? '🔇' : '🔊' }}
-          </button>
-          
-          <!-- Indicador de estado de sincronización -->
-          <span class="sync-status" :class="{ 'synced': isSynced, 'out-of-sync': !isSynced }">
-            {{ isSynced ? '🟢 Sync' : '🔴 Desync' }}
-          </span>
-          
-          <!-- Debug info (opcional - se puede quitar) -->
-          <span class="debug-info" v-if="videoElement && showDebug">
-            A:{{ playerStore.currentTime.toFixed(1) }}s | V:{{ videoElement.currentTime?.toFixed(1) || '0.0' }}s
-          </span>
-        </template>
-        
-        <!-- Información del tipo de video actual -->
-        <span class="video-type-info">
-          {{ currentVideoType === 'mp4' ? '📹 MP4' : '📺 YouTube' }}
-        </span>
-        
-        <!-- Botón para abrir en nueva pestaña -->
-        <button @click="openVideoInNewTab" class="open-external" title="Abrir en nueva pestaña">
-          🔗
-        </button>
-        
-        <!-- Toggle debug info (solo para MP4) -->
-        <button 
-          v-if="currentVideoType === 'mp4'"
-          @click="showDebug = !showDebug" 
-          class="debug-toggle" 
-          title="Mostrar/ocultar info de debug">
-          {{ showDebug ? '👁️' : '👁️‍🗨️' }}
-        </button>
       </div>
     </div>
     
@@ -136,7 +110,10 @@
          @click="toggleFullscreen">
       <div class="fullscreen-container" @click.stop>
         <div class="fullscreen-header">
-          <h3>{{ playerStore.currentSong?.titulo || playerStore.currentSong?.nombre }}</h3>
+          <div class="fullscreen-title-section">
+            <h1 class="fullscreen-song-title">{{ playerStore.currentSong?.titulo || playerStore.currentSong?.nombre }}</h1>
+            <h2 class="fullscreen-artist-name">{{ playerStore.getArtistaDisplay }}</h2>
+          </div>
           <button @click="toggleFullscreen" class="close-button">✕</button>
         </div>
         
@@ -145,6 +122,7 @@
             v-if="isValidVideo && currentVideoType === 'mp4'"
             :src="getCurrentVideoUrl()"
             :muted="isVideoMuted"
+            :loop="videoLoop"
             controls
             autoplay
             class="fullscreen-video-element"
@@ -163,10 +141,18 @@
             allowfullscreen
             class="fullscreen-video-element"
           ></iframe>
+
+          <!-- NUEVO: Overlay en pantalla completa -->
+          <div v-if="isValidVideo" class="fullscreen-overlay-info">
+            <div class="fullscreen-overlay-content">
+              <h1 class="fullscreen-overlay-song-title">{{ playerStore.currentSong?.titulo || playerStore.currentSong?.nombre }}</h1>
+              <h2 class="fullscreen-overlay-artist-name">{{ playerStore.getArtistaDisplay }}</h2>
+            </div>
+          </div>
         </div>
         
         <div class="fullscreen-controls">
-          <!-- Botones para cambiar tipo en pantalla completa -->
+          <!-- Solo botones para cambiar tipo en pantalla completa -->
           <button 
             v-if="playerStore.currentVideoUrl" 
             @click="switchToMP4" 
@@ -182,14 +168,6 @@
             class="video-type-button youtube-style">
             📺 Ver YouTube
           </button>
-
-          <!-- Controles específicos para MP4 -->
-          <template v-if="currentVideoType === 'mp4'">
-            <button @click="syncVideoManually" class="sync-button">🔄 Sincronizar</button>
-            <button @click="toggleVideoMute" :class="{ 'active': !isVideoMuted }">
-              {{ isVideoMuted ? '🔇 Activar audio' : '🔊 Silenciar' }}
-            </button>
-          </template>
         </div>
       </div>
     </div>
@@ -211,6 +189,7 @@ export default {
     const syncingInProgress = ref(false);
     const showDebug = ref(false); // Toggle para mostrar debug info
     const currentVideoType = ref('mp4'); // 'mp4' o 'youtube'
+    const videoLoop = ref(true); // NUEVO: Control de bucle del video
 
     // Obtener URL del video actual según el tipo
     const getCurrentVideoUrl = () => {
@@ -234,11 +213,11 @@ export default {
       } else if (url.includes('youtu.be/')) {
         videoId = url.split('youtu.be/')[1]?.split('?')[0];
       } else if (url.includes('youtube.com/embed/')) {
-        return url + '?autoplay=1&mute=1&rel=0&controls=1';
+        return url + '?autoplay=1&mute=1&rel=0&controls=1&loop=1';
       }
 
       if (videoId) {
-        return `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&mute=1&rel=0&controls=1&enablejsapi=1`;
+        return `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&mute=1&rel=0&controls=1&enablejsapi=1&loop=1&playlist=${videoId}`;
       }
 
       return '';
@@ -271,6 +250,15 @@ export default {
       return url.includes('youtube.com') || url.includes('youtu.be');
     };
 
+    // NUEVA: Función para alternar bucle del video
+    const toggleVideoLoop = () => {
+      videoLoop.value = !videoLoop.value;
+      if (videoElement.value && currentVideoType.value === 'mp4') {
+        videoElement.value.loop = videoLoop.value;
+        console.log('🔁 Bucle del video:', videoLoop.value ? 'ACTIVADO' : 'DESACTIVADO');
+      }
+    };
+
     // Cambiar entre MP4 y YouTube
     const switchToMP4 = () => {
       if (playerStore.currentVideoUrl) {
@@ -297,11 +285,18 @@ export default {
     const onVideoLoadedMetadata = () => {
       isLoading.value = false;
       if (videoElement.value) {
+        // IMPORTANTE: Configurar bucle automáticamente
+        videoElement.value.loop = videoLoop.value;
+        
         console.log('📹 Video cargado, duración:', videoElement.value.duration.toFixed(2) + 's');
+        console.log('🔁 Bucle configurado:', videoElement.value.loop);
         console.log('🎵 Audio actual en:', playerStore.currentTime.toFixed(2) + 's');
         
-        // Sincronizar inmediatamente
-        videoElement.value.currentTime = playerStore.currentTime;
+        // NO sincronizar automáticamente para permitir que el video corra libre
+        // Solo sincronizar si está en modo sync específico
+        if (!videoLoop.value) {
+          videoElement.value.currentTime = playerStore.currentTime;
+        }
         
         // Si el audio está reproduciéndose, iniciar el video
         if (playerStore.isPlaying) {
@@ -313,12 +308,18 @@ export default {
     const onVideoCanPlay = () => {
       isLoading.value = false;
       if (videoElement.value) {
-        console.log('✅ Video listo para reproducir');
+        // Asegurar configuración de bucle
+        videoElement.value.loop = videoLoop.value;
         
-        // Doble verificación de sincronización
-        const timeDiff = Math.abs(videoElement.value.currentTime - playerStore.currentTime);
-        if (timeDiff > 1) {
-          videoElement.value.currentTime = playerStore.currentTime;
+        console.log('✅ Video listo para reproducir');
+        console.log('🔁 Bucle final configurado:', videoElement.value.loop);
+        
+        // Solo sincronizar si NO está en modo bucle libre
+        if (!videoLoop.value) {
+          const timeDiff = Math.abs(videoElement.value.currentTime - playerStore.currentTime);
+          if (timeDiff > 1) {
+            videoElement.value.currentTime = playerStore.currentTime;
+          }
         }
         
         // Iniciar si el audio está reproduciéndose
@@ -328,8 +329,23 @@ export default {
       }
     };
 
+    // MODIFICADA: Esta función maneja cuando el video termina (por si falla el loop)
+    const onVideoEnded = () => {
+      console.log('🔚 Video terminado, reiniciando bucle...');
+      if (videoElement.value) {
+        // Reiniciar el video al comienzo
+        videoElement.value.currentTime = 0;
+        
+        // Continuar reproduciendo si el audio está activo
+        if (playerStore.isPlaying) {
+          videoElement.value.play().catch(e => console.warn('⚠️ Error al reiniciar video:', e));
+        }
+      }
+    };
+
     const onVideoTimeUpdate = () => {
-      if (!syncingInProgress.value && videoElement.value) {
+      // MODIFICADA: No sincronizar si está en modo bucle libre
+      if (!syncingInProgress.value && videoElement.value && !videoLoop.value) {
         const videoTime = videoElement.value.currentTime;
         const audioTime = playerStore.currentTime;
         const timeDiff = Math.abs(videoTime - audioTime);
@@ -366,13 +382,15 @@ export default {
     };
 
     const onVideoSeeked = () => {
-      if (videoElement.value) {
+      if (videoElement.value && !videoLoop.value) {
         const newTime = videoElement.value.currentTime;
         console.log(`⏭️ Video posicionado en: ${newTime.toFixed(2)}s`);
         playerStore.seek(newTime);
         setTimeout(() => {
           syncingInProgress.value = false;
         }, 500);
+      } else {
+        syncingInProgress.value = false;
       }
     };
 
@@ -383,15 +401,17 @@ export default {
       console.error('URL problemática:', getCurrentVideoUrl());
     };
 
-    // Watchers para sincronización (solo MP4)
+    // MODIFICADOS: Watchers para sincronización (solo cuando NO está en bucle libre)
     watch(() => playerStore.isPlaying, (isPlaying) => {
       if (videoElement.value && isValidVideo.value && currentVideoType.value === 'mp4') {
         try {
           if (isPlaying && videoElement.value.paused) {
-            // Verificar sincronización antes de reproducir
-            const timeDiff = Math.abs(videoElement.value.currentTime - playerStore.currentTime);
-            if (timeDiff > 0.5) {
-              videoElement.value.currentTime = playerStore.currentTime;
+            // Solo sincronizar si NO está en modo bucle libre
+            if (!videoLoop.value) {
+              const timeDiff = Math.abs(videoElement.value.currentTime - playerStore.currentTime);
+              if (timeDiff > 0.5) {
+                videoElement.value.currentTime = playerStore.currentTime;
+              }
             }
             videoElement.value.play().catch(e => console.warn('⚠️ Error al reproducir video:', e));
           } else if (!isPlaying && !videoElement.value.paused) {
@@ -404,7 +424,9 @@ export default {
     });
 
     watch(() => playerStore.currentTime, (newTime) => {
-      if (videoElement.value && !syncingInProgress.value && isValidVideo.value && currentVideoType.value === 'mp4') {
+      // Solo sincronizar si NO está en modo bucle libre
+      if (videoElement.value && !syncingInProgress.value && isValidVideo.value && 
+          currentVideoType.value === 'mp4' && !videoLoop.value) {
         const timeDiff = Math.abs(videoElement.value.currentTime - newTime);
         if (timeDiff > 1) {
           try {
@@ -435,18 +457,26 @@ export default {
       if (showVideo && isValidVideo.value && currentVideoType.value === 'mp4') {
         setTimeout(() => {
           if (videoElement.value) {
-            console.log('🎬 Panel de video abierto, sincronizando...');
-            syncVideoManually();
+            console.log('🎬 Panel de video abierto...');
+            // Solo sincronizar si NO está en bucle libre
+            if (!videoLoop.value) {
+              syncVideoManually();
+            }
           }
         }, 100);
       }
     });
 
-    // Métodos de control
+    // MODIFICADA: Sincronización manual
     const syncVideoManually = () => {
       if (videoElement.value && isValidVideo.value && currentVideoType.value === 'mp4') {
         console.log('🔄 Sincronización manual activada');
         console.log(`Audio: ${playerStore.currentTime.toFixed(2)}s, Video: ${videoElement.value.currentTime.toFixed(2)}s`);
+        
+        // Desactivar bucle temporalmente para sincronizar
+        const wasLooping = videoElement.value.loop;
+        videoElement.value.loop = false;
+        videoLoop.value = false;
         
         videoElement.value.currentTime = playerStore.currentTime;
         
@@ -519,6 +549,7 @@ export default {
       isSynced,
       showDebug,
       currentVideoType,
+      videoLoop, // NUEVO
       getCurrentVideoUrl,
       getYouTubeEmbedUrl,
       switchToMP4,
@@ -532,8 +563,10 @@ export default {
       onVideoSeeking,
       onVideoSeeked,
       onVideoError,
+      onVideoEnded, // NUEVO
       syncVideoManually,
       toggleVideoMute,
+      toggleVideoLoop, // NUEVO
       retryVideo,
       openVideoInNewTab,
       closeVideo,
@@ -571,22 +604,50 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 16px;
-  background: #242424;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, #242424, #1a1a1a);
   border-bottom: 1px solid #333;
   flex-shrink: 0;
+  min-height: 80px; /* Altura mínima para acomodar dos líneas */
 }
 
-.video-header h3 {
-  color: white;
-  margin: 0;
-  font-size: 0.95rem;
-  font-weight: 600;
+/* NUEVO: Sección del título estilo Spotify */
+.video-title-section {
   flex: 1;
+  margin-right: 15px;
+  min-width: 0; /* Permite que el texto se contraiga */
+}
+
+.video-song-title {
+  color: #ffffff;
+  margin: 0 0 4px 0;
+  font-size: 1.1rem;
+  font-weight: 700; /* Bold como Spotify */
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.3;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  margin-right: 10px;
+  letter-spacing: -0.02em; /* Espaciado de letra ajustado */
+}
+
+.video-artist-name {
+  color: #b3b3b3; /* Gris claro como Spotify */
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 400; /* Normal weight */
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  opacity: 0.9;
+  transition: color 0.2s ease;
+}
+
+.video-artist-name:hover {
+  color: #ffffff; /* Se vuelve blanco al hover */
+  cursor: pointer;
 }
 
 .video-header-controls {
@@ -649,7 +710,119 @@ export default {
   background: black;
 }
 
-/* Overlay de carga */
+/* NUEVO: Overlay con información de la canción sobre el video */
+.video-overlay-info {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  z-index: 20;
+  pointer-events: none; /* No interfiere con los controles del video */
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.6));
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 16px 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  animation: slideInFromBottom 0.6s ease-out;
+  max-width: calc(100% - 40px);
+}
+
+.overlay-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.overlay-song-title {
+  color: #ffffff;
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.overlay-artist-name {
+  color: #e5e5e5;
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 400;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.2;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+  opacity: 0.95;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* NUEVO: Overlay para pantalla completa */
+.fullscreen-overlay-info {
+  position: absolute;
+  bottom: 40px;
+  left: 40px;
+  z-index: 30;
+  pointer-events: none;
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.7));
+  backdrop-filter: blur(15px);
+  border-radius: 16px;
+  padding: 24px 28px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.5);
+  animation: slideInFromBottom 0.8s ease-out;
+  max-width: calc(100% - 80px);
+}
+
+.fullscreen-overlay-content {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.fullscreen-overlay-song-title {
+  color: #ffffff;
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 700;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.2;
+  letter-spacing: -0.03em;
+  text-shadow: 0 3px 12px rgba(0, 0, 0, 0.7);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fullscreen-overlay-artist-name {
+  color: #e5e5e5;
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 400;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.3;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+  opacity: 0.95;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Animación para el overlay */
+@keyframes slideInFromBottom {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
 .video-loading-overlay {
   position: absolute;
   top: 0;
@@ -947,7 +1120,74 @@ export default {
   background: #ff5100;
 }
 
-/* Responsive design */
+/* Responsive para overlay */
+@media (max-width: 768px) {
+  .video-overlay-info {
+    bottom: 15px;
+    left: 15px;
+    padding: 12px 16px;
+    border-radius: 10px;
+    max-width: calc(100% - 30px);
+  }
+  
+  .overlay-song-title {
+    font-size: 1rem;
+  }
+  
+  .overlay-artist-name {
+    font-size: 0.85rem;
+  }
+  
+  .fullscreen-overlay-info {
+    bottom: 30px;
+    left: 30px;
+    padding: 18px 22px;
+    border-radius: 12px;
+    max-width: calc(100% - 60px);
+  }
+  
+  .fullscreen-overlay-song-title {
+    font-size: 1.3rem;
+  }
+  
+  .fullscreen-overlay-artist-name {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .video-overlay-info {
+    bottom: 10px;
+    left: 10px;
+    padding: 10px 14px;
+    max-width: calc(100% - 20px);
+  }
+  
+  .overlay-song-title {
+    font-size: 0.9rem;
+  }
+  
+  .overlay-artist-name {
+    font-size: 0.8rem;
+  }
+  
+  .fullscreen-overlay-info {
+    bottom: 20px;
+    left: 20px;
+    padding: 16px 20px;
+    max-width: calc(100% - 40px);
+  }
+  
+  .fullscreen-overlay-song-title {
+    font-size: 1.1rem;
+  }
+  
+  .fullscreen-overlay-artist-name {
+    font-size: 0.9rem;
+  }
+}
+
+/* Overlay de carga */
 @media (max-width: 1024px) {
   .video-sidebar-panel {
     width: 350px;
@@ -1029,5 +1269,4 @@ export default {
   to {
     transform: translateX(0);
   }
-}
-</style>
+}</style>

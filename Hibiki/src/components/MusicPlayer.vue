@@ -1,5 +1,5 @@
 <template>
-  <div v-if="playerStore.currentSong" class="music-player" :class="{ 'minimized': isMinimized }">
+  <div v-if="playerStore.currentSong" class="music-player" :class="{ 'minimized': isMinimized, 'with-video': playerStore.showVideo }">
     <div class="player-content">
       <div class="player-info">
         <img 
@@ -174,7 +174,7 @@
       </div>
     </div>
   </div>
-  <div v-else-if="!playerStore.isUserInteracted" class="music-player-placeholder" @click="handleFirstInteraction">
+  <div v-else-if="!playerStore.isUserInteracted" class="music-player-placeholder" :class="{ 'with-video': playerStore.showVideo }" @click="handleFirstInteraction">
     <p>Haz clic aquí para activar el reproductor de música</p>
   </div>
 </template>
@@ -404,6 +404,24 @@ export default {
   max-height: 70px; 
 }
 
+/* NUEVO: Clase para cuando el video está visible */
+.music-player.with-video {
+  right: 400px; /* Deja espacio para el panel de video */
+}
+
+/* NUEVO: Responsive para el reproductor con video */
+@media screen and (max-width: 1200px) {
+  .music-player.with-video {
+    right: 350px; /* Menos espacio en pantallas medianas */
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .music-player.with-video {
+    right: 0; /* En móvil, mantener ancho completo */
+  }
+}
+
 .music-player-placeholder {
   position: fixed;
   bottom: 0;
@@ -416,6 +434,23 @@ export default {
   cursor: pointer;
   z-index: 1000;
   transition: all 0.3s ease;
+}
+
+/* NUEVO: Placeholder también se estrecha con video */
+.music-player-placeholder.with-video {
+  right: 400px;
+}
+
+@media screen and (max-width: 1200px) {
+  .music-player-placeholder.with-video {
+    right: 350px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .music-player-placeholder.with-video {
+    right: 0;
+  }
 }
 
 .music-player-placeholder:hover {
@@ -556,15 +591,22 @@ button {
 }
 
 .video-button, .lyrics-button {
-  background: none;
-  border: none;
-  color: white;
-  font-size: 18px;  /* Reduced from 24px */
-  cursor: pointer;
-  transition: transform 0.2s ease;
-  padding: 0;
-  margin: 0;
-  line-height: 1;
+  font-size: 20px;
+  background: #333 !important;
+  border-radius: 4px;
+  padding: 4px 6px;
+  transition: all 0.2s ease;
+}
+
+.video-button:hover, .lyrics-button:hover {
+  background: #555 !important;
+  transform: scale(1.1);
+  color: white !important;
+}
+
+.video-button.active, .lyrics-button.active {
+  background: #ff5100 !important;
+  color: white !important;
 }
 
 button:hover {
