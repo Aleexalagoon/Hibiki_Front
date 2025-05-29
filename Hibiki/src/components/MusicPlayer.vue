@@ -29,7 +29,7 @@
           :class="{ 'active': playerStore.showVideo }"
           class="video-button"
           :aria-label="playerStore.showVideo ? 'Cerrar video' : 'Ver video'">
-          🎬
+          𝅙
         </button>
 
         <!-- NUEVO: Botón de letra -->
@@ -39,7 +39,7 @@
           :class="{ 'active': showLyrics }"
           class="lyrics-button"
           :aria-label="showLyrics ? 'Ocultar letra' : 'Ver letra'">
-          📝
+          ✎
         </button>
 
         <!-- Control de volumen con iconos -->
@@ -556,22 +556,15 @@ button {
 }
 
 .video-button, .lyrics-button {
-  font-size: 20px;
-  background: #333 !important;
-  border-radius: 4px;
-  padding: 4px 6px;
-  transition: all 0.2s ease;
-}
-
-.video-button:hover, .lyrics-button:hover {
-  background: #555 !important;
-  transform: scale(1.1);
-  color: white !important;
-}
-
-.video-button.active, .lyrics-button.active {
-  background: #ff5100 !important;
-  color: white !important;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 18px;  /* Reduced from 24px */
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  padding: 0;
+  margin: 0;
+  line-height: 1;
 }
 
 button:hover {
