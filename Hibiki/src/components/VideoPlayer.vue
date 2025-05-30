@@ -90,7 +90,7 @@
           :class="{ 'active': currentVideoType === 'mp4' }"
           class="video-type-button"
           title="Ver video MP4">
-          📹 MP4
+          Visualizer
         </button>
         
         <button 
@@ -99,7 +99,7 @@
           :class="{ 'active': currentVideoType === 'youtube' }"
           class="video-type-button youtube-style"
           title="Ver videoclip de YouTube">
-          📺 YouTube
+          Videoclip
         </button>
       </div>
     </div>
@@ -693,7 +693,6 @@ export default {
 }
 
 .video-element {
-  width: 100%;
   height: auto;
   max-height: 100%;
   display: block;

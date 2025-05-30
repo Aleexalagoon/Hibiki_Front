@@ -29,9 +29,13 @@
           :class="{ 'active': playerStore.showVideo }"
           class="video-button"
           :aria-label="playerStore.showVideo ? 'Cerrar video' : 'Ver video'">
-          𝅙
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="2" y="6" width="14" height="10" rx="2" ry="2"/>
+                  <polygon points="16,10 22,6 22,16"/>
+                  <circle cx="9" cy="11" r="3"/>
+                  <circle cx="9" cy="11" r="1"/>
+              </svg>
         </button>
-
         <!-- NUEVO: Botón de letra -->
         <button 
           v-if="playerStore.currentSong?.letra" 
@@ -113,7 +117,12 @@
             :class="{ 'active': playerStore.showVideo }"
             class="lyrics-video-btn"
             :aria-label="playerStore.showVideo ? 'Cerrar video' : 'Ver video'">
-            🎬
+             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="2" y="6" width="14" height="10" rx="2" ry="2"/>
+                  <polygon points="16,10 22,6 22,16"/>
+                  <circle cx="9" cy="11" r="3"/>
+                  <circle cx="9" cy="11" r="1"/>
+              </svg>
           </button>
         </div>
       </div>
@@ -145,7 +154,12 @@
               :class="{ 'active': playerStore.showVideo }"
               class="modal-video-btn"
               :aria-label="playerStore.showVideo ? 'Cerrar video' : 'Ver video'">
-              🎬
+               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="2" y="6" width="14" height="10" rx="2" ry="2"/>
+                  <polygon points="16,10 22,6 22,16"/>
+                  <circle cx="9" cy="11" r="3"/>
+                  <circle cx="9" cy="11" r="1"/>
+              </svg>
             </button>
 
             <!-- NUEVO: Botón de letra en el modal de imagen -->
@@ -591,23 +605,17 @@ button {
 }
 
 .video-button, .lyrics-button {
-  font-size: 20px;
-  background: #333 !important;
-  border-radius: 4px;
-  padding: 4px 6px;
-  transition: all 0.2s ease;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 18px;  /* Reduced from 24px */
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  padding: 0;
+  margin: 0;
+  line-height: 1;
 }
 
-.video-button:hover, .lyrics-button:hover {
-  background: #555 !important;
-  transform: scale(1.1);
-  color: white !important;
-}
-
-.video-button.active, .lyrics-button.active {
-  background: #ff5100 !important;
-  color: white !important;
-}
 
 button:hover {
   transform: scale(1.2);
@@ -766,7 +774,7 @@ button:hover {
 
 .lyrics-text pre {
   color: white;
-  font-family: 'Georgia', serif;
+  font-family: "Roboto", sans-serif;
   font-size: 1.1rem;
   line-height: 1.8;
   white-space: pre-wrap;

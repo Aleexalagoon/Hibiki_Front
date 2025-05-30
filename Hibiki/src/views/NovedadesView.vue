@@ -120,12 +120,12 @@ export default {
           image: 'https://images.genius.com/9b4acd648c12aa172b1b4ec9f8eaf4da.1000x1000x1.png',
           description: 'Discover the latest songs by Mora.'
         },
-        {
-          label: 'DESTINO 2014 TOUR',
-          title: 'Tour of the new album by Raul Clyde',
+       {
+          label: 'World Tour',
+          title: 'Bad Bunny',
           subtitle: 'Hibiki Music',
-          image: 'https://www.laguiago.com/wp-content/uploads/2025/01/raul-clyde.jpg',
-          description: 'The Valencian artist will tour all over Spain in 2025.'
+          image: 'https://yt3.googleusercontent.com/Ys37SrZ6B7RUW8_X3YvQet7VCFNnWa5C5PXe09OgIoY9UkTt1GpP_zap1-w2VF5gZcyS5xQmbJs=s900-c-k-c0x00ffffff-no-rj',
+          description: 'DeBÍ TiRAR MáS FOToS World Tour'
         },
         {
           label: 'DISCOVER NEW ARTISTS',
@@ -141,20 +141,19 @@ export default {
           image: 'https://www.clarin.com/img/2023/04/27/ebOFOAW8i_2000x1500__1.jpg',
           description: 'The freshest hits just released.'
         },
-   
-        {
-          label: 'World Tour',
-          title: 'Bad Bunny',
+     {
+          label: 'DESTINO 2014 TOUR',
+          title: 'Tour of the new album by Raul Clyde',
           subtitle: 'Hibiki Music',
-          image: 'https://yt3.googleusercontent.com/Ys37SrZ6B7RUW8_X3YvQet7VCFNnWa5C5PXe09OgIoY9UkTt1GpP_zap1-w2VF5gZcyS5xQmbJs=s900-c-k-c0x00ffffff-no-rj',
-          description: 'DeBÍ TiRAR MáS FOToS World Tour'
+          image: 'https://www.laguiago.com/wp-content/uploads/2025/01/raul-clyde.jpg',
+          description: 'The Valencian artist will tour all over Spain in 2025.'
         },
         {
-          label: 'EN CONCIERTO',
-          title: 'Festival Hibiki',
+          label: 'DESTINO 2014 TOUR',
+          title: 'Tour of the new album by Raul Clyde',
           subtitle: 'Hibiki Music',
-          image: '/api/placeholder/400/320',
-          description: 'Un fin de semana de música en directo con los mejores artistas.'
+          image: 'https://www.laguiago.com/wp-content/uploads/2025/01/raul-clyde.jpg',
+          description: 'The Valencian artist will tour all over Spain in 2025.'
         },
         {
           label: 'NUEVO SINGLE',
