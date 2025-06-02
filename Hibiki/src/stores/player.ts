@@ -1,18 +1,21 @@
-// store/playerStore.ts
+// src/stores/player.ts - ACTUALIZACIÓN
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
+import { useListeningHistoryStore } from './listeningHistoryStore';
 
-// Definir el tipo para una canción
 export interface Song {
   nombre: string;
   artista: string;
   ruta: string;
   image: string;
-  [key: string]: any; // Para permitir propiedades adicionales
+  cancionId?: number;
+  cantanteId?: number;
+  albumId?: number;
+  duracion?: string;
+  [key: string]: any; 
 }
 
 export const usePlayerStore = defineStore('player', () => {
-  // Estado
   const isPlaying = ref<boolean>(false);
   const currentSong = ref<Song | null>(null);
   const currentTime = ref<number>(0);
@@ -20,101 +23,152 @@ export const usePlayerStore = defineStore('player', () => {
   const audioPlayer = ref<HTMLAudioElement>(new Audio());
   const currentPlaylist = ref<Song[]>([]);
   const isUserInteracted = ref<boolean>(false);
-  const volume = ref<number>(1); // Añadimos el estado para el volumen
+  const volume = ref<number>(1);
 
-  // Inicializar eventos del reproductor
+  // Tracking variables
+  const lastUpdateTime = ref<number>(0);
+  const trackingInterval = ref<number | null>(null);
+
   const initializeAudioEvents = () => {
-    // Evento para actualizar el tiempo actual
     audioPlayer.value.addEventListener('timeupdate', () => {
-      currentTime.value = audioPlayer.value.currentTime;
+      const newTime = audioPlayer.value.currentTime;
+      currentTime.value = newTime;
+      
+      // Actualizar progreso del tracking cada segundo
+      const now = Date.now();
+      if (now - lastUpdateTime.value >= 1000) {
+        updateListeningProgress();
+        lastUpdateTime.value = now;
+      }
     });
     
-    // Evento para cargar la duración cuando los metadatos están disponibles
     audioPlayer.value.addEventListener('loadedmetadata', () => {
       duration.value = audioPlayer.value.duration;
     });
     
-    // Evento para manejar el final de la canción
     audioPlayer.value.addEventListener('ended', () => {
-      isPlaying.value = false;
-      // Auto-play next song when current song ends
+      finishCurrentSong();
       if (currentPlaylist.value && currentPlaylist.value.length > 0) {
         nextSong(currentPlaylist.value);
       }
     });
 
-    // Registrar interacción del usuario
+    audioPlayer.value.addEventListener('pause', () => {
+      if (isPlaying.value) {
+        pauseTracking();
+      }
+    });
+
+    audioPlayer.value.addEventListener('play', () => {
+      if (!isPlaying.value) {
+        resumeTracking();
+      }
+    });
+
     document.addEventListener('click', () => {
       isUserInteracted.value = true;
     });
     
-    // Establecer el volumen inicial
     audioPlayer.value.volume = volume.value;
   };
   
-  // Inicializar eventos al crear el store
   initializeAudioEvents();
   
-  // Computed properties
   const getArtistaDisplay = computed(() => {
-    // Check for artista in different possible formats
     return currentSong.value?.artista || 
            currentSong.value?.artist || 
            (currentSong.value?.cantante?.nombre) || 
            "Artista desconocido";
   });
-  
-  // Función para normalizar una canción y asegurar que tenga todos los campos necesarios
+
   const normalizeSong = (song: any): Song => {
     return {
       ...song,
       nombre: song.nombre || song.title || 'Unknown',
       artista: song.artista || song.artist || (song.cantante?.nombre) || 'Artista desconocido',
       ruta: song.ruta || song.path || `/music/${song.cancionId}.mp3`,
-      image: song.image || song.coverImage || '/images/default-cover.jpg'
+      image: song.image || song.coverImage || '/images/default-cover.jpg',
+      cancionId: song.cancionId || song.id,
+      cantanteId: song.cantanteId || song.artistId,
+      albumId: song.albumId,
+      duracion: song.duracion || song.duration
     };
   };
+
+  // Funciones de tracking
+  const startTracking = () => {
+    const listeningStore = useListeningHistoryStore();
+    if (currentSong.value) {
+      listeningStore.startTrackingSong(currentSong.value);
+    }
+  };
+
+  const updateListeningProgress = () => {
+    const listeningStore = useListeningHistoryStore();
+    listeningStore.updatePlayProgress(currentTime.value, duration.value);
+  };
+
+  const pauseTracking = () => {
+    // El tracking continúa en pausa para medir tiempo real de escucha
+  };
+
+  const resumeTracking = () => {
+    // El tracking se reanuda automáticamente
+  };
+
+  const finishCurrentSong = () => {
+    const listeningStore = useListeningHistoryStore();
+    listeningStore.finishTrackingSong();
+  };
   
-  // Funciones
+  // Funciones principales del reproductor
   const setSong = (song: Song | null, autoplay = true) => {
     if (!song) return;
     
-    // Normalizar la canción para asegurar que tenga todos los campos necesarios
-    const normalizedSong = normalizeSong(song);
+    // Finalizar tracking de la canción anterior
+    if (currentSong.value) {
+      finishCurrentSong();
+    }
     
-    // Guardar estado de reproducción actual
+    const normalizedSong = normalizeSong(song);
     const wasPlaying = isPlaying.value;
     
-    // Pausar reproducción actual si está reproduciéndose
     if (isPlaying.value) {
       audioPlayer.value.pause();
       isPlaying.value = false;
     }
     
-    // Actualizar canción actual
     currentSong.value = normalizedSong;
     audioPlayer.value.src = normalizedSong.ruta;
     
-    // Solo intentar reproducir si autoplay es true y el usuario ha interactuado o estaba reproduciendo
     if (autoplay && (isUserInteracted.value || wasPlaying)) {
       playSong();
     } else {
-      // Precargar audio sin reproducirlo
       audioPlayer.value.load();
     }
+
+    // Iniciar tracking de la nueva canción
+    setTimeout(() => {
+      if (currentSong.value === normalizedSong) {
+        startTracking();
+      }
+    }, 100);
   };
   
   const playSong = async () => {
     if (!currentSong.value) return;
     
     try {
-      // Solo intentar reproducir si el usuario ha interactuado
       if (isUserInteracted.value) {
         await audioPlayer.value.play();
         isPlaying.value = true;
+        
+        // Asegurar que el tracking esté activo
+        if (!trackingInterval.value) {
+          startTracking();
+        }
       } else {
         console.log('No se puede reproducir automáticamente: se requiere interacción del usuario');
-        // Preparar audio, pero no reproducir
         audioPlayer.value.load();
       }
     } catch (error) {
@@ -124,7 +178,6 @@ export const usePlayerStore = defineStore('player', () => {
   };
   
   const togglePlay = () => {
-    // Marcar que el usuario ha interactuado
     isUserInteracted.value = true;
     
     if (isPlaying.value) {
@@ -137,15 +190,11 @@ export const usePlayerStore = defineStore('player', () => {
   
   const changeSong = (indexChange: number, songs: Song[]) => {
     if (!songs?.length || !currentSong.value) return;
-    
-    // Normalizar todas las canciones en la playlist
+
     const normalizedSongs = songs.map(song => normalizeSong(song));
-    
-    // Update current playlist
     currentPlaylist.value = normalizedSongs;
     
     const currentIndex = normalizedSongs.findIndex(song => 
-      // Compare by ID or name depending on your data structure
       (song.cancionId && currentSong.value?.cancionId && song.cancionId === currentSong.value?.cancionId) || 
       song.nombre === currentSong.value?.nombre
     );
@@ -153,32 +202,25 @@ export const usePlayerStore = defineStore('player', () => {
     if (currentIndex === -1) return;
     
     const newIndex = (currentIndex + indexChange + normalizedSongs.length) % normalizedSongs.length;
-    // Pasar el estado actual de reproducción
     setSong(normalizedSongs[newIndex], isPlaying.value);
   };
   
   const previousSong = (songs: Song[]) => {
-    // Marcar que el usuario ha interactuado
     isUserInteracted.value = true;
     changeSong(-1, songs);
   };
   
   const nextSong = (songs: Song[]) => {
-    // Marcar que el usuario ha interactuado
     isUserInteracted.value = true;
     changeSong(1, songs);
   };
   
   const randomSong = (songs: Song[]) => {
-    // Marcar que el usuario ha interactuado
     isUserInteracted.value = true;
     
     if (!songs || songs.length <= 1 || !currentSong.value) return;
     
-    // Normalizar todas las canciones en la playlist
     const normalizedSongs = songs.map(song => normalizeSong(song));
-    
-    // Update current playlist
     currentPlaylist.value = normalizedSongs;
     
     let randomIndex: number;
@@ -191,12 +233,10 @@ export const usePlayerStore = defineStore('player', () => {
        normalizedSongs[randomIndex].nombre === currentSong.value?.nombre)
     );
     
-    // Pasar el estado actual de reproducción
     setSong(normalizedSongs[randomIndex], isPlaying.value);
   };
   
   const seek = (time: number) => {
-    // Marcar que el usuario ha interactuado
     isUserInteracted.value = true;
     
     if (audioPlayer.value) {
@@ -205,20 +245,14 @@ export const usePlayerStore = defineStore('player', () => {
     }
   };
   
-  // Función para cambiar el volumen
   const changeVolume = (newVolume: number) => {
-    // Marcar que el usuario ha interactuado
     isUserInteracted.value = true;
-    
-    // Asegurar que el volumen esté entre 0 y 1
     const volumeValue = Math.max(0, Math.min(1, newVolume));
     
-    // Actualizar el volumen del reproductor
     if (audioPlayer.value) {
       audioPlayer.value.volume = volumeValue;
     }
     
-    // Actualizar el estado
     volume.value = volumeValue;
   };
   
@@ -228,9 +262,24 @@ export const usePlayerStore = defineStore('player', () => {
     const secs = Math.floor(seconds % 60);
     return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
   };
+
+  // Función para limpiar al cerrar la aplicación
+  const cleanup = () => {
+    if (currentSong.value) {
+      finishCurrentSong();
+    }
+    if (trackingInterval.value) {
+      clearInterval(trackingInterval.value);
+    }
+  };
+
+  // Escuchar cuando la ventana se cierra
+  if (typeof window !== 'undefined') {
+    window.addEventListener('beforeunload', cleanup);
+    window.addEventListener('pagehide', cleanup);
+  }
   
   return {
-    // Estado
     isPlaying,
     currentSong,
     currentTime,
@@ -239,11 +288,9 @@ export const usePlayerStore = defineStore('player', () => {
     isUserInteracted,
     volume,
     audioPlayer,
-    
-    // Getters
+
     getArtistaDisplay,
     
-    // Acciones
     setSong,
     togglePlay,
     previousSong,
@@ -252,6 +299,7 @@ export const usePlayerStore = defineStore('player', () => {
     seek,
     changeVolume,
     formatDuration,
-    normalizeSong
+    normalizeSong,
+    cleanup
   };
 });

@@ -1,215 +1,232 @@
+// src/stores/profileStore.ts
 import { defineStore } from 'pinia';
 
-// Interfaces para definir la estructura de los datos
-interface Artist {
-  id: number;
+interface Usuario {
+  userId: number;
   name: string;
+  email: string;
+  isPremium: boolean;
+  fecha_Registro: string;
+}
+
+interface Artista {
+  cantanteId: number;
+  nombre: string;
+  oyentesMensuales: number;
+  descripcion: string;
   image: string;
 }
 
-interface Track {
-  id: number;
-  title: string;
-  artist: string;
-  album: string;
+interface Cancion {
+  cancionId: number;
+  nombre: string;
+  duracion: string;
   image: string;
-  duration: string;
-  liked: boolean;
-  explicit?: boolean;
-  artistId?: number;
-  albumId?: number;
+  cantanteId: number;
+  albumId: number;
+  artista?: string;
 }
 
 interface Playlist {
-  id: number;
-  title: string;
+  playlistId: number;
+  nombre: string;
+  descripcion: string;
   image: string;
-  owner?: string;
+  fechaCreacion: string;
+  creadorId: number;
 }
 
-interface UserData {
-  name: string;
-  avatar: string | null;
-  publicLists: number;
-  following: number;
+interface ProfileData {
+  usuario: Usuario;
+  artistasFavoritos: Artista[];
+  cancionesMasEscuchadas: Cancion[];
+  playlistsCreadas: Playlist[];
+  estadisticas: {
+    totalCanciones: number;
+    totalPlaylists: number;
+    tiempoEscuchado: string;
+    generoFavorito: string;
+  };
 }
 
-// Interfaz para el estado del store
-interface ProfileState {
-  userData: UserData | null;
-  topArtists: Artist[];
-  topTracks: Track[];
-  publicPlaylists: Playlist[];
-  error: string | null;
-  loading: boolean;
-}
+const API_BASE_URL = "http://aa0918044ca2b4e9b94f01593a2e67bf-1447626218.us-east-1.elb.amazonaws.com/api";
 
 export const useProfileStore = defineStore('profileStore', {
-  state: (): ProfileState => ({
-    userData: null,
-    topArtists: [],
-    topTracks: [],
-    publicPlaylists: [],
-    error: null,
-    loading: false
+  state: () => ({
+    profileData: null as ProfileData | null,
+    loading: false,
+    error: null as string | null,
   }),
 
   getters: {
-    // Getter para verificar si hay datos cargados
-    hasUserData: (state) => state.userData !== null,
-    
-    // Getter para obtener el nombre del usuario de forma segura
-    userName: (state) => state.userData?.name || 'Usuario',
-    
-    // Getter para verificar si hay artistas
-    hasTopArtists: (state) => state.topArtists.length > 0,
-    
-    // Getter para verificar si hay canciones
-    hasTopTracks: (state) => state.topTracks.length > 0,
-    
-    // Getter para verificar si hay playlists
-    hasPublicPlaylists: (state) => state.publicPlaylists.length > 0
+    getUserInfo: (state) => state.profileData?.usuario || null,
+    getTopArtists: (state) => state.profileData?.artistasFavoritos || [],
+    getTopSongs: (state) => state.profileData?.cancionesMasEscuchadas || [],
+    getUserPlaylists: (state) => state.profileData?.playlistsCreadas || [],
+    getStats: (state) => state.profileData?.estadisticas || null,
+    isUserPremium: (state) => state.profileData?.usuario.isPremium || false,
   },
 
   actions: {
-    // Obtener datos del usuario
-    async fetchUserData(token: string) {
+    async fetchUserProfile(userId: number) {
       this.loading = true;
       this.error = null;
-      
-      try {
-        // Obtener datos básicos del usuario
-        const userResponse = await fetch('https://localhost:7295/api/user/profile', {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        });
 
-        if (!userResponse.ok) {
-          throw new Error(`Error al obtener datos del usuario: ${userResponse.statusText}`);
+      try {
+        // Obtener datos del usuario
+        const userResponse = await fetch(`${API_BASE_URL}/Usuario/${userId}`);
+        if (!userResponse.ok) throw new Error('Error al obtener datos del usuario');
+        const usuario = await userResponse.json();
+
+        // Obtener todos los artistas para mostrar como favoritos (simulación)
+        const artistsResponse = await fetch(`${API_BASE_URL}/Artista`);
+        if (!artistsResponse.ok) throw new Error('Error al obtener artistas');
+        const artistas = await artistsResponse.json();
+        const artistasFavoritos = artistas.slice(0, 6); // Top 6 artistas
+
+        // Obtener todas las canciones para mostrar como más escuchadas
+        const songsResponse = await fetch(`${API_BASE_URL}/Cancion`);
+        if (!songsResponse.ok) throw new Error('Error al obtener canciones');
+        const canciones = await songsResponse.json();
+        
+        // Agregar nombre del artista a las canciones
+        const cancionesConArtista = await Promise.all(
+          canciones.slice(0, 10).map(async (cancion: any) => {
+            try {
+              const artistaResponse = await fetch(`${API_BASE_URL}/Artista/${cancion.cantanteId}`);
+              if (artistaResponse.ok) {
+                const artista = await artistaResponse.json();
+                return {
+                  ...cancion,
+                  artista: artista.nombre
+                };
+              }
+              return { ...cancion, artista: 'Artista desconocido' };
+            } catch {
+              return { ...cancion, artista: 'Artista desconocido' };
+            }
+          })
+        );
+
+        // Obtener playlists del usuario
+        const playlistsResponse = await fetch(`${API_BASE_URL}/Playlist`);
+        let playlistsCreadas: Playlist[] = [];
+        if (playlistsResponse.ok) {
+          const allPlaylists = await playlistsResponse.json();
+          // Filtrar playlists creadas por el usuario actual
+          playlistsCreadas = allPlaylists.filter((playlist: any) => 
+            playlist.creadorId === userId || playlist.creador?.userId === userId
+          );
         }
 
-        const userData = await userResponse.json();
-        this.userData = userData;
+        // Generar estadísticas simuladas basadas en datos reales
+        const estadisticas = {
+          totalCanciones: canciones.length,
+          totalPlaylists: playlistsCreadas.length,
+          tiempoEscuchado: this.calculateListeningTime(canciones),
+          generoFavorito: this.getMostPopularGenre(artistasFavoritos)
+        };
 
-        // Obtener artistas más escuchados
-        await this.fetchTopArtists(token);
-        
-        // Obtener canciones más escuchadas
-        await this.fetchTopTracks(token);
-        
-        // Obtener playlists públicas
-        await this.fetchPublicPlaylists(token);
+        this.profileData = {
+          usuario,
+          artistasFavoritos,
+          cancionesMasEscuchadas: cancionesConArtista,
+          playlistsCreadas,
+          estadisticas
+        };
 
-      } catch (error: unknown) {
-        const errorMessage = error instanceof Error ? error.message : String(error);
-        console.error('Error al cargar datos del perfil:', error);
-        this.error = errorMessage;
+      } catch (err: any) {
+        this.error = err.message || 'Error al cargar el perfil';
+        console.error('Error en fetchUserProfile:', err);
       } finally {
         this.loading = false;
       }
     },
 
-    // Obtener artistas más escuchados
-    async fetchTopArtists(token: string) {
-      try {
-        const response = await fetch('https://localhost:7295/api/user/top-artists', {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          this.topArtists = data;
-        } else {
-          console.warn('No se pudieron obtener los artistas más escuchados');
-        }
-      } catch (error) {
-        console.error('Error al obtener artistas más escuchados:', error);
-      }
-    },
-
-    // Obtener canciones más escuchadas
-    async fetchTopTracks(token: string) {
-      try {
-        const response = await fetch('https://localhost:7295/api/user/top-tracks', {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          this.topTracks = data;
-        } else {
-          console.warn('No se pudieron obtener las canciones más escuchadas');
-        }
-      } catch (error) {
-        console.error('Error al obtener canciones más escuchadas:', error);
-      }
-    },
-
-    // Obtener playlists públicas
-    async fetchPublicPlaylists(token: string) {
-      try {
-        const response = await fetch('https://localhost:7295/api/user/public-playlists', {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          this.publicPlaylists = data;
-        } else {
-          console.warn('No se pudieron obtener las playlists públicas');
-        }
-      } catch (error) {
-        console.error('Error al obtener playlists públicas:', error);
-      }
-    },
-
-    // Limpiar datos del perfil
-    clearProfileData() {
-      this.userData = null;
-      this.topArtists = [];
-      this.topTracks = [];
-      this.publicPlaylists = [];
+    async updateUserProfile(userId: number, userData: Partial<Usuario>) {
+      this.loading = true;
       this.error = null;
-      this.loading = false;
-    },
 
-    // Actualizar estado de like de una canción
-    updateTrackLike(trackId: number, liked: boolean) {
-      const trackIndex = this.topTracks.findIndex(track => track.id === trackId);
-      if (trackIndex !== -1) {
-        this.topTracks[trackIndex].liked = liked;
+      try {
+        const response = await fetch(`${API_BASE_URL}/Usuario/${userId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(userData)
+        });
+
+        if (!response.ok) throw new Error('Error al actualizar perfil');
+
+        // Actualizar datos locales
+        if (this.profileData) {
+          this.profileData.usuario = { ...this.profileData.usuario, ...userData };
+        }
+
+        return true;
+      } catch (err: any) {
+        this.error = err.message || 'Error al actualizar perfil';
+        console.error('Error en updateUserProfile:', err);
+        return false;
+      } finally {
+        this.loading = false;
       }
     },
 
-    // Setter para datos de usuario (útil para testing o inicialización manual)
-    setUserData(userData: UserData) {
-      this.userData = userData;
+    async toggleFavoriteArtist(artistId: number) {
+      // Simulación de agregar/quitar artista favorito
+      if (this.profileData) {
+        const index = this.profileData.artistasFavoritos.findIndex(a => a.cantanteId === artistId);
+        if (index > -1) {
+          this.profileData.artistasFavoritos.splice(index, 1);
+        } else {
+          try {
+            const response = await fetch(`${API_BASE_URL}/Artista/${artistId}`);
+            if (response.ok) {
+              const artista = await response.json();
+              this.profileData.artistasFavoritos.push(artista);
+            }
+          } catch (err) {
+            console.error('Error al agregar artista favorito:', err);
+          }
+        }
+      }
     },
 
-    // Setter para artistas (útil si los datos vienen de otra fuente)
-    setTopArtists(artists: Artist[]) {
-      this.topArtists = artists;
+    // Métodos auxiliares
+    calculateListeningTime(canciones: any[]): string {
+      let totalMinutes = 0;
+      canciones.forEach(cancion => {
+        if (cancion.duracion) {
+          const parts = cancion.duracion.split(':');
+          if (parts.length >= 2) {
+            totalMinutes += parseInt(parts[0]) * 60 + parseInt(parts[1]);
+          }
+        }
+      });
+      
+      const hours = Math.floor(totalMinutes / 60);
+      return `${hours} horas`;
     },
 
-    // Setter para canciones (útil si los datos vienen de otra fuente)
-    setTopTracks(tracks: Track[]) {
-      this.topTracks = tracks;
+    getMostPopularGenre(artistas: Artista[]): string {
+      // Simulación basada en descripción del artista
+      const genres = ['Pop', 'Rock', 'Hip Hop', 'Electrónica', 'Jazz', 'Clásica'];
+      return genres[Math.floor(Math.random() * genres.length)];
     },
 
-    // Setter para playlists (útil si los datos vienen de otra fuente)
-    setPublicPlaylists(playlists: Playlist[]) {
-      this.publicPlaylists = playlists;
+    formatDuration(duration: string): string {
+      if (!duration) return '0:00';
+      const parts = duration.split(':');
+      if (parts.length >= 2) {
+        return `${parts[1]}:${parts[2] || '00'}`;
+      }
+      return duration;
+    },
+
+    clearProfile() {
+      this.profileData = null;
+      this.error = null;
     }
   }
 });
