@@ -258,6 +258,7 @@ onUnmounted(() => {
             <router-link to="/playlist" class="menu-item" active-class="active" @click="sidebarVisible = false">Playlists</router-link>
             <router-link to="/premium" class="menu-item" active-class="active" @click="sidebarVisible = false">Premium</router-link>
             <router-link to="/conciertos" class="menu-item" active-class="active" @click="sidebarVisible = false">Concerts</router-link>
+            <router-link to="/descarga" class="menu-item" active-class="active" @click="sidebarVisible = false">Download</router-link>
           </div>
         </nav>
         
