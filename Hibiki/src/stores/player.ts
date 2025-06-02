@@ -155,6 +155,7 @@ export const usePlayerStore = defineStore('player', () => {
     }, 100);
   };
   
+  // Mantener todas tus funciones existentes sin cambios
   const playSong = async () => {
     if (!currentSong.value) return;
     
@@ -255,7 +256,27 @@ export const usePlayerStore = defineStore('player', () => {
     
     volume.value = volumeValue;
   };
+
+  // Funciones para manejar video
+  const toggleVideoMode = () => {
+    isUserInteracted.value = true;
+    isVideoMode.value = !isVideoMode.value;
+    showVideo.value = isVideoMode.value && !!(currentSong.value?.videoUrl || currentSong.value?.videoclip);
+  };
+
+  const setShowVideo = (show: boolean) => {
+    if (hasVideo.value) {
+      showVideo.value = show;
+    }
+  };
+
+  const toggleVideo = () => {
+    if (hasVideo.value) {
+      showVideo.value = !showVideo.value;
+    }
+  };
   
+  // Mantener tu función existente
   const formatDuration = (seconds: number) => {
     if (isNaN(seconds) || seconds < 0) return "0:00";
     const minutes = Math.floor(seconds / 60);

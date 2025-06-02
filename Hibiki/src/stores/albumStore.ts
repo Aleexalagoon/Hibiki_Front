@@ -15,6 +15,7 @@ interface Cancion {
   titulo: string;
   duracion?: string;
   albumId?: number;
+  videoURL?: string;
   // Añade otras propiedades según tu modelo de datos
 }
 
