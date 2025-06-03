@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, watchEffect } from 'vue';
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 import { usePlayerStore } from '@/stores/player';
@@ -10,238 +10,239 @@ import VideoPlayer from '@/components/VideoPlayer.vue';
 import Swal from 'sweetalert2';
 import Perfil from '@/components/Perfil.vue';
 
+// Estados básicos
 const sidebarVisible = ref(false);
 const searchQuery = ref('');
 const searchResults = ref([]);
 const showSearchResults = ref(false);
 const showFilters = ref(false);
-const showGenres = ref(true); // Estado para mostrar/ocultar géneros
+const showGenres = ref(true);
 const loading = ref(false);
 
-// Filtros
+// Estados de filtros
 const selectedGenero = ref('');
 const ordenarPor = ref('');
-const tipoResultado = ref('todos'); // todos, canciones, artistas
+const tipoResultado = ref('todos');
 
-// 🎨 Géneros rediseñados con paleta naranja/negro que combina con tu web
-const generos = ref([
-  { 
-    generoId: 1, 
-    nombre: 'Reggaeton', 
-    icono: '🔥', 
-    color: '#FF5100', 
-    descripcion: 'Música latina urbana con ritmo ardiente' 
-  },
-  { 
-    generoId: 2, 
-    nombre: 'Pop', 
-    icono: '✨', 
-    color: '#FF8C00', 
-    descripcion: 'Música popular y pegajosa' 
-  },
-  { 
-    generoId: 3, 
-    nombre: 'Trap', 
-    icono: '💎', 
-    color: '#FF6B35', 
-    descripcion: 'Hip hop urbano con actitud' 
-  },
-  { 
-    generoId: 4, 
-    nombre: 'Hip Hop', 
-    icono: '🎯', 
-    color: '#FF4500', 
-    descripcion: 'Rap y cultura urbana auténtica' 
-  },
-  { 
-    generoId: 5, 
-    nombre: 'R&B', 
-    icono: '🌙', 
-    color: '#CC4400', 
-    descripcion: 'Rhythm and Blues con soul' 
-  },
-  { 
-    generoId: 6, 
-    nombre: 'Electrónica', 
-    icono: '⚡', 
-    color: '#FF7F00', 
-    descripcion: 'Beats electrónicos y EDM' 
-  },
-  { 
-    generoId: 7, 
-    nombre: 'Rock', 
-    icono: '🤘', 
-    color: '#B8460E', 
-    descripcion: 'Rock potente y energético' 
-  },
-  { 
-    generoId: 8, 
-    nombre: 'Indie', 
-    icono: '🌆', 
-    color: '#D2691E', 
-    descripcion: 'Sonidos independientes y únicos' 
-  },
-  { 
-    generoId: 9, 
-    nombre: 'Jazz', 
-    icono: '🎺', 
-    color: '#A0522D', 
-    descripcion: 'Jazz clásico y contemporáneo' 
-  },
-  { 
-    generoId: 10, 
-    nombre: 'Folk', 
-    icono: '🍂', 
-    color: '#8B4513', 
-    descripcion: 'Música folk y acústica' 
-  },
-]);
+// Géneros estáticos para evitar reactividad innecesaria
+const generos = [
+  { generoId: 1, nombre: 'Reggaeton', icono: '🔥', color: '#FF5100', descripcion: 'Música latina urbana' },
+  { generoId: 2, nombre: 'Pop', icono: '✨', color: '#FF8C00', descripcion: 'Música popular' },
+  { generoId: 3, nombre: 'Trap', icono: '💎', color: '#FF6B35', descripcion: 'Hip hop urbano' },
+  { generoId: 4, nombre: 'Hip Hop', icono: '🎯', color: '#FF4500', descripcion: 'Rap y cultura urbana' },
+  { generoId: 5, nombre: 'R&B', icono: '🌙', color: '#CC4400', descripcion: 'Rhythm and Blues' },
+  { generoId: 6, nombre: 'Electrónica', icono: '⚡', color: '#FF7F00', descripcion: 'EDM y electrónica' },
+  { generoId: 7, nombre: 'Rock', icono: '🤘', color: '#B8460E', descripcion: 'Rock y metal' },
+  { generoId: 8, nombre: 'Indie', icono: '🌆', color: '#D2691E', descripcion: 'Música independiente' },
+  { generoId: 9, nombre: 'Jazz', icono: '🎺', color: '#A0522D', descripcion: 'Jazz clásico' },
+  { generoId: 10, nombre: 'Folk', icono: '🍂', color: '#8B4513', descripcion: 'Música folk' }
+];
 
+// Stores
 const authStore = useAuthStore();
 const playerStore = usePlayerStore();
 const cancionesStore = useCancionesStore();
 const artistaStore = useArtistaStore();
 const router = useRouter();
 
-const isAuthenticated = computed(() => authStore.isAuthenticated);
-const isPremium = computed(() => authStore.isPremium);
-const allSongs = computed(() => cancionesStore.canciones || []);
+// Computed seguros con validación
+const isAuthenticated = computed(() => {
+  try {
+    return Boolean(authStore?.isAuthenticated);
+  } catch (error) {
+    console.error('Error en isAuthenticated:', error);
+    return false;
+  }
+});
 
-// Computed para filtros activos
-const hasActiveFilters = computed(() => 
-  selectedGenero.value || ordenarPor.value || tipoResultado.value !== 'todos'
-);
+const isPremium = computed(() => {
+  try {
+    return Boolean(authStore?.isPremium);
+  } catch (error) {
+    console.error('Error en isPremium:', error);
+    return false;
+  }
+});
 
-// Computed para resultados filtrados CORREGIDO
+const allSongs = computed(() => {
+  try {
+    return cancionesStore?.canciones || [];
+  } catch (error) {
+    console.error('Error en allSongs:', error);
+    return [];
+  }
+});
+
+const hasActiveFilters = computed(() => {
+  try {
+    return Boolean(
+      selectedGenero.value || 
+      ordenarPor.value || 
+      tipoResultado.value !== 'todos'
+    );
+  } catch (error) {
+    console.error('Error en hasActiveFilters:', error);
+    return false;
+  }
+});
+
 const filteredResults = computed(() => {
-  let results = [...searchResults.value];
-  
-  // Filtrar por tipo
-  if (tipoResultado.value !== 'todos') {
-    if (tipoResultado.value === 'canciones') {
-      results = results.filter(result => result.type === 'song');
-    } else if (tipoResultado.value === 'artistas') {
-      results = results.filter(result => result.type === 'artist');
+  try {
+    const results = searchResults.value || [];
+    if (!Array.isArray(results)) return [];
+    
+    let filtered = [...results];
+    
+    // Filtrar por tipo
+    if (tipoResultado.value !== 'todos') {
+      if (tipoResultado.value === 'canciones') {
+        filtered = filtered.filter(r => r?.type === 'song');
+      } else if (tipoResultado.value === 'artistas') {
+        filtered = filtered.filter(r => r?.type === 'artist');
+      }
     }
+    
+    // Ordenar
+    if (ordenarPor.value === 'nombre') {
+      filtered.sort((a, b) => (a?.title || '').localeCompare(b?.title || ''));
+    } else if (ordenarPor.value === 'artista') {
+      filtered.sort((a, b) => (a?.artist || '').localeCompare(b?.artist || ''));
+    } else if (ordenarPor.value === 'popularidad') {
+      filtered.sort((a, b) => (b?.listeners || 0) - (a?.listeners || 0));
+    }
+    
+    return filtered;
+  } catch (error) {
+    console.error('Error en filteredResults:', error);
+    return [];
   }
-  
-  // Ordenar
-  if (ordenarPor.value === 'nombre') {
-    results.sort((a, b) => a.title.localeCompare(b.title));
-  } else if (ordenarPor.value === 'artista') {
-    results.sort((a, b) => (a.artist || '').localeCompare(b.artist || ''));
-  } else if (ordenarPor.value === 'popularidad') {
-    results.sort((a, b) => (b.listeners || 0) - (a.listeners || 0));
-  }
-  
-  return results;
 });
 
-// Computed para estadísticas
 const resultStats = computed(() => {
-  const canciones = filteredResults.value.filter(r => r.type === 'song').length;
-  const artistas = filteredResults.value.filter(r => r.type === 'artist').length;
-  
-  return { canciones, artistas, total: canciones + artistas };
+  try {
+    const results = filteredResults.value || [];
+    const canciones = results.filter(r => r?.type === 'song').length;
+    const artistas = results.filter(r => r?.type === 'artist').length;
+    
+    return { canciones, artistas, total: canciones + artistas };
+  } catch (error) {
+    console.error('Error en resultStats:', error);
+    return { canciones: 0, artistas: 0, total: 0 };
+  }
 });
 
-let adInterval: any = null;
-let searchTimeout: any = null;
+// Variables para intervalos
+let adInterval = null;
+let searchTimeout = null;
 
-const toggleSidebar = () => sidebarVisible.value = !sidebarVisible.value;
+// Funciones principales
+const toggleSidebar = () => {
+  sidebarVisible.value = !sidebarVisible.value;
+};
 
-// FUNCIÓN DE BÚSQUEDA CORREGIDA
-const performSearch = () => {
-  if (!searchQuery.value.trim()) {
+const performSearch = async () => {
+  if (!searchQuery.value?.trim()) {
     showSearchResults.value = false;
     searchResults.value = [];
     return;
   }
 
   loading.value = true;
-  const query = searchQuery.value.toLowerCase().trim();
-  let songResults = [];
-  let artistResults = [];
   
-  console.log(`🔍 Buscando: "${query}" | Género seleccionado: ${selectedGenero.value}`);
-  
-  // Buscar en canciones - LÓGICA CORREGIDA
-  if (cancionesStore.canciones && Array.isArray(cancionesStore.canciones)) {
-    songResults = cancionesStore.canciones.filter(cancion => {
-      const nombre = cancion?.nombre ? cancion.nombre.toLowerCase() : '';
-      const artista = cancion?.artista ? cancion.artista.toLowerCase() : '';
-      const album = cancion?.album ? cancion.album.toLowerCase() : '';
-      
-      // Búsqueda por texto
-      const matchesQuery = nombre.includes(query) || 
-                          artista.includes(query) || 
-                          album.includes(query) ||
-                          nombre.replace(/\s+/g, '').includes(query.replace(/\s+/g, '')) ||
-                          artista.replace(/\s+/g, '').includes(query.replace(/\s+/g, ''));
-      
-      // ✅ CORRECCIÓN: Solo aplicar filtro de género si está seleccionado
-      if (selectedGenero.value) {
-        const generoSeleccionado = parseInt(selectedGenero.value);
-        const cancionGeneroId = cancion.generoId || cancion.GeneroId || cancion.generoid;
-        
-        console.log(`🎵 ${cancion.nombre} - GeneroId: ${cancionGeneroId}, Buscando: ${generoSeleccionado}, Match texto: ${matchesQuery}`);
-        
-        // Debe coincidir TANTO en texto COMO en género
-        const matchesGenero = cancionGeneroId === generoSeleccionado || 
-                             cancionGeneroId === generoSeleccionado.toString();
-        
-        return matchesQuery && matchesGenero;
+  try {
+    const query = searchQuery.value.toLowerCase().trim();
+    let songResults = [];
+    let artistResults = [];
+    
+    console.log(`🔍 Buscando: "${query}" | Género seleccionado: ${selectedGenero.value}`);
+    
+    // Buscar canciones
+    const canciones = cancionesStore?.canciones;
+    if (canciones && Array.isArray(canciones)) {
+      songResults = canciones.filter(cancion => {
+        try {
+          const nombre = cancion?.nombre?.toLowerCase() || '';
+          const artista = cancion?.artista?.toLowerCase() || '';
+          const album = cancion?.album?.toLowerCase() || '';
+          
+          const matchesQuery = 
+            nombre.includes(query) || 
+            artista.includes(query) || 
+            album.includes(query) ||
+            nombre.replace(/\s+/g, '').includes(query.replace(/\s+/g, '')) ||
+            artista.replace(/\s+/g, '').includes(query.replace(/\s+/g, ''));
+          
+          if (selectedGenero.value) {
+            const generoId = parseInt(selectedGenero.value);
+            const cancionGenero = cancion?.generoId || cancion?.GeneroId || cancion?.generoid;
+            return matchesQuery && (cancionGenero == generoId);
+          }
+          
+          return matchesQuery;
+        } catch (error) {
+          return false;
+        }
+      });
+    }
+    
+    // Buscar artistas solo si no hay género y hay artistas disponibles
+    if (!selectedGenero.value) {
+      const artistas = artistaStore?.allArtists;
+      if (artistas && Array.isArray(artistas)) {
+        try {
+          artistResults = artistas.filter(artista => {
+            try {
+              const nombre = artista?.nombre?.toLowerCase() || '';
+              return nombre.includes(query);
+            } catch (error) {
+              return false;
+            }
+          });
+        } catch (error) {
+          console.warn('Error buscando artistas:', error);
+          artistResults = [];
+        }
       }
-      
-      // Si no hay género seleccionado, solo buscar por texto
-      return matchesQuery;
-    });
-  }
-  
-  // Buscar en artistas (solo si no hay género seleccionado, ya que los artistas no tienen género)
-  if (!selectedGenero.value && artistaStore.allArtists && Array.isArray(artistaStore.allArtists)) {
-    artistResults = artistaStore.allArtists.filter(artista => {
-      const nombre = artista?.nombre ? artista.nombre.toLowerCase() : '';
-      
-      return nombre.includes(query) || 
-             nombre.replace(/\s+/g, '').includes(query.replace(/\s+/g, ''));
-    });
-  }
-  
-  // Combinar resultados
-  searchResults.value = [
-    ...songResults.map(song => ({
-      type: 'song',
-      id: song.cancionId || song.id,
-      title: song.nombre || 'Sin título',
-      artist: song.artista || 'Artista desconocido',
-      cover: song.image || '/default-cover.jpg',
-      duration: song.duracion || '0:00',
-      generoId: song.generoId || song.GeneroId || song.generoid || null,
-      data: song
-    })),
-    ...artistResults.map(artist => ({
-      type: 'artist',
-      id: artist.cantanteId || artist.id,
-      title: artist.nombre || 'Artista',
-      cover: artist.image || '/default-artist.jpg',
-      listeners: artist.oyentesMensuales || 0,
-      data: artist
-    }))
-  ];
-  
-  console.log(`📊 Resultados: ${songResults.length} canciones, ${artistResults.length} artistas`);
-  
-  loading.value = false;
-  showSearchResults.value = true;
-  
-  if (window.innerWidth <= 768) {
-    sidebarVisible.value = false;
+    }
+    
+    // Crear resultados seguros
+    searchResults.value = [
+      ...songResults.map((song, index) => ({
+        type: 'song',
+        id: song?.cancionId || song?.id || `song-${index}`,
+        title: song?.nombre || 'Sin título',
+        artist: song?.artista || 'Artista desconocido',
+        cover: song?.image || '/default-cover.jpg',
+        duration: song?.duracion || '0:00',
+        generoId: song?.generoId || song?.GeneroId || song?.generoid,
+        data: song
+      })),
+      ...artistResults.map((artist, index) => ({
+        type: 'artist',
+        id: artist?.cantanteId || artist?.id || `artist-${index}`,
+        title: artist?.nombre || 'Artista',
+        cover: artist?.image || '/default-artist.jpg',
+        listeners: artist?.oyentesMensuales || 0,
+        data: artist
+      }))
+    ];
+    
+    console.log(`📊 Resultados: ${songResults.length} canciones, ${artistResults.length} artistas`);
+    
+  } catch (error) {
+    console.error('Error en performSearch:', error);
+    searchResults.value = [];
+  } finally {
+    loading.value = false;
+    showSearchResults.value = true;
+    
+    if (window.innerWidth <= 768) {
+      sidebarVisible.value = false;
+    }
   }
 };
 
 const handleSearch = () => {
-  // Debounce mejorado
   if (searchTimeout) {
     clearTimeout(searchTimeout);
   }
@@ -249,7 +250,6 @@ const handleSearch = () => {
 };
 
 const searchWithButton = () => {
-  // Búsqueda inmediata al hacer clic en la lupa
   if (searchTimeout) {
     clearTimeout(searchTimeout);
   }
@@ -257,31 +257,40 @@ const searchWithButton = () => {
 };
 
 const navigateToResult = (result) => {
-  if (result.type === 'song') {
-    if (typeof playerStore.setSong === 'function') {
-      playerStore.setSong(result.data);
+  try {
+    if (result?.type === 'song') {
+      const song = result.data;
+      if (song && playerStore?.setSong) {
+        playerStore.setSong(song);
+        // ✅ ARREGLO: Sincronizar videoUrl con currentVideoUrl
+        if (song.videoUrl && playerStore.setCurrentVideoUrl) {
+          playerStore.setCurrentVideoUrl(song.videoUrl);
+        } else if (song.videoUrl) {
+          playerStore.currentVideoUrl = song.videoUrl;
+        }
+      }
+    } else if (result?.type === 'artist') {
+      if (artistaStore?.fetchArtistData) {
+        artistaStore.fetchArtistData(result.id);
+      }
+      router.push('/artista');
     }
-  } else if (result.type === 'artist') {
-    if (typeof artistaStore.fetchArtistData === 'function') {
-      artistaStore.fetchArtistData(result.id);
-    }
-    router.push('/artista');
+    
+    closeSearchResults();
+  } catch (error) {
+    console.error('Error navegando:', error);
   }
-  
-  closeSearchResults();
 };
 
 const closeSearchResults = () => {
   showSearchResults.value = false;
   showFilters.value = false;
-  // ✅ OPCIONAL: Descomentar la línea de abajo si quieres que se limpie el género al cerrar
-  // selectedGenero.value = '';
 };
 
 const clearSearch = () => {
   searchQuery.value = '';
   searchResults.value = [];
-  selectedGenero.value = ''; // ✅ Limpiar género al limpiar búsqueda
+  selectedGenero.value = '';
   closeSearchResults();
 };
 
@@ -297,151 +306,182 @@ const clearAllFilters = () => {
   selectedGenero.value = '';
   ordenarPor.value = '';
   tipoResultado.value = 'todos';
-  if (searchQuery.value.trim()) {
+  if (searchQuery.value?.trim()) {
     performSearch();
   }
 };
 
-// FUNCIÓN SELECTGENERO MEJORADA - Ahora abre el buscador automáticamente
 const selectGenero = (generoId) => {
-  selectedGenero.value = generoId.toString();
-  loading.value = true;
-  
-  // ✅ NUEVA FUNCIONALIDAD: Limpiar búsqueda de texto y abrir buscador automáticamente
-  searchQuery.value = '';
-  showSearchResults.value = true; // 🔥 Abrir el buscador automáticamente
-  
-  if (cancionesStore.canciones && Array.isArray(cancionesStore.canciones)) {
-    const genero = generos.value.find(g => g.generoId === generoId);
+  try {
+    selectedGenero.value = generoId.toString();
+    loading.value = true;
+    searchQuery.value = '';
+    showSearchResults.value = true;
     
-    // Buscar canciones del género seleccionado
-    const cancionesFiltradas = cancionesStore.canciones.filter(cancion => {
-      const generoCancion = cancion.generoId || cancion.GeneroId || cancion.generoid;
-      
-      console.log(`🎵 Filtrando por género: ${genero?.nombre} (ID: ${generoId})`);
-      console.log(`Canción: ${cancion.nombre}, GeneroId: ${generoCancion}`);
-      
-      return generoCancion === generoId || 
-             generoCancion === parseInt(generoId) ||
-             generoCancion === generoId.toString();
-    });
-    
-    console.log(`🎵 Total canciones: ${cancionesStore.canciones.length}`);
-    console.log(`🎵 Género seleccionado: ${genero?.nombre} (ID: ${generoId})`);
-    console.log(`🎵 Canciones encontradas: ${cancionesFiltradas.length}`);
-    
-    // Si no encontramos por generoId, mostrar las primeras canciones para debug
-    if (cancionesFiltradas.length === 0) {
-      console.log('🔍 No se encontraron canciones. Estructura de las primeras 3 canciones:');
-      cancionesStore.canciones.slice(0, 3).forEach((cancion, index) => {
-        console.log(`Canción ${index + 1}:`, {
-          nombre: cancion.nombre,
-          generoId: cancion.generoId,
-          GeneroId: cancion.GeneroId,
-          generoid: cancion.generoid,
-          todasLasPropiedades: Object.keys(cancion)
-        });
+    const canciones = cancionesStore?.canciones;
+    if (canciones && Array.isArray(canciones)) {
+      const cancionesFiltradas = canciones.filter(cancion => {
+        const generoCancion = cancion?.generoId || cancion?.GeneroId || cancion?.generoid;
+        return generoCancion == generoId;
       });
+      
+      console.log(`🎵 Género seleccionado: ID ${generoId}`);
+      console.log(`🎵 Canciones encontradas: ${cancionesFiltradas.length}`);
+      
+      searchResults.value = cancionesFiltradas.map((song, index) => ({
+        type: 'song',
+        id: song?.cancionId || song?.id || `genre-song-${index}`,
+        title: song?.nombre || 'Sin título',
+        artist: song?.artista || 'Artista desconocido',
+        cover: song?.image || '/default-cover.jpg',
+        duration: song?.duracion || '0:00',
+        generoId: generoId,
+        data: song
+      }));
     }
     
-    searchResults.value = cancionesFiltradas.map(song => ({
-      type: 'song',
-      id: song.cancionId || song.id,
-      title: song.nombre || 'Sin título',
-      artist: song.artista || 'Artista desconocido',
-      cover: song.image || '/default-cover.jpg',
-      duration: song.duracion || '0:00',
-      generoId: generoId,
-      data: song
-    }));
+    loading.value = false;
     
-    // ✅ MOSTRAR MENSAJE PERSONALIZADO en el header
-    if (cancionesFiltradas.length > 0) {
-      console.log(`✅ Mostrando ${cancionesFiltradas.length} canciones de ${genero?.nombre}`);
-    } else {
-      console.log(`❌ No se encontraron canciones de ${genero?.nombre}`);
+    if (window.innerWidth <= 768) {
+      sidebarVisible.value = false;
     }
-  }
-  
-  loading.value = false;
-  
-  // ✅ CERRAR SIDEBAR EN MÓVIL para mejor UX
-  if (window.innerWidth <= 768) {
-    sidebarVisible.value = false;
+  } catch (error) {
+    console.error('Error seleccionando género:', error);
+    loading.value = false;
   }
 };
 
 const logout = () => {
-  if (adInterval) {
-    clearInterval(adInterval);
-    adInterval = null;
+  try {
+    if (adInterval) {
+      clearInterval(adInterval);
+      adInterval = null;
+    }
+    
+    authStore?.logout();
+    router.push('/login');
+  } catch (error) {
+    console.error('Error en logout:', error);
   }
-  
-  authStore.logout();
-  router.push('/login');
 };
 
 const startAdInterval = () => {
-  if (adInterval) {
-    clearInterval(adInterval);
+  try {
+    if (adInterval) {
+      clearInterval(adInterval);
+    }
+    
+    adInterval = setInterval(() => {
+      Swal.fire({
+        title: "Hazte Premium!",
+        text: "Disfruta de música sin anuncios y accede a contenido exclusivo.",
+        icon: "info",
+        confirmButtonText: "Ver planes",
+        confirmButtonColor: "#ff5100",
+        showCancelButton: true,
+        cancelButtonText: "Cerrar",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          router.push('/premium');
+        }
+      });
+    }, 60000);
+  } catch (error) {
+    console.error('Error iniciando anuncios:', error);
   }
-  
-  adInterval = setInterval(() => {
-    Swal.fire({
-      title: "Hazte Premium!",
-      text: "Disfruta de música sin anuncios y accede a contenido exclusivo.",
-      icon: "info",
-      confirmButtonText: "Ver planes",
-      confirmButtonColor: "#ff5100",
-      showCancelButton: true,
-      cancelButtonText: "Cerrar",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        router.push('/premium');
-      }
-    });
-  }, 60000);
 };
 
-onMounted(async () => {
-  authStore.loadUserFromStorage();
-  
-  await Promise.all([
-    cancionesStore.fetchCanciones(),
-    artistaStore.fetchAllArtists()
-  ]);
-  
-  sidebarVisible.value = window.innerWidth > 768;
-  
-  if (!isPremium.value && isAuthenticated.value) {
-    startAdInterval();
-  }
-  
-  // Event listener para cerrar resultados de búsqueda al hacer click fuera
-  document.addEventListener('click', (event) => {
-    const searchContainer = document.querySelector('.menu-search-container');
-    if (searchContainer && !searchContainer.contains(event.target)) {
-      closeSearchResults();
+// ✅ WATCH PARA SINCRONIZAR VIDEO URL
+watch(() => playerStore.currentSong, (newSong) => {
+  if (newSong?.videoUrl) {
+    console.log('🎬 Sincronizando video URL:', newSong.videoUrl);
+    if (playerStore.setCurrentVideoUrl) {
+      playerStore.setCurrentVideoUrl(newSong.videoUrl);
+    } else {
+      playerStore.currentVideoUrl = newSong.videoUrl;
     }
-  });
-});
+  }
+}, { deep: true });
 
-watchEffect(() => {
-  if (authStore.isPremium && adInterval) {
-    clearInterval(adInterval);
-    adInterval = null;
-    console.log("🚀 Usuario es premium. Anuncios desactivados.");
-  } else if (!authStore.isPremium && isAuthenticated.value) {
-    startAdInterval();
+// Lifecycle hooks seguros
+onMounted(async () => {
+  try {
+    // Cargar datos de forma segura
+    if (authStore?.loadUserFromStorage) {
+      authStore.loadUserFromStorage();
+    }
+    
+    // Cargar canciones
+    if (cancionesStore?.fetchCanciones) {
+      try {
+        await cancionesStore.fetchCanciones();
+        console.log('✅ Canciones cargadas:', cancionesStore.canciones?.length || 0);
+        
+        // ✅ VERIFICAR ESTRUCTURA DE DATOS
+        if (cancionesStore.canciones && cancionesStore.canciones.length > 0) {
+          const firstSong = cancionesStore.canciones[0];
+          console.log('🎵 Primera canción estructura:', {
+            nombre: firstSong.nombre,
+            videoUrl: firstSong.videoUrl,
+            video: firstSong.video,
+            videoclip: firstSong.videoclip,
+            propiedades: Object.keys(firstSong)
+          });
+        }
+      } catch (error) {
+        console.warn('Error cargando canciones:', error);
+      }
+    }
+    
+    // Cargar artistas
+    if (artistaStore?.fetchAllArtists) {
+      try {
+        await artistaStore.fetchAllArtists();
+      } catch (error) {
+        console.warn('Error cargando artistas:', error);
+      }
+    }
+    
+    // Configurar sidebar
+    sidebarVisible.value = window.innerWidth > 768;
+    
+    // Iniciar anuncios si es necesario
+    if (!isPremium.value && isAuthenticated.value) {
+      startAdInterval();
+    }
+    
+    // Event listener para cerrar búsqueda
+    const handleClickOutside = (event) => {
+      const searchContainer = document.querySelector('.menu-search-container');
+      if (searchContainer && !searchContainer.contains(event.target)) {
+        closeSearchResults();
+      }
+    };
+    
+    document.addEventListener('click', handleClickOutside);
+    
+    // Cleanup en unmount
+    onUnmounted(() => {
+      document.removeEventListener('click', handleClickOutside);
+    });
+    
+  } catch (error) {
+    console.error('Error en onMounted:', error);
   }
 });
 
 onUnmounted(() => {
-  if (adInterval) {
-    clearInterval(adInterval);
-  }
-  if (searchTimeout) {
-    clearTimeout(searchTimeout);
+  try {
+    if (adInterval) {
+      clearInterval(adInterval);
+      adInterval = null;
+    }
+    if (searchTimeout) {
+      clearTimeout(searchTimeout);
+      searchTimeout = null;
+    }
+  } catch (error) {
+    console.error('Error en onUnmounted:', error);
   }
 });
 </script>
@@ -449,11 +489,20 @@ onUnmounted(() => {
 <template>
   <div class="app-container">
     <div class="app">
+      <!-- Botón de menú móvil -->
+      <div class="menu-toggle" @click="toggleSidebar">
+        <div class="menu-icon">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </div>
+      
       <!-- Sidebar -->
       <aside class="sidebar" :class="{ 'visible': sidebarVisible }">
-        <div class="logo">HIBIKI</div>
+        <div class="logo">HIBIKI MUSIC</div>
         <nav class="menu">
-          <!-- Buscador mejorado -->
+          <!-- Buscador -->
           <div class="menu-search-container">
             <div class="search-header">
               <div class="menu-search">
@@ -468,9 +517,7 @@ onUnmounted(() => {
                 <button v-if="searchQuery" @click="clearSearch" class="clear-search-btn">✕</button>
               </div>
               <div class="search-buttons">
-                <button @click="searchWithButton" class="search-btn" title="Buscar">
-                  🔍
-                </button>
+                <button @click="searchWithButton" class="search-btn" title="Buscar">🔍</button>
                 <button @click="toggleFilters" class="filters-toggle" :class="{ active: showFilters }" title="Filtros">
                   🎵
                   <span v-if="hasActiveFilters" class="filter-indicator">●</span>
@@ -478,7 +525,7 @@ onUnmounted(() => {
               </div>
             </div>
             
-            <!-- Panel de filtros mejorado -->
+            <!-- Panel de filtros -->
             <div v-if="showFilters" class="filters-panel">
               <div class="filter-section">
                 <div class="filter-header">
@@ -517,18 +564,15 @@ onUnmounted(() => {
               </div>
             </div>
             
-            <!-- Resultados de búsqueda mejorados -->
+            <!-- Resultados de búsqueda -->
             <div v-if="showSearchResults" class="search-results">
-              <!-- Loading -->
               <div v-if="loading" class="search-loading">
                 <div class="spinner"></div>
                 <p>Buscando...</p>
               </div>
               
-              <!-- Estadísticas de resultados MEJORADAS -->
               <div v-if="!loading && resultStats.total > 0" class="search-stats">
                 <div class="stats-header">
-                  <!-- ✅ MOSTRAR GÉNERO SELECCIONADO de forma prominente -->
                   <h3 v-if="selectedGenero && !searchQuery" class="genre-title">
                     {{ generos.find(g => g.generoId == selectedGenero)?.icono }} 
                     {{ generos.find(g => g.generoId == selectedGenero)?.nombre }}
@@ -541,10 +585,8 @@ onUnmounted(() => {
                   <span v-if="resultStats.canciones > 0">🎵 {{ resultStats.canciones }} canciones</span>
                   <span v-if="resultStats.artistas > 0">👤 {{ resultStats.artistas }} artistas</span>
                 </div>
-                <!-- MEJORADO: Mostrar filtros activos con estilo especial para géneros -->
                 <div v-if="hasActiveFilters" class="active-filters">
                   <small>
-                    <!-- Mostrar género con estilo especial -->
                     <span v-if="selectedGenero" class="genre-filter-badge" 
                           :style="{ 
                             backgroundColor: generos.find(g => g.generoId == selectedGenero)?.color + '20',
@@ -560,7 +602,6 @@ onUnmounted(() => {
                 </div>
               </div>
               
-              <!-- Lista de resultados sin límite -->
               <div class="search-results-list">
                 <div v-if="!loading && filteredResults.length === 0" class="no-results">
                   <div class="no-results-icon">🔍</div>
@@ -571,7 +612,6 @@ onUnmounted(() => {
                   <small v-else>Intenta con otros términos de búsqueda</small>
                 </div>
                 
-                <!-- Mostrar TODOS los resultados sin límite -->
                 <div 
                   v-for="result in filteredResults" 
                   :key="`${result.type}-${result.id}`"
@@ -600,7 +640,7 @@ onUnmounted(() => {
               </div>
             </div>
             
-            <!-- Géneros con toggle mejorado y alineado -->
+            <!-- Géneros musicales -->
             <div v-if="!searchQuery && !showSearchResults" class="genre-section">
               <div class="genre-header">
                 <h4>🎨 Explorar géneros</h4>
@@ -629,18 +669,17 @@ onUnmounted(() => {
             </div>
           </div>
           
-          <!-- Enlaces de navegación alineados -->
+          <!-- Enlaces de navegación -->
           <div class="navigation-menu">
-            <!-- Mostrar Inicio solo si no es premium o no está autenticado -->
-            <router-link v-if="!isPremium || !isAuthenticated" to="/inicio" class="menu-item" active-class="active" @click="sidebarVisible = false"> Inicio</router-link>
-            <router-link to="/novedades" class="menu-item" active-class="active" @click="sidebarVisible = false"> Novedades</router-link>
+            <router-link v-if="!isPremium || !isAuthenticated" to="/inicio" class="menu-item" active-class="active" @click="sidebarVisible = false">🏠 Home</router-link>
+            <router-link to="/novedades" class="menu-item" active-class="active" @click="sidebarVisible = false">🔥 News</router-link>
             
             <div v-if="isAuthenticated">
-              <router-link to="/artista" class="menu-item" active-class="active" @click="sidebarVisible = false"> Artistas</router-link>
-              <router-link to="/playlist" class="menu-item" active-class="active" @click="sidebarVisible = false"> Playlists</router-link>
-              <router-link to="/premium" class="menu-item" active-class="active" @click="sidebarVisible = false"> Premium</router-link>
-              <router-link to="/conciertos" class="menu-item" active-class="active" @click="sidebarVisible = false">Concerts</router-link>
-<router-link to="/descarga" class="menu-item" active-class="active" @click="sidebarVisible = false">Download</router-link>
+              <router-link to="/artista" class="menu-item" active-class="active" @click="sidebarVisible = false">👤 Artists</router-link>
+              <router-link to="/playlist" class="menu-item" active-class="active" @click="sidebarVisible = false">📋 Playlists</router-link>
+              <router-link to="/premium" class="menu-item" active-class="active" @click="sidebarVisible = false">⭐ Premium</router-link>
+              <router-link to="/conciertos" class="menu-item" active-class="active" @click="sidebarVisible = false">🎤 Concerts</router-link>
+              <router-link to="/descarga" class="menu-item" active-class="active" @click="sidebarVisible = false">📥 Download</router-link>
             </div>
           </div>
         </nav>
@@ -650,16 +689,7 @@ onUnmounted(() => {
         </div>
       </aside>
       
-      <!-- Mobile Menu Toggle Button -->
-      <div class="menu-toggle" @click="toggleSidebar">
-        <div class="menu-icon">
-          <span></span>
-          <span></span>
-          <span></span>
-        </div>
-      </div>
-      
-      <!-- Componente de perfil de usuario -->
+      <!-- Componente de perfil -->
       <div class="profile-container-p">
         <Perfil />
       </div>
@@ -669,9 +699,9 @@ onUnmounted(() => {
       </main>
     </div>
     
-    <!-- Reproductor de música -->
+    <!-- Reproductores -->
     <MusicPlayer :songs="allSongs" />
-    <VideoPlayer :song="allSongs" />
+    <VideoPlayer />
   </div>
 </template>
 
@@ -746,7 +776,6 @@ onUnmounted(() => {
   position: relative;
 }
 
-/* ESTILOS DEL BUSCADOR SÚPER MEJORADO */
 .menu-search-container {
   position: relative;
   width: 100%;
@@ -835,7 +864,6 @@ onUnmounted(() => {
   transform: scale(1.1);
 }
 
-/* SOLO mostrar el punto verde cuando hay filtros activos - SIN punto gris */
 .filter-indicator {
   position: absolute;
   top: -3px;
@@ -854,7 +882,6 @@ onUnmounted(() => {
   50% { opacity: 0.5; }
 }
 
-/* PANEL DE FILTROS MEJORADO */
 .filters-panel {
   background: linear-gradient(135deg, #333, #2a2a2a);
   border-radius: 12px;
@@ -922,7 +949,6 @@ onUnmounted(() => {
   color: #ff5100;
 }
 
-/* RESULTADOS DE BÚSQUEDA MEJORADOS */
 .search-results {
   background: linear-gradient(135deg, #222, #1a1a1a);
   border-radius: 12px;
@@ -955,7 +981,6 @@ onUnmounted(() => {
   100% { transform: rotate(360deg); }
 }
 
-/* NUEVOS ESTILOS para la visualización de géneros seleccionados */
 .genre-title {
   display: flex;
   align-items: center;
@@ -996,7 +1021,6 @@ onUnmounted(() => {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
-/* ESTILOS EXISTENTES MEJORADOS */
 .search-stats {
   padding: 12px 16px;
   border-bottom: 1px solid #333;
@@ -1037,7 +1061,6 @@ onUnmounted(() => {
   color: #ccc;
 }
 
-/* NUEVO: Estilos para filtros activos */
 .active-filters {
   margin-top: 4px;
   padding-top: 4px;
@@ -1198,7 +1221,6 @@ onUnmounted(() => {
   color: #ff8c00;
 }
 
-/* GÉNEROS MEJORADOS Y ALINEADOS */
 .genre-section {
   margin-bottom: 16px;
   padding: 0;
@@ -1236,7 +1258,6 @@ onUnmounted(() => {
   background: rgba(255, 81, 0, 0.1);
 }
 
-/* CONTENEDOR DE NAVEGACIÓN ALINEADO */
 .navigation-menu {
   margin-top: 0;
   padding-top: 0;
@@ -1387,7 +1408,6 @@ onUnmounted(() => {
   top: 16px;
 }
 
-/* Scrollbar personalizado */
 .search-results::-webkit-scrollbar,
 .sidebar::-webkit-scrollbar {
   width: 6px;
@@ -1454,6 +1474,25 @@ onUnmounted(() => {
   
   .menu-search {
     width: 100%;
+  }
+  
+  .app:after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+  }
+  
+  .sidebar.visible ~ .app:after {
+    opacity: 1;
+    visibility: visible;
   }
 }
 </style>
