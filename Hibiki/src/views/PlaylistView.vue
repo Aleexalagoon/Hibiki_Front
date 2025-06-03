@@ -1,16 +1,16 @@
 <template>
   <div class="playlist-page">
-    <!-- Error de conexión global -->
+    <!-- Global connection error -->
     <div v-if="connectionError" class="connection-error">
       <div class="error-content">
-        <h3>⚠️ Error de Conexión</h3>
+        <h3>⚠️ Connection Error</h3>
         <p>{{ connectionError }}</p>
         <div class="error-actions">
           <button @click="retryConnection" class="retry-btn" :disabled="loading">
-            {{ loading ? 'Conectando...' : 'Reintentar conexión' }}
+            {{ loading ? 'Connecting...' : 'Retry connection' }}
           </button>
           <button @click="checkBackendStatus" class="check-btn">
-            Verificar estado del servidor
+            Check server status
           </button>
         </div>
       </div>
@@ -18,24 +18,24 @@
 
     <div v-else class="main-container">
       <div class="playlists-list">
-        <h2>Mis Playlists</h2>
+        <h2>My Playlists</h2>
         
         <!-- Loading state -->
         <div v-if="loading" class="loading-state">
           <div class="loading-spinner"></div>
-          <p>Cargando playlists...</p>
+          <p>Loading playlists...</p>
         </div>
         
         <!-- Error state -->
         <div v-else-if="error" class="error-state">
           <p class="error">{{ error }}</p>
-          <button @click="fetchPlaylists" class="retry-btn">Reintentar</button>
+          <button @click="fetchPlaylists" class="retry-btn">Retry</button>
         </div>
         
         <!-- Empty state -->
         <div v-else-if="allPlaylists.length === 0" class="empty-state">
-          <p>No tienes playlists aún</p>
-          <button @click="createNewPlaylist" class="create-btn">Crear mi primera playlist</button>
+          <p>You don't have any playlists yet</p>
+          <button @click="createNewPlaylist" class="create-btn">Create my first playlist</button>
         </div>
         
         <!-- Playlists list -->
@@ -55,14 +55,14 @@
             />
             <div class="playlist-info">
               <h3>{{ playlist.nombre }}</h3>
-              <p class="song-count">{{ playlist.canciones?.length || 0 }} canciones</p>
+              <p class="song-count">{{ playlist.canciones?.length || 0 }} songs</p>
             </div>
           </div>
         </div>
         
         <!-- Create new playlist button -->
         <button @click="createNewPlaylist" class="create-playlist-btn">
-          + Nueva Playlist
+          + New Playlist
         </button>
       </div>
 
@@ -83,9 +83,9 @@
               </p>
               <div class="playlist-stats">
                 <span v-if="selectedPlaylist.creador">
-                  Por {{ selectedPlaylist.creador.name || 'Usuario desconocido' }}
+                  By {{ selectedPlaylist.creador.name || 'Unknown user' }}
                 </span>
-                <span>{{ selectedPlaylist.canciones?.length || 0 }} canciones</span>
+                <span>{{ selectedPlaylist.canciones?.length || 0 }} songs</span>
                 <span>{{ formatDuration(getTotalDuration()) }}</span>
               </div>
             </div>
@@ -98,33 +98,33 @@
               class="play-btn"
               :disabled="!selectedPlaylist.canciones || selectedPlaylist.canciones.length === 0"
             >
-              ▶️ Reproducir
+              ▶ Play
             </button>
             
-            <!-- 🆕 BOTÓN AGREGAR SIEMPRE VISIBLE -->
+            <!-- 🆕 ADD BUTTON ALWAYS VISIBLE -->
             <button @click="addSongsToPlaylist" class="add-songs-control-btn">
-              ➕ Agregar canciones
+              ✚ Add songs
             </button>
             
             <button @click="editPlaylist" class="edit-btn">
-              ✏️ Editar
+              ✎ Edit
             </button>
             <button @click="deletePlaylist" class="delete-btn">
-              🗑️ Eliminar
+              ✘ Delete
             </button>
           </div>
 
           <!-- Songs list -->
           <div class="songs-section">
             <div class="songs-header">
-              <h2>Canciones</h2>
-              <!-- 🆕 BOTÓN ADICIONAL EN EL HEADER -->
+              <h2>Songs</h2>
+              <!-- 🆕 ADDITIONAL BUTTON IN HEADER -->
               <button 
                 v-if="selectedPlaylist.canciones && selectedPlaylist.canciones.length > 0"
                 @click="addSongsToPlaylist" 
                 class="add-songs-header-btn"
               >
-                ➕ Más canciones
+                ✚ More songs
               </button>
             </div>
             
@@ -152,20 +152,20 @@
                 <button 
                   @click.stop="removeSongFromPlaylist(song.cancionId)"
                   class="remove-song-btn"
-                  title="Eliminar de la playlist"
+                  title="Remove from playlist"
                 >
                   ✕
                 </button>
               </div>
             </div>
             
-            <!-- 🔄 ESTADO VACÍO MEJORADO -->
+            <!-- 🔄 IMPROVED EMPTY STATE -->
             <div v-else class="empty-playlist">
-              <div class="empty-playlist-icon">🎵</div>
-              <h3>Esta playlist está vacía</h3>
-              <p>Comienza agregando algunas canciones para escuchar</p>
+              <div class="empty-playlist-icon">♬</div>
+              <h3>This playlist is empty</h3>
+              <p>Start by adding some songs to listen to</p>
               <button @click="addSongsToPlaylist" class="add-songs-btn-large">
-                ➕ Agregar canciones
+                ✚ Add songs
               </button>
             </div>
           </div>
@@ -173,19 +173,19 @@
         
         <!-- Default state when no playlist is selected -->
         <div v-else class="no-selection">
-          <h2>Selecciona una playlist</h2>
-          <p>Elige una playlist de la lista para ver sus detalles y canciones.</p>
+          <h2>Select a playlist</h2>
+          <p>Choose a playlist from the list to view its details and songs.</p>
         </div>
       </div>
     </div>
 
-    <!-- Modal para crear/editar playlist -->
+    <!-- Modal for create/edit playlist -->
     <div v-if="showModal" class="modal-overlay" @click="closeModal">
       <div class="modal" @click.stop>
-        <h3>{{ isEditing ? 'Editar Playlist' : 'Nueva Playlist' }}</h3>
+        <h3>{{ isEditing ? 'Edit Playlist' : 'New Playlist' }}</h3>
         <form @submit.prevent="savePlaylist">
           <div class="form-group">
-            <label for="nombre">Nombre:</label>
+            <label for="nombre">Name:</label>
             <input 
               type="text" 
               id="nombre"
@@ -195,7 +195,7 @@
             />
           </div>
           <div class="form-group">
-            <label for="descripcion">Descripción:</label>
+            <label for="descripcion">Description:</label>
             <textarea 
               id="descripcion"
               v-model="modalData.descripcion" 
@@ -204,38 +204,38 @@
             ></textarea>
           </div>
           <div class="form-group">
-            <label for="image">URL de imagen:</label>
+            <label for="image">Image URL:</label>
             <input 
               type="url" 
               id="image"
               v-model="modalData.image" 
-              placeholder="https://ejemplo.com/imagen.jpg"
+              placeholder="https://example.com/image.jpg"
             />
           </div>
           <div class="modal-actions">
             <button type="button" @click="closeModal" class="cancel-btn">
-              Cancelar
+              Cancel
             </button>
             <button type="submit" class="save-btn" :disabled="!modalData.nombre.trim()">
-              {{ isEditing ? 'Guardar cambios' : 'Crear playlist' }}
+              {{ isEditing ? 'Save changes' : 'Create playlist' }}
             </button>
           </div>
         </form>
       </div>
     </div>
 
-    <!-- Modal para agregar canciones -->
+    <!-- Modal for adding songs -->
     <div v-if="showAddSongsModal" class="modal-overlay" @click="closeAddSongsModal">
       <div class="modal add-songs-modal" @click.stop>
-        <h3>Agregar canciones a "{{ selectedPlaylist?.nombre }}"</h3>
+        <h3>Add songs to "{{ selectedPlaylist?.nombre }}"</h3>
         
-        <!-- Búsqueda de canciones -->
+        <!-- Song search -->
         <div class="search-section">
           <div class="search-bar">
             <input 
               type="text" 
               v-model="songSearchQuery" 
-              placeholder="Buscar canciones por nombre o artista..."
+              placeholder="Search songs by name or artist..."
               @input="searchSongs"
               class="search-input"
             />
@@ -243,15 +243,15 @@
           </div>
         </div>
 
-        <!-- Loading de búsqueda -->
+        <!-- Search loading -->
         <div v-if="searchLoading" class="search-loading">
           <div class="loading-spinner"></div>
-          <p>Buscando canciones...</p>
+          <p>Searching songs...</p>
         </div>
 
-        <!-- Resultados de búsqueda -->
+        <!-- Search results -->
         <div v-else-if="availableSongs.length > 0" class="songs-results">
-          <h4>Canciones disponibles ({{ availableSongs.length }})</h4>
+          <h4>Available songs ({{ availableSongs.length }})</h4>
           <div class="songs-grid">
             <div 
               v-for="song in availableSongs" 
@@ -275,34 +275,34 @@
                 :disabled="isSongInPlaylist(song.cancionId) || addingSong === song.cancionId"
                 class="add-song-btn"
               >
-                <span v-if="addingSong === song.cancionId">⏳</span>
-                <span v-else-if="isSongInPlaylist(song.cancionId)">✅</span>
-                <span v-else>➕</span>
+                <span v-if="addingSong === song.cancionId">⟲</span>
+                <span v-else-if="isSongInPlaylist(song.cancionId)">✔</span>
+                <span v-else>✚</span>
               </button>
             </div>
           </div>
         </div>
 
-        <!-- Estado vacío -->
+        <!-- Empty state -->
         <div v-else-if="songSearchQuery && !searchLoading" class="empty-search">
-          <p>No se encontraron canciones para "{{ songSearchQuery }}"</p>
+          <p>No songs found for "{{ songSearchQuery }}"</p>
           <button @click="loadAllSongs" class="load-all-btn">
-            Mostrar todas las canciones
+            Show all songs
           </button>
         </div>
 
-        <!-- Estado inicial -->
+        <!-- Initial state -->
         <div v-else class="initial-state">
-          <p>Busca canciones por nombre o artista, o</p>
+          <p>Search for songs by name or artist, or</p>
           <button @click="loadAllSongs" class="load-all-btn">
-            Mostrar todas las canciones disponibles
+            Show all available songs
           </button>
         </div>
 
-        <!-- Acciones del modal -->
+        <!-- Modal actions -->
         <div class="modal-actions">
           <button @click="closeAddSongsModal" class="cancel-btn">
-            Cerrar
+            Close
           </button>
         </div>
       </div>

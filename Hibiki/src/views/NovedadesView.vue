@@ -138,7 +138,7 @@ export default {
           label: 'UPDATED PLAYLIST',
           title: 'Daily highlights',
           subtitle: 'Hibiki Music',
-          image: 'https://www.clarin.com/img/2023/04/27/ebOFOAW8i_2000x1500__1.jpg',
+          image: 'https://is1-ssl.mzstatic.com/image/thumb/AMCArtistImages221/v4/04/11/76/041176c7-49db-77ea-59c2-18d4b08810a0/ami-identity-6398293bdcd4d3678c157c96d018c22f-2025-05-21T17-33-43.914Z_cropped.png/486x486bb.png',
           description: 'The freshest hits just released.'
         },
      {
