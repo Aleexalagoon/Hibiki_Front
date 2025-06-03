@@ -26,16 +26,16 @@ const tipoResultado = ref('todos');
 
 // Géneros estáticos para evitar reactividad innecesaria
 const generos = [
-  { generoId: 1, nombre: 'Reggaeton', icono: '🔥', color: '#FF5100', descripcion: 'Música latina urbana' },
-  { generoId: 2, nombre: 'Pop', icono: '✨', color: '#FF8C00', descripcion: 'Música popular' },
-  { generoId: 3, nombre: 'Trap', icono: '💎', color: '#FF6B35', descripcion: 'Hip hop urbano' },
-  { generoId: 4, nombre: 'Hip Hop', icono: '🎯', color: '#FF4500', descripcion: 'Rap y cultura urbana' },
-  { generoId: 5, nombre: 'R&B', icono: '🌙', color: '#CC4400', descripcion: 'Rhythm and Blues' },
-  { generoId: 6, nombre: 'Electrónica', icono: '⚡', color: '#FF7F00', descripcion: 'EDM y electrónica' },
-  { generoId: 7, nombre: 'Rock', icono: '🤘', color: '#B8460E', descripcion: 'Rock y metal' },
-  { generoId: 8, nombre: 'Indie', icono: '🌆', color: '#D2691E', descripcion: 'Música independiente' },
-  { generoId: 9, nombre: 'Jazz', icono: '🎺', color: '#A0522D', descripcion: 'Jazz clásico' },
-  { generoId: 10, nombre: 'Folk', icono: '🍂', color: '#8B4513', descripcion: 'Música folk' }
+  { generoId: 1, nombre: 'Reggaeton', icono: '', color: '#FF5100', descripcion: 'Música latina urbana' },
+  { generoId: 2, nombre: 'Pop', icono: '', color: '#FF5100', descripcion: 'Música popular' },
+  { generoId: 3, nombre: 'Trap', icono: '', color: '#FF5100', descripcion: 'Hip hop urbano' },
+  { generoId: 4, nombre: 'Hip Hop', icono: '', color: '#FF5100', descripcion: 'Rap y cultura urbana' },
+  { generoId: 5, nombre: 'R&B', icono: '', color: '#FF5100', descripcion: 'Rhythm and Blues' },
+  { generoId: 6, nombre: 'Electrónica', icono: '', color: '#FF5100', descripcion: 'EDM y electrónica' },
+  { generoId: 7, nombre: 'Rock', icono: '', color: '#FF5100', descripcion: 'Rock y metal' },
+  { generoId: 8, nombre: 'Indie', icono: '', color: '#FF5100', descripcion: 'Música independiente' },
+  { generoId: 9, nombre: 'Jazz', icono: '', color: '#FF5100', descripcion: 'Jazz clásico' },
+  { generoId: 10, nombre: 'Folk', icono: '', color: '#FF5100', descripcion: 'Música folk' }
 ];
 
 // Stores
@@ -325,8 +325,8 @@ const selectGenero = (generoId) => {
         return generoCancion == generoId;
       });
       
-      console.log(`🎵 Género seleccionado: ID ${generoId}`);
-      console.log(`🎵 Canciones encontradas: ${cancionesFiltradas.length}`);
+      console.log(`♬ Género seleccionado: ID ${generoId}`);
+      console.log(`♬ Canciones encontradas: ${cancionesFiltradas.length}`);
       
       searchResults.value = cancionesFiltradas.map((song, index) => ({
         type: 'song',
@@ -508,7 +508,7 @@ onUnmounted(() => {
               <div class="menu-search">
                 <input 
                   type="text" 
-                  placeholder="Buscar canciones, artistas..." 
+                  placeholder="Search..." 
                   v-model="searchQuery" 
                   @input="handleSearch"
                   @keyup.enter="searchWithButton"
@@ -517,9 +517,9 @@ onUnmounted(() => {
                 <button v-if="searchQuery" @click="clearSearch" class="clear-search-btn">✕</button>
               </div>
               <div class="search-buttons">
-                <button @click="searchWithButton" class="search-btn" title="Buscar">🔍</button>
+                <button @click="searchWithButton" class="search-btn" title="Buscar">⌕</button>
                 <button @click="toggleFilters" class="filters-toggle" :class="{ active: showFilters }" title="Filtros">
-                  🎵
+                  ♬
                   <span v-if="hasActiveFilters" class="filter-indicator">●</span>
                 </button>
               </div>
@@ -582,7 +582,7 @@ onUnmounted(() => {
                   <button @click="closeSearchResults" class="close-button">✕</button>
                 </div>
                 <div class="stats-breakdown">
-                  <span v-if="resultStats.canciones > 0">🎵 {{ resultStats.canciones }} canciones</span>
+                  <span v-if="resultStats.canciones > 0">♬ {{ resultStats.canciones }} canciones</span>
                   <span v-if="resultStats.artistas > 0">👤 {{ resultStats.artistas }} artistas</span>
                 </div>
                 <div v-if="hasActiveFilters" class="active-filters">
@@ -643,7 +643,7 @@ onUnmounted(() => {
             <!-- Géneros musicales -->
             <div v-if="!searchQuery && !showSearchResults" class="genre-section">
               <div class="genre-header">
-                <h4>🎨 Explorar géneros</h4>
+                <h4>Explore Genres</h4>
                 <button @click="toggleGenres" class="toggle-genres-btn" :class="{ active: showGenres }">
                   {{ showGenres ? '▼' : '▶' }}
                 </button>
@@ -671,15 +671,13 @@ onUnmounted(() => {
           
           <!-- Enlaces de navegación -->
           <div class="navigation-menu">
-            <router-link v-if="!isPremium || !isAuthenticated" to="/inicio" class="menu-item" active-class="active" @click="sidebarVisible = false">🏠 Home</router-link>
-            <router-link to="/novedades" class="menu-item" active-class="active" @click="sidebarVisible = false">🔥 News</router-link>
-            
+            <router-link v-if="!isPremium || !isAuthenticated" to="/inicio" class="menu-item" active-class="active" @click="sidebarVisible = false">Home</router-link>
+            <router-link to="/novedades" class="menu-item" active-class="active" @click="sidebarVisible = false">News</router-link>
             <div v-if="isAuthenticated">
-              <router-link to="/artista" class="menu-item" active-class="active" @click="sidebarVisible = false">👤 Artists</router-link>
-              <router-link to="/playlist" class="menu-item" active-class="active" @click="sidebarVisible = false">📋 Playlists</router-link>
-              <router-link to="/premium" class="menu-item" active-class="active" @click="sidebarVisible = false">⭐ Premium</router-link>
-              <router-link to="/conciertos" class="menu-item" active-class="active" @click="sidebarVisible = false">🎤 Concerts</router-link>
-              <router-link to="/descarga" class="menu-item" active-class="active" @click="sidebarVisible = false">📥 Download</router-link>
+              <router-link to="/artista" class="menu-item" active-class="active" @click="sidebarVisible = false">Artists</router-link>
+              <router-link to="/playlist" class="menu-item" active-class="active" @click="sidebarVisible = false">Playlists</router-link>
+              <router-link to="/premium" class="menu-item" active-class="active" @click="sidebarVisible = false">Premium</router-link>
+              <router-link to="/conciertos" class="menu-item" active-class="active" @click="sidebarVisible = false">Concerts</router-link>
             </div>
           </div>
         </nav>
