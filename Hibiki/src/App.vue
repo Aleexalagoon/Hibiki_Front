@@ -6,6 +6,7 @@ import { usePlayerStore } from '@/stores/player';
 import { useCancionesStore } from '@/stores/cancionesStore';
 import { useArtistaStore } from '@/stores/artistaStore';
 import MusicPlayer from '@/components/MusicPlayer.vue';
+import VideoPlayer from '@/components/VideoPlayer.vue';
 import Swal from 'sweetalert2';
 import Perfil from '@/components/Perfil.vue';
 
@@ -670,6 +671,7 @@ onUnmounted(() => {
     
     <!-- Reproductor de música -->
     <MusicPlayer :songs="allSongs" />
+    <VideoPlayer :song="allSongs" />
   </div>
 </template>
 
