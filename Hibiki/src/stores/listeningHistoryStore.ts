@@ -1,355 +1,346 @@
 // src/stores/listeningHistoryStore.ts
-import { defineStore } from 'pinia';
+import { defineStore } from 'pinia'
 
 interface PlayRecord {
-  id: string;
-  cancionId: number;
-  cantanteId: number;
-  albumId?: number;
-  timestamp: number;
-  duration: number; // duración que se escuchó en segundos
-  totalDuration: number; // duración total de la canción
-  completed: boolean; // si se escuchó más del 80%
-  sessionId: string;
-}
-
-interface SongStats {
-  cancionId: number;
-  nombre: string;
-  artista: string;
-  cantanteId: number;
-  image: string;
-  duracion: string;
-  playCount: number;
-  totalListenTime: number; // tiempo total escuchado en segundos
-  lastPlayed: number;
-  completionRate: number; // porcentaje promedio de completación
+  id: string
+  cancionId: number
+  cantanteId: number
+  albumId?: number
+  songName: string
+  artistName: string
+  image?: string
+  timestamp: number
+  duration: number
+  totalDuration: number
+  completed: boolean
 }
 
 interface ArtistStats {
-  cantanteId: number;
-  nombre: string;
-  image: string;
-  oyentesMensuales: number;
-  playCount: number;
-  totalListenTime: number;
-  uniqueSongs: number;
-  lastPlayed: number;
+  cantanteId: number
+  nombre: string
+  image?: string
+  playCount: number
+  totalListenTime: number
+  uniqueSongs: number
+  lastPlayed: number
 }
 
-const API_BASE_URL = "http://aa0918044ca2b4e9b94f01593a2e67bf-1447626218.us-east-1.elb.amazonaws.com/api";
+interface SongStats {
+  cancionId: number
+  nombre: string
+  artista: string
+  image?: string
+  duracion: string
+  cantanteId: number
+  albumId?: number
+  playCount: number
+  totalListenTime: number
+  completionRate: number
+  lastPlayed: number
+}
+
+interface ListeningStats {
+  totalPlayTime: number
+  songsPlayed: number
+  uniqueSongs: number
+  uniqueArtists: number
+  averageSessionTime: number
+}
 
 export const useListeningHistoryStore = defineStore('listeningHistory', {
   state: () => ({
     playHistory: [] as PlayRecord[],
-    topSongs: [] as SongStats[],
-    topArtists: [] as ArtistStats[],
-    currentSession: '',
-    currentPlay: null as PlayRecord | null,
-    startTime: 0,
+    monthlyData: {
+      startDate: new Date().setDate(1),
+      endDate: new Date()
+    },
     isTracking: false,
+    currentTrackStart: null as number | null,
+    lastSaveTime: Date.now()
   }),
 
   getters: {
-    // Top 10 canciones más escuchadas del último mes
-    monthlyTopSongs: (state) => {
-      const oneMonthAgo = Date.now() - (30 * 24 * 60 * 60 * 1000);
-      return state.topSongs
-        .filter(song => song.lastPlayed > oneMonthAgo)
-        .sort((a, b) => {
-          // Priorizar por play count, luego por tiempo total escuchado
-          if (b.playCount === a.playCount) {
-            return b.totalListenTime - a.totalListenTime;
-          }
-          return b.playCount - a.playCount;
-        })
-        .slice(0, 10);
-    },
-
-    // Top 6 artistas más escuchados del último mes
-    monthlyTopArtists: (state) => {
-      const oneMonthAgo = Date.now() - (30 * 24 * 60 * 60 * 1000);
-      return state.topArtists
-        .filter(artist => artist.lastPlayed > oneMonthAgo)
-        .sort((a, b) => {
-          // Priorizar por tiempo total, luego por variedad de canciones
-          if (Math.abs(b.totalListenTime - a.totalListenTime) < 600) { // si la diferencia es menor a 10 min
-            return b.uniqueSongs - a.uniqueSongs;
-          }
-          return b.totalListenTime - a.totalListenTime;
-        })
-        .slice(0, 6);
-    },
-
-    // Estadísticas generales
-    listeningStats: (state) => {
-      const oneMonthAgo = Date.now() - (30 * 24 * 60 * 60 * 1000);
-      const monthlyPlays = state.playHistory.filter(play => play.timestamp > oneMonthAgo);
+    // Obtener historial del mes actual
+    currentMonthHistory: (state): PlayRecord[] => {
+      const now = new Date()
+      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).getTime()
       
-      const totalTime = monthlyPlays.reduce((sum, play) => sum + play.duration, 0);
-      const uniqueSongs = new Set(monthlyPlays.map(play => play.cancionId)).size;
-      const uniqueArtists = new Set(monthlyPlays.map(play => play.cantanteId)).size;
+      return state.playHistory.filter(record => 
+        record.timestamp >= startOfMonth
+      )
+    },
+
+    // Top artistas del mes
+    monthlyTopArtists(): ArtistStats[] {
+      const artistMap = new Map<number, ArtistStats>()
+      
+      this.currentMonthHistory.forEach(record => {
+        if (!record.cantanteId) return
+        
+        const existing = artistMap.get(record.cantanteId)
+        if (existing) {
+          existing.playCount++
+          existing.totalListenTime += record.duration
+          existing.lastPlayed = Math.max(existing.lastPlayed, record.timestamp)
+          // Track unique songs
+          const songs = new Set([...Array(existing.uniqueSongs)])
+          songs.add(record.cancionId)
+          existing.uniqueSongs = songs.size
+        } else {
+          artistMap.set(record.cantanteId, {
+            cantanteId: record.cantanteId,
+            nombre: record.artistName || 'Artista desconocido',
+            image: record.image,
+            playCount: 1,
+            totalListenTime: record.duration,
+            uniqueSongs: 1,
+            lastPlayed: record.timestamp
+          })
+        }
+      })
+      
+      return Array.from(artistMap.values())
+        .sort((a, b) => b.totalListenTime - a.totalListenTime)
+        .slice(0, 10)
+    },
+
+    // Top canciones del mes
+    monthlyTopSongs(): SongStats[] {
+      const songMap = new Map<number, SongStats>()
+      
+      this.currentMonthHistory.forEach(record => {
+        if (!record.cancionId) return
+        
+        const existing = songMap.get(record.cancionId)
+        if (existing) {
+          existing.playCount++
+          existing.totalListenTime += record.duration
+          existing.lastPlayed = Math.max(existing.lastPlayed, record.timestamp)
+          
+          // Actualizar completion rate
+          const completions = this.currentMonthHistory.filter(r => 
+            r.cancionId === record.cancionId && r.completed
+          ).length
+          existing.completionRate = (completions / existing.playCount) * 100
+        } else {
+          songMap.set(record.cancionId, {
+            cancionId: record.cancionId,
+            nombre: record.songName || 'Canción desconocida',
+            artista: record.artistName || 'Artista desconocido',
+            image: record.image,
+            duracion: this.formatDuration(record.totalDuration),
+            cantanteId: record.cantanteId,
+            albumId: record.albumId,
+            playCount: 1,
+            totalListenTime: record.duration,
+            completionRate: record.completed ? 100 : 0,
+            lastPlayed: record.timestamp
+          })
+        }
+      })
+      
+      return Array.from(songMap.values())
+        .sort((a, b) => b.playCount - a.playCount)
+        .slice(0, 20)
+    },
+
+    // Estadísticas de escucha
+    listeningStats(): ListeningStats {
+      const history = this.currentMonthHistory
+      
+      const totalPlayTime = Math.round(
+        history.reduce((sum, record) => sum + record.duration, 0) / 3600
+      )
+      
+      const uniqueSongs = new Set(history.map(r => r.cancionId)).size
+      const uniqueArtists = new Set(history.map(r => r.cantanteId)).size
+      
+      // Calcular tiempo promedio de sesión
+      const sessions = this.groupBySessions(history)
+      const avgSessionTime = sessions.length > 0
+        ? Math.round(
+            sessions.reduce((sum, session) => sum + session.duration, 0) / 
+            sessions.length / 60
+          )
+        : 0
       
       return {
-        totalPlayTime: Math.floor(totalTime / 3600), // en horas
-        songsPlayed: monthlyPlays.length,
+        totalPlayTime,
+        songsPlayed: history.length,
         uniqueSongs,
         uniqueArtists,
-        averageSessionTime: monthlyPlays.length > 0 ? Math.floor(totalTime / monthlyPlays.length / 60) : 0 // en minutos
-      };
+        averageSessionTime: avgSessionTime
+      }
     }
   },
 
   actions: {
-    // Inicializar nueva sesión de escucha
-    startListeningSession() {
-      this.currentSession = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    // Inicializar el store
+    async initialize() {
+      this.loadFromLocalStorage()
+      // No inicializar setupPlayerTracking aquí para evitar referencias circulares
     },
 
-    // Comenzar tracking de una canción
-    async startTrackingSong(song: any) {
-      if (!song) return;
-
-      this.isTracking = true;
-      this.startTime = Date.now();
+    // Empezar a trackear una canción (llamado desde el player)
+    startTrackingSong(song: any) {
+      if (!song || !song.cancionId) return
       
-      this.currentPlay = {
-        id: `play_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-        cancionId: song.cancionId || song.id,
-        cantanteId: song.cantanteId || song.artistId,
+      // Si ya estamos trackeando, finalizar la anterior
+      if (this.isTracking) {
+        this.finishTrackingSong()
+      }
+      
+      this.isTracking = true
+      this.currentTrackStart = Date.now()
+      
+      // Guardar información de la canción actual para usarla después
+      this.currentSongInfo = {
+        cancionId: song.cancionId,
+        cantanteId: song.cantanteId || 0,
         albumId: song.albumId,
-        timestamp: Date.now(),
-        duration: 0,
-        totalDuration: this.parseDurationToSeconds(song.duracion || '0:00'),
-        completed: false,
-        sessionId: this.currentSession
-      };
-
-      console.log('🎵 Iniciando tracking de:', song.nombre);
+        songName: song.nombre || 'Canción desconocida',
+        artistName: song.artista || 'Artista desconocido',
+        image: song.image,
+        totalDuration: this.parseDuration(song.duracion),
+        currentTime: 0
+      }
     },
 
-    // Actualizar progreso de la canción actual
+    // Actualizar progreso de reproducción
     updatePlayProgress(currentTime: number, totalDuration: number) {
-      if (!this.currentPlay || !this.isTracking) return;
-
-      const listenedTime = Math.floor((Date.now() - this.startTime) / 1000);
-      this.currentPlay.duration = Math.min(listenedTime, totalDuration);
-      this.currentPlay.totalDuration = totalDuration;
-      
-      // Marcar como completada si se escuchó más del 80%
-      if (currentTime > 0 && totalDuration > 0) {
-        const completionPercentage = currentTime / totalDuration;
-        this.currentPlay.completed = completionPercentage > 0.8;
+      if (this.currentSongInfo) {
+        this.currentSongInfo.currentTime = currentTime
+        if (totalDuration && !this.currentSongInfo.totalDuration) {
+          this.currentSongInfo.totalDuration = Math.floor(totalDuration)
+        }
       }
     },
 
     // Finalizar tracking de la canción actual
-    async finishTrackingSong() {
-      if (!this.currentPlay || !this.isTracking) return;
-
-      const finalDuration = Math.floor((Date.now() - this.startTime) / 1000);
-      this.currentPlay.duration = finalDuration;
-
-      // Solo registrar si se escuchó al menos 30 segundos o 25% de la canción
-      const minTime = Math.min(30, this.currentPlay.totalDuration * 0.25);
+    finishTrackingSong() {
+      if (!this.isTracking || !this.currentTrackStart || !this.currentSongInfo) return
       
-      if (this.currentPlay.duration >= minTime) {
-        this.playHistory.push({ ...this.currentPlay });
-        await this.updateSongStats(this.currentPlay);
-        await this.updateArtistStats(this.currentPlay);
-        this.saveToLocalStorage();
-        
-        console.log('✅ Reproducción registrada:', {
-          duration: this.currentPlay.duration,
-          completed: this.currentPlay.completed
-        });
+      const duration = this.currentSongInfo.currentTime || 
+                      Math.floor((Date.now() - this.currentTrackStart) / 1000)
+      const completed = duration >= (this.currentSongInfo.totalDuration * 0.8) // 80% = completada
+      
+      const record: PlayRecord = {
+        id: `${Date.now()}-${Math.random()}`,
+        cancionId: this.currentSongInfo.cancionId,
+        cantanteId: this.currentSongInfo.cantanteId,
+        albumId: this.currentSongInfo.albumId,
+        songName: this.currentSongInfo.songName,
+        artistName: this.currentSongInfo.artistName,
+        image: this.currentSongInfo.image,
+        timestamp: this.currentTrackStart,
+        duration: Math.floor(duration),
+        totalDuration: this.currentSongInfo.totalDuration,
+        completed
       }
-
-      this.currentPlay = null;
-      this.isTracking = false;
-      this.startTime = 0;
+      
+      this.playHistory.push(record)
+      this.saveToLocalStorage()
+      
+      this.isTracking = false
+      this.currentTrackStart = null
+      this.currentSongInfo = null
     },
 
-    // Actualizar estadísticas de la canción
-    async updateSongStats(playRecord: PlayRecord) {
-      try {
-        // Buscar o crear estadísticas de la canción
-        let songStats = this.topSongs.find(s => s.cancionId === playRecord.cancionId);
-        
-        if (!songStats) {
-          // Obtener información de la canción desde la API
-          const songResponse = await fetch(`${API_BASE_URL}/Cancion/${playRecord.cancionId}`);
-          if (!songResponse.ok) return;
-          
-          const songData = await songResponse.json();
-          
-          // Obtener información del artista
-          const artistResponse = await fetch(`${API_BASE_URL}/Artista/${playRecord.cantanteId}`);
-          const artistData = artistResponse.ok ? await artistResponse.json() : { nombre: 'Artista desconocido' };
-          
-          songStats = {
-            cancionId: playRecord.cancionId,
-            nombre: songData.nombre || 'Canción desconocida',
-            artista: artistData.nombre || 'Artista desconocido',
-            cantanteId: playRecord.cantanteId,
-            image: songData.image || '',
-            duracion: songData.duracion || '0:00',
-            playCount: 0,
-            totalListenTime: 0,
-            lastPlayed: 0,
-            completionRate: 0
-          };
-          
-          this.topSongs.push(songStats);
-        }
-
-        // Actualizar estadísticas
-        songStats.playCount++;
-        songStats.totalListenTime += playRecord.duration;
-        songStats.lastPlayed = playRecord.timestamp;
-        
-        // Calcular tasa de completación promedio
-        const songPlays = this.playHistory.filter(p => p.cancionId === playRecord.cancionId);
-        const completedPlays = songPlays.filter(p => p.completed).length;
-        songStats.completionRate = songPlays.length > 0 ? (completedPlays / songPlays.length) * 100 : 0;
-
-      } catch (error) {
-        console.error('Error actualizando estadísticas de canción:', error);
+    // Guardar manualmente cuando se hace clic en una canción
+    trackSongClick(song: any) {
+      if (!song || !song.cancionId) return
+      
+      const record: PlayRecord = {
+        id: `${Date.now()}-${Math.random()}`,
+        cancionId: song.cancionId,
+        cantanteId: song.cantanteId || 0,
+        albumId: song.albumId,
+        songName: song.nombre || 'Canción desconocida',
+        artistName: song.artista || 'Artista desconocido',
+        image: song.image,
+        timestamp: Date.now(),
+        duration: 0, // Se actualizará cuando termine
+        totalDuration: this.parseDuration(song.duracion),
+        completed: false
       }
-    },
-
-    // Actualizar estadísticas del artista
-    async updateArtistStats(playRecord: PlayRecord) {
-      try {
-        let artistStats = this.topArtists.find(a => a.cantanteId === playRecord.cantanteId);
-        
-        if (!artistStats) {
-          // Obtener información del artista desde la API
-          const artistResponse = await fetch(`${API_BASE_URL}/Artista/${playRecord.cantanteId}`);
-          if (!artistResponse.ok) return;
-          
-          const artistData = await artistResponse.json();
-          
-          artistStats = {
-            cantanteId: playRecord.cantanteId,
-            nombre: artistData.nombre || 'Artista desconocido',
-            image: artistData.image || '',
-            oyentesMensuales: artistData.oyentesMensuales || 0,
-            playCount: 0,
-            totalListenTime: 0,
-            uniqueSongs: 0,
-            lastPlayed: 0
-          };
-          
-          this.topArtists.push(artistStats);
-        }
-
-        // Actualizar estadísticas
-        artistStats.playCount++;
-        artistStats.totalListenTime += playRecord.duration;
-        artistStats.lastPlayed = playRecord.timestamp;
-        
-        // Calcular canciones únicas del artista
-        const artistSongs = new Set(
-          this.playHistory
-            .filter(p => p.cantanteId === playRecord.cantanteId)
-            .map(p => p.cancionId)
-        );
-        artistStats.uniqueSongs = artistSongs.size;
-
-      } catch (error) {
-        console.error('Error actualizando estadísticas de artista:', error);
-      }
+      
+      // Agregar inmediatamente para que aparezca en actividad reciente
+      this.playHistory.push(record)
+      this.saveToLocalStorage()
     },
 
     // Utilidades
-    parseDurationToSeconds(duration: string): number {
-      if (!duration) return 0;
-      const parts = duration.split(':').map(Number);
-      if (parts.length === 2) {
-        return parts[0] * 60 + parts[1]; // mm:ss
-      } else if (parts.length === 3) {
-        return parts[0] * 3600 + parts[1] * 60 + parts[2]; // hh:mm:ss
+    parseDuration(duration: string): number {
+      if (!duration) return 0
+      const parts = duration.split(':')
+      if (parts.length >= 2) {
+        return (parseInt(parts[0]) || 0) * 60 + (parseInt(parts[1]) || 0)
       }
-      return 0;
+      return 0
     },
 
-    formatSeconds(seconds: number): string {
-      const hours = Math.floor(seconds / 3600);
-      const minutes = Math.floor((seconds % 3600) / 60);
-      const secs = seconds % 60;
+    formatDuration(seconds: number): string {
+      const mins = Math.floor(seconds / 60)
+      const secs = seconds % 60
+      return `${mins}:${secs.toString().padStart(2, '0')}`
+    },
+
+    groupBySessions(records: PlayRecord[]) {
+      const sessions: any[] = []
+      let currentSession: any = null
       
-      if (hours > 0) {
-        return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-      }
-      return `${minutes}:${secs.toString().padStart(2, '0')}`;
+      records.sort((a, b) => a.timestamp - b.timestamp).forEach(record => {
+        if (!currentSession || 
+            record.timestamp - currentSession.endTime > 30 * 60 * 1000) { // 30 min gap
+          currentSession = {
+            startTime: record.timestamp,
+            endTime: record.timestamp + record.duration * 1000,
+            duration: record.duration
+          }
+          sessions.push(currentSession)
+        } else {
+          currentSession.endTime = record.timestamp + record.duration * 1000
+          currentSession.duration += record.duration
+        }
+      })
+      
+      return sessions
     },
 
-    // Persistencia local
+    // Local Storage
     saveToLocalStorage() {
       try {
-        localStorage.setItem('hibiki_listening_history', JSON.stringify({
-          playHistory: this.playHistory.slice(-1000), // mantener solo las últimas 1000 reproducciones
-          topSongs: this.topSongs,
-          topArtists: this.topArtists
-        }));
-      } catch (error) {
-        console.error('Error guardando historial:', error);
+        // Mantener solo los últimos 1000 registros
+        const recentHistory = this.playHistory.slice(-1000)
+        localStorage.setItem('listeningHistory', JSON.stringify(recentHistory))
+        this.lastSaveTime = Date.now()
+      } catch (e) {
+        console.error('Error saving listening history:', e)
       }
     },
 
     loadFromLocalStorage() {
       try {
-        const saved = localStorage.getItem('hibiki_listening_history');
+        const saved = localStorage.getItem('listeningHistory')
         if (saved) {
-          const data = JSON.parse(saved);
-          this.playHistory = data.playHistory || [];
-          this.topSongs = data.topSongs || [];
-          this.topArtists = data.topArtists || [];
+          this.playHistory = JSON.parse(saved)
         }
-      } catch (error) {
-        console.error('Error cargando historial:', error);
+      } catch (e) {
+        console.error('Error loading listening history:', e)
+        this.playHistory = []
       }
     },
 
-    // Limpiar datos antiguos (más de 3 meses)
-    cleanOldData() {
-      const threeMonthsAgo = Date.now() - (90 * 24 * 60 * 60 * 1000);
-      
-      this.playHistory = this.playHistory.filter(play => play.timestamp > threeMonthsAgo);
-      
-      // Recalcular estadísticas después de limpiar
-      this.recalculateStats();
-      this.saveToLocalStorage();
-    },
-
-    // Recalcular todas las estadísticas
-    recalculateStats() {
-      // Limpiar estadísticas actuales
-      this.topSongs = [];
-      this.topArtists = [];
-      
-      // Recalcular desde el historial
-      this.playHistory.forEach(play => {
-        this.updateSongStats(play);
-        this.updateArtistStats(play);
-      });
-    },
-
-    // Inicializar el store
-    async initialize() {
-      this.loadFromLocalStorage();
-      this.startListeningSession();
-      
-      // Limpiar datos antiguos una vez al día
-      const lastCleanup = localStorage.getItem('hibiki_last_cleanup');
-      const now = Date.now();
-      const oneDayAgo = now - (24 * 60 * 60 * 1000);
-      
-      if (!lastCleanup || parseInt(lastCleanup) < oneDayAgo) {
-        this.cleanOldData();
-        localStorage.setItem('hibiki_last_cleanup', now.toString());
-      }
+    // Limpiar historial antiguo (más de 3 meses)
+    cleanOldHistory() {
+      const threeMonthsAgo = Date.now() - (90 * 24 * 60 * 60 * 1000)
+      this.playHistory = this.playHistory.filter(record => 
+        record.timestamp > threeMonthsAgo
+      )
+      this.saveToLocalStorage()
     }
-  }
-});
+  },
+
+  // Datos temporales para la canción actual
+  currentSongInfo: null as any
+})

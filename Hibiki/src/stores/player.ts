@@ -1,4 +1,4 @@
-// src/stores/player.ts - ACTUALIZACIÓN
+// src/stores/player.ts
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import { useListeningHistoryStore } from './listeningHistoryStore';
@@ -24,6 +24,10 @@ export const usePlayerStore = defineStore('player', () => {
   const currentPlaylist = ref<Song[]>([]);
   const isUserInteracted = ref<boolean>(false);
   const volume = ref<number>(1);
+  
+  // Variables para video
+  const isVideoMode = ref<boolean>(false);
+  const showVideo = ref<boolean>(false);
 
   // Tracking variables
   const lastUpdateTime = ref<number>(0);
@@ -79,6 +83,10 @@ export const usePlayerStore = defineStore('player', () => {
            currentSong.value?.artist || 
            (currentSong.value?.cantante?.nombre) || 
            "Artista desconocido";
+  });
+
+  const hasVideo = computed(() => {
+    return !!(currentSong.value?.videoUrl || currentSong.value?.videoclip);
   });
 
   const normalizeSong = (song: any): Song => {
@@ -155,7 +163,6 @@ export const usePlayerStore = defineStore('player', () => {
     }, 100);
   };
   
-  // Mantener todas tus funciones existentes sin cambios
   const playSong = async () => {
     if (!currentSong.value) return;
     
@@ -276,7 +283,6 @@ export const usePlayerStore = defineStore('player', () => {
     }
   };
   
-  // Mantener tu función existente
   const formatDuration = (seconds: number) => {
     if (isNaN(seconds) || seconds < 0) return "0:00";
     const minutes = Math.floor(seconds / 60);
@@ -309,10 +315,14 @@ export const usePlayerStore = defineStore('player', () => {
     isUserInteracted,
     volume,
     audioPlayer,
+    isVideoMode,
+    showVideo,
 
     getArtistaDisplay,
+    hasVideo,
     
     setSong,
+    playSong,
     togglePlay,
     previousSong,
     nextSong,
@@ -321,6 +331,9 @@ export const usePlayerStore = defineStore('player', () => {
     changeVolume,
     formatDuration,
     normalizeSong,
-    cleanup
+    cleanup,
+    toggleVideoMode,
+    setShowVideo,
+    toggleVideo
   };
 });

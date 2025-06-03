@@ -78,26 +78,26 @@
         <h2 class="section-title">Estadísticas de Escucha</h2>
         <div class="stats-grid">
           <div class="stat-card">
-            <div class="stat-number">{{ listeningStats.totalPlayTime }}</div>
+            <div class="stat-number">{{ listeningStats.totalPlayTime || 0 }}</div>
             <div class="stat-label">Horas escuchadas este mes</div>
           </div>
           <div class="stat-card">
-            <div class="stat-number">{{ listeningStats.songsPlayed }}</div>
+            <div class="stat-number">{{ listeningStats.songsPlayed || 0 }}</div>
             <div class="stat-label">Reproducciones este mes</div>
           </div>
           <div class="stat-card">
-            <div class="stat-number">{{ listeningStats.uniqueSongs }}</div>
+            <div class="stat-number">{{ listeningStats.uniqueSongs || 0 }}</div>
             <div class="stat-label">Canciones diferentes</div>
           </div>
           <div class="stat-card">
-            <div class="stat-number">{{ listeningStats.uniqueArtists }}</div>
+            <div class="stat-number">{{ listeningStats.uniqueArtists || 0 }}</div>
             <div class="stat-label">Artistas diferentes</div>
           </div>
         </div>
         
         <!-- Estadística adicional -->
-        <div class="listening-insight">
-          <p v-if="listeningStats.averageSessionTime > 0">
+        <div class="listening-insight" v-if="listeningStats.averageSessionTime > 0">
+          <p>
             📊 Tu sesión promedio de escucha es de {{ listeningStats.averageSessionTime }} minutos
           </p>
         </div>
@@ -123,15 +123,15 @@
             </div>
             <h3 class="artist-name">{{ artist.nombre }}</h3>
             <div class="artist-stats">
-              <p class="artist-play-count">{{ artist.playCount }} reproducciones</p>
-              <p class="artist-time">{{ formatMinutes(artist.totalListenTime) }}</p>
-              <p class="artist-songs">{{ artist.uniqueSongs }} canciones diferentes</p>
+              <p class="artist-play-count">{{ artist.playCount || 0 }} reproducciones</p>
+              <p class="artist-time">{{ formatMinutes(artist.totalListenTime || 0) }}</p>
+              <p class="artist-songs">{{ artist.uniqueSongs || 0 }} canciones diferentes</p>
             </div>
             <div class="listen-percentage">
               <div class="percentage-bar">
                 <div 
                   class="percentage-fill" 
-                  :style="{ width: calculatePercentage(artist.totalListenTime, topArtistsReal[0]?.totalListenTime) + '%' }"
+                  :style="{ width: calculatePercentage(artist.totalListenTime || 0, topArtistsReal[0]?.totalListenTime || 1) + '%' }"
                 ></div>
               </div>
             </div>
@@ -161,24 +161,24 @@
               </div>
             </div>
             <div class="song-info">
-              <h4 class="song-title">{{ song.nombre }}</h4>
-              <p class="song-artist">{{ song.artista }}</p>
+              <h4 class="song-title">{{ song.nombre || 'Canción desconocida' }}</h4>
+              <p class="song-artist">{{ song.artista || 'Artista desconocido' }}</p>
             </div>
             <div class="song-stats">
               <div class="stat-item">
-                <span class="stat-number">{{ song.playCount }}</span>
+                <span class="stat-number">{{ song.playCount || 0 }}</span>
                 <span class="stat-label">reproducciones</span>
               </div>
               <div class="stat-item">
-                <span class="stat-number">{{ formatMinutes(song.totalListenTime) }}</span>
+                <span class="stat-number">{{ formatMinutes(song.totalListenTime || 0) }}</span>
                 <span class="stat-label">tiempo total</span>
               </div>
-              <div class="completion-rate">
-                <span class="completion-percentage">{{ Math.round(song.completionRate) }}%</span>
+              <div class="completion-rate" v-if="song.completionRate">
+                <span class="completion-percentage">{{ Math.round(song.completionRate || 0) }}%</span>
                 <span class="completion-label">completada</span>
               </div>
             </div>
-            <div class="song-duration">{{ song.duracion }}</div>
+            <div class="song-duration">{{ formatDuration(song.duracion) }}</div>
           </div>
         </div>
       </div>
@@ -221,9 +221,14 @@
             class="activity-item"
           >
             <div class="activity-time">{{ formatRecentTime(activity.timestamp) }}</div>
-            <div class="activity-song">
-              <span class="song-name">{{ activity.songName }}</span>
-              <span class="artist-name">{{ activity.artistName }}</span>
+            <div class="activity-content">
+              <div class="activity-image" v-if="activity.image">
+                <img :src="activity.image || defaultImage" :alt="activity.songName" />
+              </div>
+              <div class="activity-song">
+                <span class="song-name">{{ activity.songName || 'Canción desconocida' }}</span>
+                <span class="artist-name">{{ activity.artistName || 'Artista desconocido' }}</span>
+              </div>
             </div>
             <div class="activity-duration">
               {{ formatSeconds(activity.listenDuration) }} / {{ activity.totalDuration }}
@@ -236,7 +241,7 @@
       </div>
 
       <!-- Empty State -->
-      <div v-if="!topArtistsReal.length && !topSongsReal.length" class="empty-state">
+      <div v-if="!topArtistsReal.length && !topSongsReal.length && !loading" class="empty-state">
         <div class="empty-icon">🎵</div>
         <h3>¡Empieza a escuchar música!</h3>
         <p>Reproduce canciones para ver tus estadísticas personalizadas aquí</p>
@@ -252,11 +257,15 @@ import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { usePlayerStore } from '@/stores/player'
 import { useListeningHistoryStore } from '@/stores/listeningHistoryStore'
+import { useTrackSong } from '@/stores/useTrackSong'
+import { useProfileStore } from '@/stores/perfil'
 
 const router = useRouter()
 const authStore = useAuthStore()
 const playerStore = usePlayerStore()
 const listeningStore = useListeningHistoryStore()
+const profileStore = useProfileStore()
+const { playSongWithTracking } = useTrackSong()
 
 // Estado local
 const profileData = ref<any>(null)
@@ -275,28 +284,60 @@ const defaultPlaylistImage = 'https://via.placeholder.com/200x200/333/white?text
 const userInfo = computed(() => authStore.user)
 const isUserPremium = computed(() => authStore.isPremium)
 
-// Datos reales del tracking
-const topArtistsReal = computed(() => listeningStore.monthlyTopArtists)
-const topSongsReal = computed(() => listeningStore.monthlyTopSongs)
-const listeningStats = computed(() => listeningStore.listeningStats)
+// Datos del profileStore (opcional - puedes usarlos como respaldo)
+const topArtistsFromStore = computed(() => profileStore.getTopArtists)
+const topSongsFromStore = computed(() => profileStore.getTopSongs) 
+const userPlaylistsFromStore = computed(() => profileStore.getUserPlaylists)
+const statsFromStore = computed(() => profileStore.getStats)
+
+// Combinar datos del listeningStore (principal) con datos del profileStore (respaldo)
+const topArtistsReal = computed(() => {
+  const listeningArtists = listeningStore.monthlyTopArtists
+  return listeningArtists.length > 0 ? listeningArtists : topArtistsFromStore.value
+})
+
+const topSongsReal = computed(() => {
+  const listeningSongs = listeningStore.monthlyTopSongs  
+  return listeningSongs.length > 0 ? listeningSongs : topSongsFromStore.value
+})
+
+// Arreglar las estadísticas para evitar NaN
+const listeningStats = computed(() => {
+  const stats = listeningStore.listeningStats
+  return {
+    totalPlayTime: stats?.totalPlayTime || 0,
+    songsPlayed: stats?.songsPlayed || 0,
+    uniqueSongs: stats?.uniqueSongs || 0,
+    uniqueArtists: stats?.uniqueArtists || 0,
+    averageSessionTime: stats?.averageSessionTime || 0
+  }
+})
 
 // Playlists reales del usuario
-const realUserPlaylists = computed(() => profileData.value?.playlistsCreadas || [])
+const realUserPlaylists = computed(() => {
+  const localPlaylists = profileData.value?.playlistsCreadas || []
+  const storePlaylists = userPlaylistsFromStore.value || []
+  return localPlaylists.length > 0 ? localPlaylists : storePlaylists
+})
 
-// Actividad reciente (últimas 10 reproducciones)
+// Actividad reciente mejorada
 const recentActivity = computed(() => {
   return listeningStore.playHistory
     .slice(-10)
     .reverse()
-    .map(play => ({
-      id: play.id,
-      timestamp: play.timestamp,
-      songName: getSongName(play.cancionId),
-      artistName: getArtistName(play.cantanteId),
-      listenDuration: play.duration,
-      totalDuration: formatSeconds(play.totalDuration),
-      completed: play.completed
-    }))
+    .map(play => {
+      // Los datos ya vienen completos del store
+      return {
+        id: play.id,
+        timestamp: play.timestamp,
+        songName: play.songName || 'Canción desconocida',
+        artistName: play.artistName || 'Artista desconocido',
+        image: play.image || null,
+        listenDuration: play.duration || 0,
+        totalDuration: formatSeconds(play.totalDuration || 0),
+        completed: play.completed || false
+      }
+    })
 })
 
 // Methods
@@ -305,15 +346,19 @@ const loadProfile = async () => {
   error.value = null
   
   try {
-    const API_BASE_URL = "http://aa0918044ca2b4e9b94f01593a2e67bf-1447626218.us-east-1.elb.amazonaws.com/api"
+    const API_BASE_URL = "https://localhost:7295/api"
     
-    // Solo cargar playlists ya que artistas y canciones vienen del tracking
+    // Cargar datos del perfil usando profileStore
+    if (authStore.user?.userId) {
+      await profileStore.fetchUserProfile(authStore.user.userId)
+    }
+    
+    // Solo cargar playlists adicionales si es necesario
     try {
       const playlistsResponse = await fetch(`${API_BASE_URL}/Playlist`)
       if (playlistsResponse.ok) {
         const playlists = await playlistsResponse.json()
         if (Array.isArray(playlists)) {
-          // Filtrar playlists del usuario actual si es posible
           const userPlaylists = playlists.filter(playlist => 
             playlist.creadorId === userInfo.value?.userId || 
             playlist.creador?.userId === userInfo.value?.userId
@@ -356,35 +401,32 @@ const toggleEditMode = () => {
 const saveProfile = async () => {
   try {
     loading.value = true
-    // Implementar guardado real aquí cuando tengas el endpoint
-    console.log('Guardando perfil:', editForm.value)
     
-    // Simular actualización exitosa
-    if (authStore.user) {
-      authStore.user.name = editForm.value.name
-      authStore.user.email = editForm.value.email
+    const success = await profileStore.updateUserProfile(userInfo.value?.userId, {
+      name: editForm.value.name,
+      email: editForm.value.email
+    })
+    
+    if (success) {
+      if (authStore.user) {
+        authStore.user.name = editForm.value.name
+        authStore.user.email = editForm.value.email
+      }
+      editMode.value = false
+    } else {
+      throw new Error(profileStore.error || 'Error al guardar')
     }
     
-    editMode.value = false
   } catch (err) {
     console.error('Error al guardar:', err)
+    error.value = err.message || 'Error al guardar el perfil'
   } finally {
     loading.value = false
   }
 }
 
 const playSong = (song: any) => {
-  // Convertir el formato de song para el reproductor
-  const playerSong = {
-    ...song,
-    nombre: song.nombre,
-    artista: song.artista,
-    ruta: `/music/${song.cancionId}.mp3`, // Ajustar según tu estructura
-    image: song.image,
-    cancionId: song.cancionId,
-    cantanteId: song.cantanteId
-  }
-  playerStore.setSong(playerSong)
+  playSongWithTracking(song)
 }
 
 const goToArtist = (artistId: number) => {
@@ -403,6 +445,9 @@ const goToDiscover = () => {
 const formatDate = (dateString: string): string => {
   try {
     const date = new Date(dateString)
+    if (isNaN(date.getTime())) {
+      return 'Fecha no disponible'
+    }
     return date.toLocaleDateString('es-ES', {
       year: 'numeric',
       month: 'long',
@@ -413,7 +458,10 @@ const formatDate = (dateString: string): string => {
   }
 }
 
+// Función arreglada para formatear minutos
 const formatMinutes = (seconds: number): string => {
+  if (!seconds || isNaN(seconds)) return '0m'
+  
   const minutes = Math.floor(seconds / 60)
   const hours = Math.floor(minutes / 60)
   
@@ -424,13 +472,41 @@ const formatMinutes = (seconds: number): string => {
   return `${minutes}m`
 }
 
+// Función arreglada para formatear segundos
 const formatSeconds = (seconds: number): string => {
+  if (!seconds || isNaN(seconds)) return '0:00'
+  
   const minutes = Math.floor(seconds / 60)
-  const secs = seconds % 60
+  const secs = Math.floor(seconds % 60)
   return `${minutes}:${secs.toString().padStart(2, '0')}`
 }
 
+// Función arreglada para formatear duración
+const formatDuration = (duration: string): string => {
+  if (!duration) return '0:00'
+  
+  // Si ya está en formato mm:ss, devolverlo
+  if (duration.includes(':')) {
+    const parts = duration.split(':')
+    if (parts.length >= 2) {
+      const minutes = parseInt(parts[0]) || 0
+      const seconds = parseInt(parts[1]) || 0
+      return `${minutes}:${seconds.toString().padStart(2, '0')}`
+    }
+  }
+  
+  // Si es un número, asumimos que son segundos
+  const totalSeconds = parseInt(duration)
+  if (!isNaN(totalSeconds)) {
+    return formatSeconds(totalSeconds)
+  }
+  
+  return '0:00'
+}
+
 const formatRecentTime = (timestamp: number): string => {
+  if (!timestamp || isNaN(timestamp)) return 'Hace un momento'
+  
   const now = Date.now()
   const diffInMinutes = Math.floor((now - timestamp) / (1000 * 60))
   
@@ -445,16 +521,18 @@ const formatRecentTime = (timestamp: number): string => {
 }
 
 const calculatePercentage = (value: number, maxValue: number): number => {
-  if (!maxValue) return 0
+  if (!value || !maxValue || isNaN(value) || isNaN(maxValue)) return 0
   return Math.round((value / maxValue) * 100)
 }
 
 const getSongName = (cancionId: number): string => {
+  if (!cancionId) return 'Canción desconocida'
   const song = topSongsReal.value.find(s => s.cancionId === cancionId)
   return song?.nombre || 'Canción desconocida'
 }
 
 const getArtistName = (cantanteId: number): string => {
+  if (!cantanteId) return 'Artista desconocido'
   const artist = topArtistsReal.value.find(a => a.cantanteId === cantanteId)
   return artist?.nombre || 'Artista desconocido'
 }
@@ -474,6 +552,11 @@ onMounted(async () => {
   // Inicializar el store de listening history
   await listeningStore.initialize()
   
+  // Cargar perfil usando el profileStore si tenemos userId
+  if (authStore.user?.userId) {
+    await profileStore.fetchUserProfile(authStore.user.userId)
+  }
+  
   await loadProfile()
 })
 
@@ -483,6 +566,7 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
+/* Todos los estilos se mantienen igual que antes */
 .profile-container {
   min-height: 100vh;
   background: linear-gradient(180deg, #1e1e1e 0%, #121212 100%);
@@ -967,7 +1051,7 @@ onUnmounted(() => {
   text-align: right;
 }
 
-/* Recent Activity */
+/* Recent Activity - Mejorado */
 .recent-activity {
   background: rgba(255, 255, 255, 0.02);
   border-radius: 12px;
@@ -990,6 +1074,27 @@ onUnmounted(() => {
   font-size: 12px;
   color: #a7a7a7;
   min-width: 80px;
+}
+
+.activity-content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.activity-image {
+  width: 40px;
+  height: 40px;
+  border-radius: 4px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.activity-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .activity-song {
@@ -1179,6 +1284,10 @@ onUnmounted(() => {
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
+  }
+
+  .activity-content {
+    width: 100%;
   }
 }
 
