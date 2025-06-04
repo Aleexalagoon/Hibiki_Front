@@ -3,7 +3,6 @@ import NovedadesView from "@/views/NovedadesView.vue";
 import LoginView from "@/views/LoginView.vue";
 import RegisterView from "@/views/RegisterView.vue";
 import PremiumView from "@/views/PremiumView.vue";
-import Hibiki from "@/views/Hibiki.vue";
 import PoliticaView from "@/views/PoliticaView.vue";
 import TerminosView from "@/views/TerminosView.vue";
 import CookiesView from "@/views/CookiesView.vue";
@@ -11,7 +10,6 @@ import InfoAnunciosView from "@/views/InfoAnunciosView.vue";
 import InicioView from "@/views/InicioView.vue";
 import PlaylistView from "@/views/PlaylistView.vue";
 import ArtistaView from "@/views/ArtistaView.vue";
-import CancionesView from "@/views/CancionesView.vue";
 import perfilView from "@/views/perfil.vue";
 import PagoView from "@/views/PagoView.vue";
 import PagoCompletadoView from "@/views/PagoCompletadoView.vue";
@@ -52,12 +50,6 @@ const router = createRouter({
       path: "/premium",
       name: "premium",
       component: PremiumView,
-    },
-
-    {
-      path: "/hibki",
-      name: "hibki",
-      component: Hibiki,
     },
 
     {
@@ -109,11 +101,6 @@ const router = createRouter({
       props: true
     },
 
-    {
-      path: "/canciones",
-      name: "canciones",
-      component: CancionesView,
-    },
     {
       path: "/perfil",
       name: "perfil",
