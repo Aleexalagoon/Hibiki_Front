@@ -173,10 +173,6 @@
                 <span class="stat-number">{{ formatMinutes(song.totalListenTime || 0) }}</span>
                 <span class="stat-label">tiempo total</span>
               </div>
-              <div class="completion-rate" v-if="song.completionRate">
-                <span class="completion-percentage">{{ Math.round(song.completionRate || 0) }}%</span>
-                <span class="completion-label">completada</span>
-              </div>
             </div>
             <div class="song-duration">{{ formatDuration(song.duracion) }}</div>
           </div>
@@ -207,7 +203,7 @@
         </div>
       </div>
 
-      <!-- Actividad Reciente -->
+      <!-- Actividad Reciente - SIN indicador "completado" -->
       <div class="section" v-if="recentActivity.length > 0">
         <div class="section-header">
           <h2 class="section-title">Actividad reciente</h2>
@@ -230,11 +226,9 @@
                 <span class="artist-name">{{ activity.artistName || 'Artista desconocido' }}</span>
               </div>
             </div>
+            <!-- 🔥 REMOVIDO: El indicador "completado" -->
             <div class="activity-duration">
-              {{ formatSeconds(activity.listenDuration) }} / {{ activity.totalDuration }}
-            </div>
-            <div class="activity-completion" :class="{ completed: activity.completed }">
-              {{ activity.completed ? '✓ Completada' : '◐ Parcial' }}
+              {{ formatSecondsClean(activity.listenDuration) }}
             </div>
           </div>
         </div>
@@ -288,7 +282,6 @@ const isUserPremium = computed(() => authStore.isPremium)
 const topArtistsFromStore = computed(() => profileStore.getTopArtists)
 const topSongsFromStore = computed(() => profileStore.getTopSongs) 
 const userPlaylistsFromStore = computed(() => profileStore.getUserPlaylists)
-const statsFromStore = computed(() => profileStore.getStats)
 
 // Combinar datos del listeningStore (principal) con datos del profileStore (respaldo)
 const topArtistsReal = computed(() => {
@@ -320,22 +313,20 @@ const realUserPlaylists = computed(() => {
   return localPlaylists.length > 0 ? localPlaylists : storePlaylists
 })
 
-// Actividad reciente mejorada
+// 🔥 ACTIVIDAD RECIENTE SIN "completado"
 const recentActivity = computed(() => {
   return listeningStore.playHistory
     .slice(-10)
     .reverse()
     .map(play => {
-      // Los datos ya vienen completos del store
       return {
         id: play.id,
         timestamp: play.timestamp,
         songName: play.songName || 'Canción desconocida',
         artistName: play.artistName || 'Artista desconocido',
         image: play.image || null,
-        listenDuration: play.duration || 0,
-        totalDuration: formatSeconds(play.totalDuration || 0),
-        completed: play.completed || false
+        listenDuration: play.duration || 0
+        // 🔥 REMOVIDO: completed, totalDuration, etc.
       }
     })
 })
@@ -346,6 +337,7 @@ const loadProfile = async () => {
   error.value = null
   
   try {
+    // 🎯 USAR LA MISMA URL QUE EN AUTH STORE
     const API_BASE_URL = "https://localhost:7295/api"
     
     // Cargar datos del perfil usando profileStore
@@ -398,27 +390,36 @@ const toggleEditMode = () => {
   }
 }
 
+// 🎯 ARREGLADO: Actualizar authStore también
+// 🔥 MÉTODO SAVEPROFILE CORREGIDO - Solo esta parte del componente Vue
 const saveProfile = async () => {
   try {
     loading.value = true
     
-    const success = await profileStore.updateUserProfile(userInfo.value?.userId, {
+    console.log('Iniciando actualización de perfil...')
+    console.log('Datos del formulario:', editForm.value)
+    console.log('Usuario actual:', userInfo.value)
+    
+    // 1. 🔥 USAR AUTHSTORE.UPDATEUSERDATA en lugar del profileStore
+    const updatedUser = await authStore.updateUserData({
       name: editForm.value.name,
       email: editForm.value.email
     })
     
-    if (success) {
-      if (authStore.user) {
-        authStore.user.name = editForm.value.name
-        authStore.user.email = editForm.value.email
-      }
-      editMode.value = false
-    } else {
-      throw new Error(profileStore.error || 'Error al guardar')
+    console.log('Usuario actualizado por authStore:', updatedUser)
+    
+    // 2. 🔥 ACTUALIZAR TAMBIÉN EL PROFILESTORE si es necesario
+    if (userInfo.value?.userId) {
+      await profileStore.refreshData(userInfo.value.userId)
     }
     
+    // 3. Salir del modo edición
+    editMode.value = false
+    
+    console.log('Perfil actualizado exitosamente')
+    
   } catch (err) {
-    console.error('Error al guardar:', err)
+    console.error('Error al guardar perfil:', err)
     error.value = err.message || 'Error al guardar el perfil'
   } finally {
     loading.value = false
@@ -441,7 +442,7 @@ const goToDiscover = () => {
   router.push('/novedades')
 }
 
-// Utility functions
+// 🔧 UTILITY FUNCTIONS ARREGLADAS
 const formatDate = (dateString: string): string => {
   try {
     const date = new Date(dateString)
@@ -458,9 +459,9 @@ const formatDate = (dateString: string): string => {
   }
 }
 
-// Función arreglada para formatear minutos
+// 🔧 ARREGLADO: Formatear minutos correctamente
 const formatMinutes = (seconds: number): string => {
-  if (!seconds || isNaN(seconds)) return '0m'
+  if (!seconds || isNaN(seconds) || seconds === 0) return '0m'
   
   const minutes = Math.floor(seconds / 60)
   const hours = Math.floor(minutes / 60)
@@ -472,31 +473,51 @@ const formatMinutes = (seconds: number): string => {
   return `${minutes}m`
 }
 
-// Función arreglada para formatear segundos
+// 🔧 ARREGLADO: Formatear segundos correctamente
 const formatSeconds = (seconds: number): string => {
-  if (!seconds || isNaN(seconds)) return '0:00'
+  if (!seconds || isNaN(seconds) || seconds === 0) return '0:00'
   
   const minutes = Math.floor(seconds / 60)
   const secs = Math.floor(seconds % 60)
   return `${minutes}:${secs.toString().padStart(2, '0')}`
 }
 
-// Función arreglada para formatear duración
-const formatDuration = (duration: string): string => {
+// 🔧 NUEVA: Función limpia para actividad reciente
+const formatSecondsClean = (seconds: number): string => {
+  if (!seconds || isNaN(seconds) || seconds === 0) return '0:00'
+  
+  const minutes = Math.floor(seconds / 60)
+  const secs = Math.floor(seconds % 60)
+  return `${minutes}:${secs.toString().padStart(2, '0')}`
+}
+
+// 🔧 ARREGLADO: Formatear duración de canciones
+const formatDuration = (duration: any): string => {
   if (!duration) return '0:00'
   
-  // Si ya está en formato mm:ss, devolverlo
-  if (duration.includes(':')) {
+  // Si es un string con formato mm:ss o hh:mm:ss
+  if (typeof duration === 'string' && duration.includes(':')) {
     const parts = duration.split(':')
-    if (parts.length >= 2) {
+    if (parts.length === 3) {
+      // Formato hh:mm:ss, tomar solo mm:ss
+      const minutes = parseInt(parts[1]) || 0
+      const seconds = parseInt(parts[2]) || 0
+      return `${minutes}:${seconds.toString().padStart(2, '0')}`
+    } else if (parts.length === 2) {
+      // Formato mm:ss
       const minutes = parseInt(parts[0]) || 0
       const seconds = parseInt(parts[1]) || 0
       return `${minutes}:${seconds.toString().padStart(2, '0')}`
     }
   }
   
-  // Si es un número, asumimos que son segundos
-  const totalSeconds = parseInt(duration)
+  // Si es un número (segundos)
+  if (typeof duration === 'number') {
+    return formatSeconds(duration)
+  }
+  
+  // Si es un string que representa un número
+  const totalSeconds = parseInt(duration.toString())
   if (!isNaN(totalSeconds)) {
     return formatSeconds(totalSeconds)
   }
@@ -523,18 +544,6 @@ const formatRecentTime = (timestamp: number): string => {
 const calculatePercentage = (value: number, maxValue: number): number => {
   if (!value || !maxValue || isNaN(value) || isNaN(maxValue)) return 0
   return Math.round((value / maxValue) * 100)
-}
-
-const getSongName = (cancionId: number): string => {
-  if (!cancionId) return 'Canción desconocida'
-  const song = topSongsReal.value.find(s => s.cancionId === cancionId)
-  return song?.nombre || 'Canción desconocida'
-}
-
-const getArtistName = (cantanteId: number): string => {
-  if (!cantanteId) return 'Artista desconocido'
-  const artist = topArtistsReal.value.find(a => a.cantanteId === cantanteId)
-  return artist?.nombre || 'Artista desconocido'
 }
 
 // Watchers para actualizar en tiempo real
@@ -566,7 +575,9 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-/* Todos los estilos se mantienen igual que antes */
+/* Mantén todos tus estilos CSS originales exactamente igual */
+/* Solo agregué algunas mejoras menores para el formateo */
+
 .profile-container {
   min-height: 100vh;
   background: linear-gradient(180deg, #1e1e1e 0%, #121212 100%);
@@ -574,7 +585,6 @@ onUnmounted(() => {
   padding: 24px;
 }
 
-/* Loading & Error States */
 .loading-container {
   display: flex;
   flex-direction: column;
@@ -622,7 +632,6 @@ onUnmounted(() => {
   margin-top: 16px;
 }
 
-/* Profile Header */
 .profile-header {
   display: flex;
   align-items: center;
@@ -711,7 +720,6 @@ onUnmounted(() => {
   color: #000;
 }
 
-/* Edit Form */
 .edit-form {
   background: rgba(255, 255, 255, 0.05);
   border-radius: 12px;
@@ -768,7 +776,6 @@ onUnmounted(() => {
   color: #a7a7a7;
 }
 
-/* Stats Section */
 .stats-section {
   margin-bottom: 48px;
 }
@@ -807,7 +814,6 @@ onUnmounted(() => {
   text-align: center;
 }
 
-/* Sections */
 .section {
   margin-bottom: 48px;
 }
@@ -827,7 +833,6 @@ onUnmounted(() => {
   font-size: 14px;
 }
 
-/* Artists Grid - Enhanced for real data */
 .artists-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -917,7 +922,6 @@ onUnmounted(() => {
   transition: width 0.3s ease;
 }
 
-/* Songs List - Enhanced for real data */
 .songs-list {
   gap: 8px;
   display: flex;
@@ -1028,30 +1032,15 @@ onUnmounted(() => {
   color: #a7a7a7;
 }
 
-.completion-rate {
-  text-align: center;
-}
-
-.completion-percentage {
-  font-weight: bold;
-  color: #4ade80;
-  display: block;
-  font-size: 14px;
-}
-
-.completion-label {
-  font-size: 11px;
-  color: #a7a7a7;
-}
-
 .song-duration {
   color: #a7a7a7;
   font-size: 14px;
   min-width: 50px;
   text-align: right;
+  font-weight: 500;
 }
 
-/* Recent Activity - Mejorado */
+/* 🔥 ACTIVIDAD RECIENTE SIMPLIFICADA */
 .recent-activity {
   background: rgba(255, 255, 255, 0.02);
   border-radius: 12px;
@@ -1104,6 +1093,7 @@ onUnmounted(() => {
 .song-name {
   font-weight: 600;
   display: block;
+  font-size: 14px;
 }
 
 .artist-name {
@@ -1114,22 +1104,11 @@ onUnmounted(() => {
 .activity-duration {
   font-size: 12px;
   color: #a7a7a7;
-  min-width: 80px;
+  min-width: 60px;
   text-align: center;
+  font-weight: 500;
 }
 
-.activity-completion {
-  font-size: 12px;
-  color: #666;
-  min-width: 100px;
-  text-align: center;
-}
-
-.activity-completion.completed {
-  color: #4ade80;
-}
-
-/* Playlists Grid */
 .playlists-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -1183,7 +1162,6 @@ onUnmounted(() => {
   font-size: 12px;
 }
 
-/* Empty State */
 .empty-state {
   text-align: center;
   padding: 48px 24px;
@@ -1339,7 +1317,6 @@ onUnmounted(() => {
   }
 }
 
-/* Nuevos estilos para destacar datos reales */
 .real-data {
   position: relative;
 }
@@ -1352,7 +1329,6 @@ onUnmounted(() => {
   font-size: 16px;
 }
 
-/* Animaciones para datos en tiempo real */
 @keyframes pulse {
   0% { transform: scale(1); }
   50% { transform: scale(1.05); }
@@ -1363,7 +1339,6 @@ onUnmounted(() => {
   animation: pulse 2s ease-in-out infinite;
 }
 
-/* Estilos para indicadores de actividad */
 .section-title {
   position: relative;
 }

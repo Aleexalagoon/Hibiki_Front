@@ -7,6 +7,7 @@ interface Usuario {
   email: string;
   isPremium: boolean;
   fecha_Registro: string;
+  password?: string; // 🔥 AÑADIDO: Para preservar la contraseña
 }
 
 interface Artista {
@@ -62,7 +63,7 @@ interface ProfileData {
   };
 }
 
-// Usar la misma URL base que en playlistStore para consistencia
+// 🎯 USAR LA MISMA URL QUE EN AUTH STORE
 const API_BASE_URL = "https://localhost:7295/api";
 
 export const useProfileStore = defineStore('profileStore', {
@@ -349,7 +350,8 @@ export const useProfileStore = defineStore('profileStore', {
         name: usuario.name || usuario.Name || 'Usuario',
         email: usuario.email || usuario.Email || '',
         isPremium: usuario.isPremium || usuario.IsPremium || false,
-        fecha_Registro: usuario.fecha_Registro || usuario.FechaRegistro || new Date().toISOString()
+        fecha_Registro: usuario.fecha_Registro || usuario.FechaRegistro || new Date().toISOString(),
+        password: usuario.password || usuario.Password // 🔥 AÑADIDO: Preservar contraseña
       };
     },
 
@@ -434,32 +436,73 @@ export const useProfileStore = defineStore('profileStore', {
       return error.message || 'Error desconocido al cargar el perfil';
     },
 
-    // Métodos de actualización
+    // 🔥 MÉTODO ACTUALIZADO: Preservar contraseña al actualizar perfil
     async updateUserProfile(userId: number, userData: Partial<Usuario>) {
       this.loading = true;
       this.error = null;
 
       try {
+        console.log('Actualizando perfil del usuario:', userId);
+
+        // 🔥 PASO 1: Obtener datos actuales del usuario para preservar la contraseña
+        const currentResponse = await fetch(`${API_BASE_URL}/Usuario/${userId}`, {
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          }
+        });
+
+        if (!currentResponse.ok) {
+          throw new Error(`Error al obtener datos actuales: ${currentResponse.status}`);
+        }
+
+        const currentData = await currentResponse.json();
+        console.log('Datos actuales obtenidos correctamente');
+
+        // 🔥 PASO 2: Crear objeto completo preservando la contraseña
+        const completeUserData = {
+          userId: userId,
+          name: userData.name || currentData.name || currentData.Name,
+          email: userData.email || currentData.email || currentData.Email,
+          password: currentData.password || currentData.Password, // 👈 PRESERVAR contraseña original
+          isPremium: userData.isPremium !== undefined ? userData.isPremium : (currentData.isPremium || currentData.IsPremium),
+          fecha_Registro: currentData.fecha_Registro || currentData.FechaRegistro || new Date().toISOString()
+        };
+
+        console.log('Enviando datos completos (sin mostrar contraseña):', {
+          ...completeUserData,
+          password: '[PROTEGIDO]'
+        });
+
+        // 🔥 PASO 3: Enviar actualización completa al backend
         const response = await fetch(`${API_BASE_URL}/Usuario/${userId}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
             'Accept': 'application/json'
           },
-          body: JSON.stringify(userData)
+          body: JSON.stringify(completeUserData)
         });
 
         if (!response.ok) {
-          throw new Error(`Error al actualizar perfil: ${response.status}`);
+          const errorText = await response.text();
+          throw new Error(`Error al actualizar perfil: ${response.status} - ${errorText}`);
         }
 
-        // Actualizar datos locales
+        // 🔥 PASO 4: Actualizar datos locales en el store
         if (this.profileData) {
-          this.profileData.usuario = { ...this.profileData.usuario, ...userData };
+          this.profileData.usuario = {
+            ...this.profileData.usuario,
+            ...userData,
+            password: currentData.password || currentData.Password // Mantener contraseña
+          };
         }
 
+        console.log('Perfil actualizado exitosamente');
         return true;
+
       } catch (err: any) {
+        console.error('Error al actualizar perfil:', err);
         this.error = this.handleError(err);
         return false;
       } finally {
