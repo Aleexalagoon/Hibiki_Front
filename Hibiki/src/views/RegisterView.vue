@@ -196,7 +196,6 @@ export default {
   }
 };
 </script>
-
 <style scoped>
 * {
   box-sizing: border-box;
@@ -328,6 +327,7 @@ export default {
 
 .floating-label {
   position: relative;
+  z-index: 0;
 }
 
 .form-input {
@@ -348,24 +348,26 @@ export default {
   box-shadow: 0 0 0 4px rgba(255, 81, 0, 0.1);
 }
 
-.form-input:focus + .form-label,
-.form-input:not(:placeholder-shown) + .form-label {
-  transform: translateY(-12px) scale(0.8);
-  color: var(--accent-color);
-}
-
 .form-label {
   position: absolute;
   left: 16px;
-  top: 50%;
-  transform: translateY(-50%);
+  top: 20px;
   color: var(--text-secondary);
   font-size: 16px;
   pointer-events: none;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  background: var(--background-tertiary);
+  background: var(--background-secondary);
   padding: 0 4px;
-  transform-origin: left center;
+  transform-origin: left top;
+  z-index: 1;
+}
+
+.form-input:focus + .form-label,
+.form-input:not(:placeholder-shown) + .form-label {
+  top: -2px;
+  font-size: 12px;
+  color: var(--accent-color);
+  background: var(--background-secondary);
 }
 
 .input-decoration {
