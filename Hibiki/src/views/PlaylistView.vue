@@ -86,7 +86,6 @@
                   By {{ selectedPlaylist.creador.name || 'Unknown user' }}
                 </span>
                 <span>{{ selectedPlaylist.canciones?.length || 0 }} songs</span>
-                <span>{{ formatDuration(getTotalDuration()) }}</span>
               </div>
             </div>
           </div>
@@ -119,13 +118,6 @@
             <div class="songs-header">
               <h2>Songs</h2>
               <!-- 🆕 ADDITIONAL BUTTON IN HEADER -->
-              <button 
-                v-if="selectedPlaylist.canciones && selectedPlaylist.canciones.length > 0"
-                @click="addSongsToPlaylist" 
-                class="add-songs-header-btn"
-              >
-                ✚ More songs
-              </button>
             </div>
             
             <div v-if="selectedPlaylist.canciones && selectedPlaylist.canciones.length > 0" class="songs-list">
@@ -239,7 +231,7 @@
               @input="searchSongs"
               class="search-input"
             />
-            <button @click="searchSongs" class="search-btn">🔍</button>
+            <button @click="searchSongs" class="search-btn">⌕</button>
           </div>
         </div>
 
@@ -345,19 +337,14 @@ export default defineComponent({
     const loading = computed(() => playlistStore.loading);
     const error = computed(() => playlistStore.error);
 
-    const formatDuration = (duration) => {
-      if (!duration) return '0:00';
-      
-      if (typeof duration === 'string') {
-        const parts = duration.split(':');
-        if (parts.length >= 2) {
-          const minutes = parseInt(parts[0]) || 0;
-          const seconds = parseInt(parts[1]) || 0;
-          return `${minutes}:${seconds.toString().padStart(2, '0')}`;
-        }
+   const formatDuration = (duration) => {
+      if (!duration) return '0m 0s';
+      const [hours, minutes, seconds] = duration.split(':').map(Number);
+      if (hours > 0) {
+        return `${hours}h ${minutes}m ${seconds}s`;
+      } else {
+        return `${minutes}m ${seconds}s`;
       }
-      
-      return '0:00';
     };
 
     const getTotalDuration = () => {
@@ -1028,20 +1015,20 @@ export default defineComponent({
 
 /* Botón de agregar en los controles principales */
 .add-songs-control-btn {
-  background: #28a745;
-  color: white;
-  border: none;
-  padding: 12px 20px;
-  border-radius: 25px;
-  font-weight: 600;
+  background: transparent;
+  color: #ff5100;
+  border: 1px solid #ff5100;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
 }
 
 .add-songs-control-btn:hover {
-  background: #218838;
-  transform: scale(1.05);
+  background: #ca3900;
+  color: white;
 }
 
 /* Songs section */
@@ -1060,24 +1047,6 @@ export default defineComponent({
 .songs-header h2 {
   font-size: 1.5rem;
   margin: 0;
-  color: white;
-}
-
-/* Botón pequeño en el header */
-.add-songs-header-btn {
-  background: transparent;
-  color: #28a745;
-  border: 1px solid #28a745;
-  padding: 8px 16px;
-  border-radius: 20px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-size: 0.9rem;
-}
-
-.add-songs-header-btn:hover {
-  background: #28a745;
   color: white;
 }
 
