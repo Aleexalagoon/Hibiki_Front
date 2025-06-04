@@ -529,33 +529,33 @@ onUnmounted(() => {
             <div v-if="showFilters" class="filters-panel">
               <div class="filter-section">
                 <div class="filter-header">
-                  <h4>🎛️ Filtros</h4>
-                  <button @click="clearAllFilters" class="clear-filters-btn">Limpiar</button>
+                  <h4>⌨ Filters</h4>
+                  <button @click="clearAllFilters" class="clear-filters-btn">Clean</button>
                 </div>
                 
                 <div class="filter-group">
-                  <label>📂 Tipo:</label>
-                  <select v-model="tipoResultado" @change="performSearch">
-                    <option value="todos">Todos los resultados</option>
-                    <option value="canciones">Solo canciones</option>
-                    <option value="artistas">Solo artistas</option>
+                  <label>▶ Type:</label>
+                    <select v-model="tipoResultado" @change="performSearch">
+                    <option value="todos">All results</option>
+                    <option value="canciones">Only songs</option>
+                    <option value="artistas">Only artists</option>
                   </select>
                 </div>
                 
                 <div class="filter-group">
-                  <label>🔢 Ordenar:</label>
+                  <label>▶ Sort:</label>
                   <select v-model="ordenarPor" @change="performSearch">
-                    <option value="">Relevancia</option>
-                    <option value="nombre">Nombre (A-Z)</option>
-                    <option value="artista">Artista (A-Z)</option>
-                    <option value="popularidad">Popularidad</option>
+                    <option value="">Relevance</option>
+                    <option value="nombre">Name (A-Z)</option>
+                    <option value="artista">Artist (A-Z)</option>
+                    <option value="popularidad">Popularity</option>
                   </select>
                 </div>
                 
                 <div class="filter-group">
-                  <label>🎨 Género:</label>
+                  <label>▶ Gender:</label>
                   <select v-model="selectedGenero" @change="performSearch">
-                    <option value="">Todos los géneros</option>
+                    <option value="">All genres</option>
                     <option v-for="genero in generos" :key="genero.generoId" :value="genero.generoId">
                       {{ genero.icono }} {{ genero.nombre }}
                     </option>
@@ -604,12 +604,12 @@ onUnmounted(() => {
               
               <div class="search-results-list">
                 <div v-if="!loading && filteredResults.length === 0" class="no-results">
-                  <div class="no-results-icon">🔍</div>
-                  <p>No se encontraron resultados</p>
+                  <div class="no-results-icon">⌕</div>
+                  <p>No results found</p>
                   <small v-if="hasActiveFilters">
-                    Intenta con otros términos o <button @click="clearAllFilters" class="link-button">quita los filtros</button>
+                    Try other search terms or <button @click="clearAllFilters" class="link-button">remove the filters</button>
                   </small>
-                  <small v-else>Intenta con otros términos de búsqueda</small>
+                  <small v-else>Try other search terms</small>
                 </div>
                 
                 <div 
@@ -683,7 +683,7 @@ onUnmounted(() => {
         </nav>
         
         <div v-if="isAuthenticated" class="auth-buttons">
-          <button class="logout-button" @click="logout">Cerrar Sesión</button>
+          <button class="logout-button" @click="logout">Log Out</button>
         </div>
       </aside>
       
