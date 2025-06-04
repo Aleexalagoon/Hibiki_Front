@@ -307,6 +307,7 @@ import { defineComponent, computed, onMounted, ref } from 'vue';
 import { usePlaylistStore } from '@/stores/PlaylistStore';
 import { usePlayerStore } from '@/stores/player';
 import { useAuthStore } from '@/stores/auth';
+import Swal from 'sweetalert2';
 
 export default defineComponent({
   setup() {
@@ -419,11 +420,17 @@ export default defineComponent({
       showModal.value = true;
     };
 
+    // ✅ FUNCIÓN ACTUALIZADA CON SWEETALERT2
     const savePlaylist = async () => {
       try {
         // Validar que el nombre no esté vacío
         if (!modalData.value.nombre.trim()) {
-          alert('El nombre de la playlist es obligatorio');
+          Swal.fire({
+            icon: 'warning',
+            title: 'Name required',
+            text: 'The playlist name is mandatory',
+            confirmButtonColor: '#ff5100'
+          });
           return;
         }
 
@@ -436,7 +443,17 @@ export default defineComponent({
           };
           
           await playlistStore.updatePlaylist(updatedPlaylist);
-          console.log('Playlist actualizada exitosamente');
+          
+          // ✅ SUCCESS MESSAGE CON SWEETALERT
+          Swal.fire({
+            icon: 'success',
+            title: 'Updated!',
+            text: 'Playlist updated successfully',
+            timer: 2000,
+            showConfirmButton: false,
+            toast: true,
+            position: 'top-end'
+          });
         } else {
           const newPlaylist = {
             userId: authStore.user?.userId || 1,
@@ -446,10 +463,16 @@ export default defineComponent({
             image: modalData.value.image.trim() || defaultImage
           };
           
-          console.log('Datos a enviar:', newPlaylist);
-          
           const createdPlaylist = await playlistStore.createPlaylist(newPlaylist);
-          console.log('Playlist creada exitosamente:', createdPlaylist);
+          
+          // ✅ SUCCESS MESSAGE CON SWEETALERT
+          Swal.fire({
+            icon: 'success',
+            title: 'Created!',
+            text: `Playlist "${newPlaylist.nombre}" created successfully`,
+            confirmButtonColor: '#ff5100',
+            draggable: true
+          });
           
           // Seleccionar automáticamente la nueva playlist
           if (createdPlaylist) {
@@ -461,32 +484,98 @@ export default defineComponent({
         
       } catch (error) {
         console.error('Error al guardar playlist:', error);
-        alert(`Error al guardar la playlist: ${error.message}`);
+        
+        // ✅ ERROR MESSAGE CON SWEETALERT
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: `Error saving playlist: ${error.message}`,
+          footer: '<a href="#">Why do I have this issue?</a>',
+          confirmButtonColor: '#ff5100'
+        });
       }
     };
 
+    // ✅ FUNCIÓN ACTUALIZADA CON SWEETALERT2
     const deletePlaylist = async () => {
       if (!selectedPlaylist.value) return;
       
-      if (confirm(`¿Estás seguro de que quieres eliminar "${selectedPlaylist.value.nombre}"?`)) {
+      // ✅ CONFIRMATION DIALOG CON SWEETALERT
+      const result = await Swal.fire({
+        title: 'Are you sure?',
+        text: `You are about to delete "${selectedPlaylist.value.nombre}". You won't be able to revert this!`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'Cancel'
+      });
+
+      if (result.isConfirmed) {
         try {
           await playlistStore.deletePlaylist(selectedPlaylist.value.playlistId);
+          
+          // ✅ SUCCESS MESSAGE TRAS ELIMINAR
+          Swal.fire({
+            title: 'Deleted!',
+            text: 'Your playlist has been deleted.',
+            icon: 'success',
+            confirmButtonColor: '#ff5100'
+          });
         } catch (error) {
           console.error('Error al eliminar playlist:', error);
-          alert(`Error al eliminar la playlist: ${error.message}`);
+          
+          // ✅ ERROR MESSAGE
+          Swal.fire({
+            icon: 'error',
+            title: 'Error!',
+            text: `Could not delete playlist: ${error.message}`,
+            confirmButtonColor: '#ff5100'
+          });
         }
       }
     };
 
+    // ✅ FUNCIÓN ACTUALIZADA CON SWEETALERT2
     const removeSongFromPlaylist = async (cancionId) => {
       if (!selectedPlaylist.value) return;
       
-      if (confirm('¿Eliminar esta canción de la playlist?')) {
+      // ✅ CONFIRMATION DIALOG CON SWEETALERT
+      const result = await Swal.fire({
+        title: 'Remove song?',
+        text: 'Do you want to remove this song from the playlist?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#ff5100',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Yes, remove it',
+        cancelButtonText: 'Cancel'
+      });
+
+      if (result.isConfirmed) {
         try {
           await playlistStore.removeSongFromPlaylist(selectedPlaylist.value.playlistId, cancionId);
+          
+          // ✅ SUCCESS TOAST
+          Swal.fire({
+            icon: 'success',
+            title: 'Song removed',
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 2000
+          });
         } catch (error) {
           console.error('Error al eliminar canción:', error);
-          alert(`Error al eliminar la canción: ${error.message}`);
+          
+          // ✅ ERROR MESSAGE
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: `Could not remove song: ${error.message}`,
+            confirmButtonColor: '#ff5100'
+          });
         }
       }
     };
@@ -515,7 +604,14 @@ export default defineComponent({
         console.log('Canciones cargadas:', availableSongs.value.length);
       } catch (error) {
         console.error('Error al cargar canciones:', error);
-        alert('Error al cargar las canciones disponibles');
+        
+        // ✅ ERROR CON SWEETALERT
+        Swal.fire({
+          icon: 'error',
+          title: 'Loading error',
+          text: 'Could not load available songs',
+          confirmButtonColor: '#ff5100'
+        });
         availableSongs.value = [];
       } finally {
         searchLoading.value = false;
@@ -547,16 +643,26 @@ export default defineComponent({
       return selectedPlaylist.value?.canciones?.some(cancion => cancion.cancionId === cancionId) || false;
     };
 
-    // Función para agregar una canción a la playlist actual
+    // ✅ FUNCIÓN ACTUALIZADA CON SWEETALERT2
     const addSongToCurrentPlaylist = async (cancionId) => {
       if (!selectedPlaylist.value) {
-        alert('No hay una playlist seleccionada');
+        Swal.fire({
+          icon: 'warning',
+          title: 'No playlist selected',
+          text: 'Please select a playlist first',
+          confirmButtonColor: '#ff5100'
+        });
         return;
       }
       
       // Verificar si la canción ya está en la playlist
       if (isSongInPlaylist(cancionId)) {
-        alert('Esta canción ya está en la playlist');
+        Swal.fire({
+          icon: 'info',
+          title: 'Already added',
+          text: 'This song is already in the playlist',
+          confirmButtonColor: '#ff5100'
+        });
         return;
       }
       
@@ -571,11 +677,26 @@ export default defineComponent({
         // También recargar la lista de playlists para actualizar el contador
         await playlistStore.fetchAllPlaylists();
         
-        console.log('Canción agregada exitosamente');
+        // ✅ SUCCESS TOAST
+        Swal.fire({
+          icon: 'success',
+          title: 'Song added!',
+          toast: true,
+          position: 'top-end',
+          showConfirmButton: false,
+          timer: 2000
+        });
         
       } catch (error) {
         console.error('Error al agregar canción:', error);
-        alert(`Error al agregar la canción: ${error.message}`);
+        
+        // ✅ ERROR MESSAGE
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: `Could not add song: ${error.message}`,
+          confirmButtonColor: '#ff5100'
+        });
       } finally {
         addingSong.value = null;
       }
@@ -587,6 +708,7 @@ export default defineComponent({
       modalData.value = { nombre: '', descripcion: '', image: '' };
     };
 
+    // ✅ FUNCIÓN ACTUALIZADA CON SWEETALERT2
     const fetchPlaylists = async () => {
       connectionError.value = '';
       try {
@@ -614,20 +736,37 @@ export default defineComponent({
       await fetchPlaylists();
     };
 
+    // ✅ FUNCIÓN ACTUALIZADA CON SWEETALERT2
     const checkBackendStatus = async () => {
       try {
         const isConnected = await playlistStore.checkConnection();
         
         if (isConnected) {
-          alert('✅ El servidor está respondiendo correctamente. Intenta cargar las playlists nuevamente.');
+          Swal.fire({
+            icon: 'success',
+            title: 'Server OK!',
+            text: 'The server is responding correctly. Try loading playlists again.',
+            confirmButtonColor: '#ff5100'
+          });
           connectionError.value = '';
           await fetchPlaylists();
         } else {
-          alert('❌ El servidor no está respondiendo. Verifica que el backend esté ejecutándose en: https://localhost:7295/api');
+          Swal.fire({
+            icon: 'error',
+            title: 'Server not responding',
+            text: 'Please verify that the backend is running on: https://localhost:7295/api',
+            confirmButtonColor: '#ff5100'
+          });
         }
       } catch (error) {
         console.error('Error al verificar conexión:', error);
-        alert('Error al verificar la conexión con el servidor');
+        
+        Swal.fire({
+          icon: 'error',
+          title: 'Connection error',
+          text: 'Error checking server connection',
+          confirmButtonColor: '#ff5100'
+        });
       }
     };
 
@@ -639,6 +778,8 @@ export default defineComponent({
       console.log('Componente PlaylistView montado');
       await fetchPlaylists();
     });
+
+    // Al final de tu sección <script>, después de la línea donde tienes:
 
     return {
       allPlaylists,
@@ -680,6 +821,7 @@ export default defineComponent({
     };
   },
 });
+
 </script>
 
 <style scoped>
