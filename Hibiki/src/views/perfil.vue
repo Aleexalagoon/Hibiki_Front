@@ -3,21 +3,21 @@
     <!-- Loading State -->
     <div v-if="loading" class="loading-container">
       <div class="loading-spinner"></div>
-      <p>Cargando perfil...</p>
+      <p>Loading profile...</p>
     </div>
 
     <!-- Error State -->
     <div v-else-if="error" class="error-container">
       <div class="error-message">
-        <h3>Error al cargar el perfil</h3>
+        <h3>Error loading profile</h3>
         <p>{{ error }}</p>
-        <button @click="loadProfile" class="retry-button">Reintentar</button>
+        <button @click="loadProfile" class="retry-button">Retry</button>
       </div>
     </div>
 
     <!-- Profile Content -->
     <div v-else-if="userInfo" class="profile-content">
-      <!-- Header del Perfil -->
+      <!-- Profile Header -->
       <div class="profile-header">
         <div class="profile-avatar">
           <div class="avatar-circle">
@@ -26,33 +26,33 @@
         </div>
         
         <div class="profile-info">
-          <span class="profile-label">Perfil</span>
-          <h1 class="profile-name">{{ userInfo?.name || 'Usuario' }}</h1>
+          <span class="profile-label">Profile</span>
+          <h1 class="profile-name">{{ userInfo?.name || 'User' }}</h1>
           <div class="profile-stats">
-            <span class="stat-item">{{ realUserPlaylists?.length || 0 }} playlists públicas</span>
+            <span class="stat-item">{{ realUserPlaylists?.length || 0 }} Public playlists</span>
             <span class="stat-separator">•</span>
-            <span class="stat-item">Miembro desde {{ userInfo?.fecha_Registro ? formatDate(userInfo.fecha_Registro) : 'N/A' }}</span>
+            <span class="stat-item">Member since {{ userInfo?.fecha_Registro ? formatDate(userInfo.fecha_Registro) : 'N/A' }}</span>
             <span v-if="isUserPremium" class="premium-badge">PREMIUM</span>
           </div>
         </div>
 
         <div class="profile-actions">
           <button @click="toggleEditMode" class="edit-button">
-            {{ editMode ? 'Cancelar' : 'Editar perfil' }}
+            {{ editMode ? 'Cancel' : 'Edit profile' }}
           </button>
         </div>
       </div>
 
-      <!-- Formulario de Edición -->
+      <!-- Edit Form -->
       <div v-if="editMode" class="edit-form">
         <div class="form-group">
-          <label for="name">Nombre:</label>
+          <label for="name">Name:</label>
           <input 
             id="name"
             v-model="editForm.name" 
             type="text" 
             class="form-input"
-            placeholder="Tu nombre"
+            placeholder="Your name"
           />
         </div>
         <div class="form-group">
@@ -62,67 +62,67 @@
             v-model="editForm.email" 
             type="email" 
             class="form-input"
-            placeholder="tu@email.com"
+            placeholder="your@email.com"
           />
         </div>
         <div class="form-actions">
           <button @click="saveProfile" class="save-button" :disabled="loading">
-            {{ loading ? 'Guardando...' : 'Guardar' }}
+            {{ loading ? 'Saving...' : 'Save' }}
           </button>
-          <button @click="toggleEditMode" class="cancel-button">Cancelar</button>
+          <button @click="toggleEditMode" class="cancel-button">Cancel</button>
         </div>
       </div>
 
-      <!-- 🔥 GRÁFICO DE MINUTOS TOTALES ESCUCHADOS POR DÍAS -->
+      <!-- 🔥 CHART OF TOTAL LISTENING MINUTES BY DAYS -->
       <div class="listening-chart-section">
-        <h2 class="section-title">Tus minutos de escucha diarios</h2>
+        <h2 class="section-title">Your daily listening minutes</h2>
         <div class="chart-container">
           <canvas ref="listeningChart" width="800" height="300"></canvas>
         </div>
         <div class="chart-insights">
           <div class="insight-item">
             <span class="insight-value">{{ totalMinutesThisMonth }}m</span>
-            <span class="insight-label">Total este mes</span>
+            <span class="insight-label">Total this month</span>
           </div>
           <div class="insight-item">
             <span class="insight-value">{{ averageDailyMinutes }}m</span>
-            <span class="insight-label">Promedio diario</span>
+            <span class="insight-label">Daily average</span>
           </div>
           <div class="insight-item">
             <span class="insight-value">{{ bestListeningDay }}</span>
-            <span class="insight-label">Tu mejor día</span>
+            <span class="insight-label">Your best day</span>
           </div>
         </div>
       </div>
 
-      <!-- Estadísticas de Escucha Real (MEJORADO: minutos en lugar de horas) -->
+      <!-- Real Listening Statistics (IMPROVED: minutes instead of hours) -->
       <div class="stats-section">
-        <h2 class="section-title">Estadísticas de Escucha</h2>
+        <h2 class="section-title">Listening Statistics</h2>
         <div class="stats-grid">
           <div class="stat-card">
             <div class="stat-number">{{ formatMinutesFromSeconds(listeningStats.totalPlayTime * 3600) }}</div>
-            <div class="stat-label">Minutos escuchados este mes</div>
+            <div class="stat-label">Minutes listened this month</div>
           </div>
           <div class="stat-card">
             <div class="stat-number">{{ listeningStats.songsPlayed || 0 }}</div>
-            <div class="stat-label">Reproducciones este mes</div>
+            <div class="stat-label">Plays this month</div>
           </div>
           <div class="stat-card">
             <div class="stat-number">{{ listeningStats.uniqueSongs || 0 }}</div>
-            <div class="stat-label">Canciones diferentes</div>
+            <div class="stat-label">Different songs</div>
           </div>
           <div class="stat-card">
             <div class="stat-number">{{ listeningStats.uniqueArtists || 0 }}</div>
-            <div class="stat-label">Artistas diferentes</div>
+            <div class="stat-label">Different artists</div>
           </div>
         </div>
       </div>
 
-      <!-- Artistas Más Escuchados (CORREGIDO: tracking de canciones únicas) -->
+      <!-- Most Listened Artists (FIXED: unique songs tracking) -->
       <div class="section" v-if="topArtistsReal.length > 0">
         <div class="section-header">
-          <h2 class="section-title">Artistas más escuchados este mes</h2>
-          <span class="section-subtitle">Basado en tu actividad real de escucha</span>
+          <h2 class="section-title">Most listened artists this month</h2>
+          <span class="section-subtitle">Based on your real listening activity</span>
         </div>
         
         <div class="artists-grid">
@@ -138,9 +138,9 @@
             </div>
             <h3 class="artist-name">{{ artist.nombre }}</h3>
             <div class="artist-stats">
-              <p class="artist-play-count">{{ artist.playCount || 0 }} reproducciones</p>
+              <p class="artist-play-count">{{ artist.playCount || 0 }} plays</p>
               <p class="artist-time">{{ formatMinutesFromSeconds(artist.totalListenTime || 0) }}</p>
-              <p class="artist-songs">{{ artist.uniqueSongs || 0 }} canciones diferentes</p>
+              <p class="artist-songs">{{ artist.uniqueSongs || 0 }} different songs</p>
             </div>
             <div class="listen-percentage">
               <div class="percentage-bar">
@@ -154,11 +154,11 @@
         </div>
       </div>
 
-      <!-- Canciones Más Escuchadas (Datos Reales) -->
+      <!-- Most Listened Songs (Real Data) -->
       <div class="section" v-if="topSongsReal.length > 0">
         <div class="section-header">
-          <h2 class="section-title">Canciones más escuchadas este mes</h2>
-          <span class="section-subtitle">Tu música favorita basada en reproducciones reales</span>
+          <h2 class="section-title">Most listened songs this month</h2>
+          <span class="section-subtitle">Your favorite music based on real plays</span>
         </div>
         
         <div class="songs-list">
@@ -176,17 +176,17 @@
               </div>
             </div>
             <div class="song-info">
-              <h4 class="song-title">{{ song.nombre || 'Canción desconocida' }}</h4>
-              <p class="song-artist">{{ song.artista || 'Artista desconocido' }}</p>
+              <h4 class="song-title">{{ song.nombre || 'Unknown song' }}</h4>
+              <p class="song-artist">{{ song.artista || 'Unknown artist' }}</p>
             </div>
             <div class="song-stats">
               <div class="stat-item">
                 <span class="stat-number">{{ song.playCount || 0 }}</span>
-                <span class="stat-label">reproducciones</span>
+                <span class="stat-label">plays</span>
               </div>
               <div class="stat-item">
                 <span class="stat-number">{{ formatMinutesFromSeconds(song.totalListenTime || 0) }}</span>
-                <span class="stat-label">tiempo total</span>
+                <span class="stat-label">total time</span>
               </div>
             </div>
             <div class="song-duration">{{ formatDuration(song.duracion) }}</div>
@@ -194,11 +194,11 @@
         </div>
       </div>
 
-      <!-- Playlists Creadas -->
+      <!-- Created Playlists -->
       <div class="section" v-if="realUserPlaylists.length > 0">
         <div class="section-header">
-          <h2 class="section-title">Playlists creadas</h2>
-          <span class="section-subtitle">Tus colecciones personales</span>
+          <h2 class="section-title">Created playlists</h2>
+          <span class="section-subtitle">Your personal collections</span>
         </div>
         
         <div class="playlists-grid">
@@ -212,17 +212,17 @@
               <img :src="playlist.image || defaultPlaylistImage" :alt="playlist.nombre" />
             </div>
             <h3 class="playlist-name">{{ playlist.nombre }}</h3>
-            <p class="playlist-description">{{ playlist.descripcion || 'Sin descripción' }}</p>
-            <span class="playlist-date">Creada el {{ formatDate(playlist.fechaCreacion) }}</span>
+            <p class="playlist-description">{{ playlist.descripcion || 'No description' }}</p>
+            <span class="playlist-date">Created on {{ formatDate(playlist.fechaCreacion) }}</span>
           </div>
         </div>
       </div>
 
-      <!-- Actividad Reciente - SIN indicador "completado" -->
+      <!-- Recent Activity - WITHOUT "completed" indicator -->
       <div class="section" v-if="recentActivity.length > 0">
         <div class="section-header">
-          <h2 class="section-title">Actividad reciente</h2>
-          <span class="section-subtitle">Últimas canciones que has escuchado</span>
+          <h2 class="section-title">Recent activity</h2>
+          <span class="section-subtitle">Latest songs you've listened to</span>
         </div>
         
         <div class="recent-activity">
@@ -237,8 +237,8 @@
                 <img :src="activity.image || defaultImage" :alt="activity.songName" />
               </div>
               <div class="activity-song">
-                <span class="song-name">{{ activity.songName || 'Canción desconocida' }}</span>
-                <span class="artist-name">{{ activity.artistName || 'Artista desconocido' }}</span>
+                <span class="song-name">{{ activity.songName || 'Unknown song' }}</span>
+                <span class="artist-name">{{ activity.artistName || 'Unknown artist' }}</span>
               </div>
             </div>
             <div class="activity-duration">
@@ -251,9 +251,9 @@
       <!-- Empty State -->
       <div v-if="!topArtistsReal.length && !topSongsReal.length && !loading" class="empty-state">
         <div class="empty-icon">🎵</div>
-        <h3>¡Empieza a escuchar música!</h3>
-        <p>Reproduce canciones para ver tus estadísticas personalizadas aquí</p>
-        <button @click="goToDiscover" class="discover-button">Descubrir música</button>
+        <h3>Start listening to music!</h3>
+        <p>Play songs to see your personalized statistics here</p>
+        <button @click="goToDiscover" class="discover-button">Discover music</button>
       </div>
     </div>
   </div>
@@ -699,12 +699,12 @@ const createListeningChart = () => {
   ctx.font = 'bold 16px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
   ctx.textAlign = 'center'
   ctx.textBaseline = 'top'
-  ctx.fillText('Minutos totales escuchados por día', rect.width / 2, 15)
+  ctx.fillText('Total minutes listened to per day', rect.width / 2, 15)
   
   // Subtítulo
   ctx.fillStyle = 'rgba(255, 255, 255, 0.6)'
   ctx.font = '12px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
-  ctx.fillText('Últimos 14 días', rect.width / 2, 35)
+  ctx.fillText('Last 14 days', rect.width / 2, 35)
 }
 
 // Methods
