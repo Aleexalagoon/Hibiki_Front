@@ -1,4 +1,3 @@
-
 <template>
   <div class="login-wrapper">
     <div class="background-pattern"></div>
@@ -26,7 +25,6 @@
                 required 
               />
               <label for="email" class="form-label">Email</label>
-              <div class="input-decoration"></div>
             </div>
           </div>
           
@@ -241,7 +239,6 @@ const loginUser = async () => {
   font-size: 16px;
   color: var(--text-primary);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
 }
 
 .form-input:focus {

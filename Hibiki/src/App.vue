@@ -227,7 +227,7 @@ const performSearch = async () => {
       }))
     ];
     
-    console.log(`📊 Resultados: ${songResults.length} canciones, ${artistResults.length} artistas`);
+    console.log(`Results: ${songResults.length} canciones, ${artistResults.length} artistas`);
     
   } catch (error) {
     console.error('Error en performSearch:', error);
@@ -600,12 +600,12 @@ onUnmounted(() => {
                     {{ generos.find(g => g.generoId == selectedGenero)?.nombre }}
                     <span class="song-count">({{ resultStats.total }})</span>
                   </h3>
-                  <h3 v-else>📊 Resultados ({{ resultStats.total }})</h3>
+                  <h3 v-else>Results ({{ resultStats.total }})</h3>
                   <button @click="closeSearchResults" class="close-button">✕</button>
                 </div>
                 <div class="stats-breakdown">
-                  <span v-if="resultStats.canciones > 0">♬ {{ resultStats.canciones }} canciones</span>
-                  <span v-if="resultStats.artistas > 0">👤 {{ resultStats.artistas }} artistas</span>
+                  <span v-if="resultStats.canciones > 0">♬ {{ resultStats.canciones }} songs</span>
+                  <span v-if="resultStats.artistas > 0">웃 {{ resultStats.artistas }} artists</span>
                 </div>
                 <div v-if="hasActiveFilters" class="active-filters">
                   <small>
@@ -656,7 +656,7 @@ onUnmounted(() => {
                     </div>
                   </div>
                   <div class="result-type">
-                    {{ result.type === 'song' ? '🎵' : '👤' }}
+                    {{ result.type === 'song' ? '♬' : '웃' }}
                   </div>
                 </div>
               </div>
