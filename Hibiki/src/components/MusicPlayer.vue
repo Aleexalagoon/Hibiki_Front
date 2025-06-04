@@ -169,7 +169,7 @@
               :class="{ 'active': showLyrics }"
               class="modal-lyrics-btn"
               :aria-label="showLyrics ? 'Ocultar letra' : 'Ver letra'">
-              📝
+              ✎
             </button>
           </div>
           <div class="modal-progress">
