@@ -86,14 +86,14 @@
       </div>
     </div>
   </div>
-  <footer class="footer">
+<footer class="footer">
     <div class="footer-content">
       <p class="footer-text">© 2025 Hibiki. All rights reserved.</p>
       <div class="footer-links">
-        <a href="/politica" class="footer-link">Privacy Policy</a>
-        <a href="/terminos" class="footer-link">Terms and Conditions</a>
-        <a href="/cookies" class="footer-link">Cookie Policy</a>
-        <a href="/infoanuncios" class="footer-link">Ad Information</a>
+        <router-link to="/politica" class="footer-link">Privacy Policy</router-link>
+        <router-link to="/terminos" class="footer-link">Terms and Conditions</router-link>
+        <router-link to="/cookies" class="footer-link">Cookie Policy</router-link>
+        <router-link to="/infoanuncios" class="footer-link">Ad Information</router-link>
       </div>
     </div>
   </footer>

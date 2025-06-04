@@ -243,6 +243,7 @@ const performSearch = async () => {
 };
 
 const handleSearch = () => {
+  if (!validateAuthForSearch()) return; // ⬅️ AGREGAR ESTA LÍNEA
   if (searchTimeout) {
     clearTimeout(searchTimeout);
   }
@@ -254,6 +255,26 @@ const searchWithButton = () => {
     clearTimeout(searchTimeout);
   }
   performSearch();
+};
+
+const validateAuthForSearch = () => {
+  if (!isAuthenticated.value) {
+    Swal.fire({
+      title: "Login required",
+      text: "You must log in to use the search engine.",
+      icon: "warning",
+      confirmButtonText: "Login",
+      confirmButtonColor: "#ff5100",
+      showCancelButton: true,
+      cancelButtonText: "Cancel",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        router.push('/login');
+      }
+    });
+    return false;
+  }
+  return true;
 };
 
 const navigateToResult = (result) => {
@@ -312,6 +333,7 @@ const clearAllFilters = () => {
 };
 
 const selectGenero = (generoId) => {
+  if (!validateAuthForSearch()) return; // ⬅️ AGREGAR ESTA LÍNEA
   try {
     selectedGenero.value = generoId.toString();
     loading.value = true;

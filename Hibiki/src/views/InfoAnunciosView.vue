@@ -62,7 +62,7 @@
             To personalize ads and track their performance, Hibiki uses cookies and other tracking technologies. These tools allow us to analyze user behavior and provide more targeted advertisements.
           </p>
           <p>
-            If you'd like to learn more about how we use cookies, you can read our <a href="/cookies" class="policy-link">Cookies Policy</a>.
+            If you'd like to learn more about how we use cookies, you can read our Cookies Policy.
           </p>
         </div>
       </div>
