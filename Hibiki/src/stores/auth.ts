@@ -64,7 +64,7 @@ export const useAuthStore = defineStore('auth', {
 
     async loginUser(email: string, password: string) {
       try {
-        const url = `${API_BASE_URL}/Usuario/login?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`;
+        const url = `https://localhost:7295/api/Usuario/login?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`;
         const response = await fetch(url, { method: 'GET' });
 
         if (!response.ok) throw new Error('Credenciales inválidas');
