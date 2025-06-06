@@ -7,7 +7,7 @@ on:
     branches: [ "home" ]
 
 env:
-  EKS_CLUSTER_NAME: demo-cluster
+  EKS_CLUSTER_NAME: demo-clusterTFG
   AWS_REGION: us-east-1
   IMAGE_NAME: alejandroalagon33/tfg
   IMAGE_TAG: hibikifront-hibiki-complete-v1.2
