@@ -23,7 +23,7 @@ const handlePayment = async (event) => {
   }
   
   try {
-    const updateResponse = await fetch(`https://localhost:7295/api/Usuario/${authStore.user.id}`, {
+    const updateResponse = await fetch(`https://${import.meta.env.VITE_API_URL}/Usuario/${authStore.user.id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',

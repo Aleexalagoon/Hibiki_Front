@@ -35,7 +35,7 @@ export const useTemaStore = defineStore('temaStore', {
       this.error = null;
       try {
         // Si no tienes endpoint directo, primero obtenemos todos los temas
-        const response = await fetch('https://localhost:7295/api/Tema');
+        const response = await fetch(`http://hibikimusicapi.retocsv.es/api/Tema`);
         if (!response.ok) {
           throw new Error('Error al obtener los temas');
         }
@@ -62,7 +62,7 @@ export const useTemaStore = defineStore('temaStore', {
       this.loading = true;
       this.error = null;
       try {
-        const response = await fetch(`https://localhost:7295/api/Tema/album/${albumId}`);
+        const response = await fetch(`http://hibikimusicapi.retocsv.es/api/Tema/album/${albumId}`);
         if (!response.ok) {
           throw new Error('Error al obtener los temas del álbum');
         }

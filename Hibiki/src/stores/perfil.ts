@@ -63,9 +63,6 @@ interface ProfileData {
   };
 }
 
-// 🎯 USAR LA MISMA URL QUE EN AUTH STORE
-const API_BASE_URL = "https://localhost:7295/api";
-
 export const useProfileStore = defineStore('profileStore', {
   state: () => ({
     profileData: null as ProfileData | null,
@@ -148,7 +145,7 @@ export const useProfileStore = defineStore('profileStore', {
 
     async fetchUserData(userId: number): Promise<Usuario> {
       try {
-        const response = await fetch(`${API_BASE_URL}/Usuario/${userId}`, {
+        const response = await fetch(`http://hibikimusicapi.retocsv.es/api/Usuario/${userId}`, {
           headers: {
             'Content-Type': 'application/json',
             'Accept': 'application/json'
@@ -176,7 +173,7 @@ export const useProfileStore = defineStore('profileStore', {
 
     async fetchTopArtists(): Promise<Artista[]> {
       try {
-        const response = await fetch(`${API_BASE_URL}/Artista`, {
+        const response = await fetch(`http://hibikimusicapi.retocsv.es/api/Artista`, {
           headers: {
             'Content-Type': 'application/json',
             'Accept': 'application/json'
@@ -199,7 +196,7 @@ export const useProfileStore = defineStore('profileStore', {
 
     async fetchTopSongs(): Promise<Cancion[]> {
       try {
-        const response = await fetch(`${API_BASE_URL}/Cancion`, {
+        const response = await fetch(`http://hibikimusicapi.retocsv.es/api/Cancion`, {
           headers: {
             'Content-Type': 'application/json',
             'Accept': 'application/json'
@@ -223,7 +220,7 @@ export const useProfileStore = defineStore('profileStore', {
             
             if (normalizedSong.cantanteId) {
               try {
-                const artistResponse = await fetch(`${API_BASE_URL}/Artista/${normalizedSong.cantanteId}`);
+                const artistResponse = await fetch(`http://hibikimusicapi.retocsv.es/api/Artista/${normalizedSong.cantanteId}`);
                 if (artistResponse.ok) {
                   const artista = await artistResponse.json();
                   normalizedSong.artista = artista.nombre || 'Artista desconocido';
@@ -249,7 +246,7 @@ export const useProfileStore = defineStore('profileStore', {
 
     async fetchUserPlaylists(userId: number): Promise<Playlist[]> {
       try {
-        const response = await fetch(`${API_BASE_URL}/Playlist`, {
+        const response = await fetch(`http://hibikimusicapi.retocsv.es/api/Playlist`, {
           headers: {
             'Content-Type': 'application/json',
             'Accept': 'application/json'
@@ -361,7 +358,7 @@ export const useProfileStore = defineStore('profileStore', {
         nombre: artista.nombre || artista.Nombre || 'Artista desconocido',
         oyentesMensuales: artista.oyentesMensuales || artista.OyentesMensuales || 0,
         descripcion: artista.descripcion || artista.Descripcion || '',
-        image: artista.image || artista.Image || 'https://placehold.co/150x150/444/fff?text=Artista'
+        image: artista.image || artista.Image || 'http://placehold.co/150x150/444/fff?text=Artista'
       };
     },
 
@@ -370,7 +367,7 @@ export const useProfileStore = defineStore('profileStore', {
         cancionId: cancion.cancionId || cancion.CancionId || 0,
         nombre: cancion.nombre || cancion.Nombre || 'Sin título',
         duracion: cancion.duracion || cancion.Duracion || '0:00',
-        image: cancion.image || cancion.Image || 'https://placehold.co/150x150/444/fff?text=Song',
+        image: cancion.image || cancion.Image || 'http://placehold.co/150x150/444/fff?text=Song',
         cantanteId: cancion.cantanteId || cancion.CantanteId || 0,
         albumId: cancion.albumId || cancion.AlbumId || 0,
         artista: cancion.artista || cancion.Artista || 'Artista desconocido',
@@ -383,7 +380,7 @@ export const useProfileStore = defineStore('profileStore', {
         playlistId: playlist.playlistId || playlist.PlaylistId || 0,
         nombre: playlist.nombre || playlist.Nombre || 'Playlist sin nombre',
         descripcion: playlist.descripcion || playlist.Descripcion || '',
-        image: playlist.image || playlist.Image || 'https://placehold.co/150x150/444/fff?text=Playlist',
+        image: playlist.image || playlist.Image || 'http://placehold.co/150x150/444/fff?text=Playlist',
         fechaCreacion: playlist.fechaCreacion || playlist.FechaCreacion || new Date().toISOString(),
         creadorId: playlist.creadorId || playlist.CreadorId || 0,
         userId: playlist.userId || playlist.UserId || 0,
@@ -445,7 +442,7 @@ export const useProfileStore = defineStore('profileStore', {
         console.log('Actualizando perfil del usuario:', userId);
 
         // 🔥 PASO 1: Obtener datos actuales del usuario para preservar la contraseña
-        const currentResponse = await fetch(`${API_BASE_URL}/Usuario/${userId}`, {
+        const currentResponse = await fetch(`http://hibikimusicapi.retocsv.es/api/Usuario/${userId}`, {
           headers: {
             'Content-Type': 'application/json',
             'Accept': 'application/json'
@@ -475,7 +472,7 @@ export const useProfileStore = defineStore('profileStore', {
         });
 
         // 🔥 PASO 3: Enviar actualización completa al backend
-        const response = await fetch(`${API_BASE_URL}/Usuario/${userId}`, {
+        const response = await fetch(`http://hibikimusicapi.retocsv.es/api/Usuario/${userId}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -521,7 +518,7 @@ export const useProfileStore = defineStore('profileStore', {
       } else {
         // Agregar a favoritos
         try {
-          const response = await fetch(`${API_BASE_URL}/Artista/${artistId}`);
+          const response = await fetch(`http://hibikimusicapi.retocsv.es/api/Artista/${artistId}`);
           if (response.ok) {
             const artista = await response.json();
             this.profileData.artistasFavoritos.push(this.normalizeArtista(artista));

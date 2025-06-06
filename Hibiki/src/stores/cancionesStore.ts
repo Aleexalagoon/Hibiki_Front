@@ -17,7 +17,7 @@ export const useCancionesStore = defineStore('canciones', () => {
   const fetchCanciones = async (): Promise<void> => {
     loading.value = true;
     try {
-      const response = await fetch('https://localhost:7295/api/Cancion');
+      const response = await fetch(`http://hibikimusicapi.retocsv.es/api/Cancion`);
       if (!response.ok) {
         throw new Error(`Error: ${response.status} - ${response.statusText}`);
       }

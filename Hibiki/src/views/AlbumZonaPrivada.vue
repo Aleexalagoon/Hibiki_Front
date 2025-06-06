@@ -317,7 +317,7 @@ const imageError = (event) => {
 // Funciones API
 const fetchAlbums = async () => {
   try {
-    const response = await fetch('https://localhost:7295/api/Album')
+    const response = await fetch(`http://hibikimusicapi.retocsv.es/api/Album`)
     const data = await response.json()
     albums.value = data
   } catch (error) {
@@ -328,7 +328,7 @@ const fetchAlbums = async () => {
 
 const addAlbum = async () => {
   try {
-    const response = await fetch('https://localhost:7295/api/Album', {
+    const response = await fetch(`http://hibikimusicapi.retocsv.es/api/Album`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -354,7 +354,7 @@ const addAlbum = async () => {
 
 const updateAlbum = async () => {
   try {
-    const response = await fetch(`https://localhost:7295/api/Album/${updateForm.value.albumId}`, {
+    const response = await fetch(`http://hibikimusicapi.retocsv.es/api/Album/${updateForm.value.albumId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -381,7 +381,7 @@ const updateAlbum = async () => {
 
 const deleteAlbum = async () => {
   try {
-    const response = await fetch(`https://localhost:7295/api/Album/${deleteForm.value.albumId}`, {
+    const response = await fetch(`http://hibikimusicapi.retocsv.es/api/Album/${deleteForm.value.albumId}`, {
       method: 'DELETE'
     })
     

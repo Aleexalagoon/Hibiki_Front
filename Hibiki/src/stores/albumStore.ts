@@ -45,7 +45,7 @@ export const useAlbumStore = defineStore('albumStore', {
       this.loading = true;
       this.error = null;
       try {
-        const response = await fetch(`https://localhost:7295/api/Album/ByArtist/${artistId}`);
+        const response = await fetch(`http://hibikimusicapi.retocsv.es/api/Album/ByArtist/${artistId}`);
         if (!response.ok) {
           throw new Error(`Error en la API: ${response.statusText}`);
         }
@@ -65,7 +65,7 @@ export const useAlbumStore = defineStore('albumStore', {
       this.loading = true;
       this.error = null;
       try {
-        const response = await fetch(`https://localhost:7295/api/Cancion/ByAlbum/${albumId}`);
+        const response = await fetch(`http://hibikimusicapi.retocsv.es/api/Cancion/ByAlbum/${albumId}`);
         if (!response.ok) {
           throw new Error(`Error en la API: ${response.statusText}`);
         }

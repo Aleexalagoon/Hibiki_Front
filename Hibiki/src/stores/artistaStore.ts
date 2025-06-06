@@ -41,7 +41,7 @@ export const useArtistaStore = defineStore('artistaStore', {
       this.loading = true;
       this.error = null;
       try {
-        const response = await fetch('https://localhost:7295/api/Artista');
+        const response = await fetch(`http://hibikimusicapi.retocsv.es/api/Artista`);
         if (!response.ok) {
           throw new Error('Error al obtener los artistas');
         }
@@ -60,7 +60,7 @@ export const useArtistaStore = defineStore('artistaStore', {
       this.loading = true;
       this.error = null;
       try {
-        const response = await fetch(`https://localhost:7295/api/Artista/${artistId}`);
+        const response = await fetch(`http://hibikimusicapi.retocsv.es/api/Artista/${artistId}`);
         if (!response.ok) {
           throw new Error('Error al obtener los datos del artista');
         }

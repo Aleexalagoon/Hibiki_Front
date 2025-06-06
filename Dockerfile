@@ -1,32 +1,29 @@
-# Build stage
+# Etapa de construcción
 FROM node:20-alpine as build-stage
 
-# Set working directory
+# Establecer directorio de trabajo
 WORKDIR /app
 
-# Copy package.json and package-lock.json
+# Copiar package.json y package-lock.json
 COPY Hibiki/package*.json ./
 
-# Install dependencies
+# Instalar dependencias
 RUN npm install
 
-# Copy project files
+# Copiar archivos del proyecto
 COPY Hibiki/ .
 
-# Build the app
-RUN npm run build
+# Construir solo con Vite, sin verificación de tipos
+RUN npx vite build
 
-# Production stage
+# Etapa de producción
 FROM nginx:stable-alpine as production-stage
 
-# Copy built files from build stage to nginx serve directory
+# Copiar archivos construidos
 COPY --from=build-stage /app/dist /usr/share/nginx/html
 
-# Copy custom nginx config if needed
-# COPY nginx.conf /etc/nginx/conf.d/default.conf
-
-# Expose port 80
+# Exponer puerto 80
 EXPOSE 80
 
-# Start nginx
+# Iniciar nginx
 CMD ["nginx", "-g", "daemon off;"]

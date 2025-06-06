@@ -29,7 +29,7 @@ export interface Playlist {
   creador: Usuario;
 }
 
-const API_BASE_URL = "https://localhost:7295/api";
+const API_BASE_URL = "http://hibikimusicapi.retocsv.es/api";
 
 export const usePlaylistStore = defineStore('playlist', {
   state: () => ({

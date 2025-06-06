@@ -1,8 +1,6 @@
 import { defineStore } from 'pinia';
 import Swal from 'sweetalert2';
 
-const API_BASE_URL = "http://aa0918044ca2b4e9b94f01593a2e67bf-1447626218.us-east-1.elb.amazonaws.com/api";
-
 interface User {
   userId: number;
   name: string;
@@ -25,7 +23,7 @@ export const useAuthStore = defineStore('auth', {
       try {
         const userEmail = email || `${username}@example.com`;
 
-        const response = await fetch(`${API_BASE_URL}/Usuario`, {
+        const response = await fetch(`http://hibikimusicapi.retocsv.es/api/Usuario`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -64,7 +62,7 @@ export const useAuthStore = defineStore('auth', {
 
     async loginUser(email: string, password: string) {
       try {
-        const url = `https://localhost:7295/api/Usuario/login?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`;
+        const url = `http://hibikimusicapi.retocsv.es/api/Usuario/login?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`;
         const response = await fetch(url, { method: 'GET' });
 
         if (!response.ok) throw new Error('Credenciales inválidas');
@@ -109,7 +107,7 @@ export const useAuthStore = defineStore('auth', {
         console.log('Iniciando actualización de usuario:', this.user.userId);
 
         // 🔥 PASO 1: Obtener datos actuales del usuario para preservar la contraseña
-        const currentResponse = await fetch(`${API_BASE_URL}/Usuario/${this.user.userId}`, {
+        const currentResponse = await fetch(`http://hibikimusicapi.retocsv.es/api/Usuario/${this.user.userId}`, {
           headers: {
             'Content-Type': 'application/json',
             'Accept': 'application/json'
@@ -139,7 +137,7 @@ export const useAuthStore = defineStore('auth', {
         });
 
         // 🔥 PASO 3: Enviar actualización completa al backend
-        const response = await fetch(`${API_BASE_URL}/Usuario/${this.user.userId}`, {
+        const response = await fetch(`http://hibikimusicapi.retocsv.es/api/Usuario/${this.user.userId}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -193,7 +191,7 @@ export const useAuthStore = defineStore('auth', {
       try {
         if (!this.user?.userId) return;
         
-        const response = await fetch(`${API_BASE_URL}/Usuario/${this.user.userId}`);
+        const response = await fetch(`http://hibikimusicapi.retocsv.es/api/Usuario/${this.user.userId}`);
         if (!response.ok) throw new Error('Error al obtener datos del usuario');
 
         const userData = await response.json();

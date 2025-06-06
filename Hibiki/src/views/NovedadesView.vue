@@ -227,7 +227,7 @@ export default {
     },
     async fetchRecentSongs() {
       try {
-        const response = await fetch('https://localhost:7295/api/Cancion');
+        const response = await fetch(`http://hibikimusicapi.retocsv.es/api/Cancion`);
         const data = await response.json();
         this.recentSongs = data;
       } catch (error) {
@@ -236,7 +236,7 @@ export default {
     },
     async fetchRecentTemas() {
       try {
-        const response = await fetch('https://localhost:7295/api/Tema');
+        const response = await fetch(`http://hibikimusicapi.retocsv.es/api/Tema`);
         const data = await response.json();
         this.recentTemas = data;
       } catch (error) {
@@ -245,7 +245,7 @@ export default {
     },
     async fetchNewAlbums() {
       try {
-        const response = await fetch('https://localhost:7295/api/Album');
+        const response = await fetch(`http://hibikimusicapi.retocsv.es/api/Album`);
         const data = await response.json();
         this.newAlbums = data;
       } catch (error) {
@@ -747,4 +747,4 @@ export default {
     right: -10px;
   }
 }
-</style scoped>
+</style>

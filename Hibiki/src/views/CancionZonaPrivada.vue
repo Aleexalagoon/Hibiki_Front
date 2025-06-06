@@ -273,7 +273,7 @@ const resetAddForm = () => {
 // Funciones API
 const fetchSongs = async () => {
   try {
-    const response = await fetch('https://localhost:7295/api/Cancion')
+    const response = await fetch(`http://hibikimusicapi.retocsv.es/api/Cancion`)
     const data = await response.json()
     songs.value = data
   } catch (error) {
@@ -286,7 +286,7 @@ const formatDuration = (duration) => duration || 'N/A'
 
 const addSong = async () => {
   try {
-    const response = await fetch('https://localhost:7295/api/Cancion', {
+    const response = await fetch(`http://hibikimusicapi.retocsv.es/api/Cancion`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -313,7 +313,7 @@ const addSong = async () => {
 
 const updateSong = async () => {
   try {
-    const response = await fetch(`https://localhost:7295/api/Cancion/${updateForm.value.cancionId}`, {
+    const response = await fetch(`http://hibikimusicapi.retocsv.es/api/Cancion/${updateForm.value.cancionId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -341,7 +341,7 @@ const updateSong = async () => {
 
 const deleteSong = async () => {
   try {
-    const response = await fetch(`https://localhost:7295/api/Cancion/${deleteForm.value.cancionId}`, {
+    const response = await fetch(`http://hibikimusicapi.retocsv.es/api/Cancion/${deleteForm.value.cancionId}`, {
       method: 'DELETE'
     })
     

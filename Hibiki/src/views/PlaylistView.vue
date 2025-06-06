@@ -754,7 +754,7 @@ export default defineComponent({
           Swal.fire({
             icon: 'error',
             title: 'Server not responding',
-            text: 'Please verify that the backend is running on: https://localhost:7295/api',
+            text: 'Please verify that the backend is running on: http://hibikimusicapi.retocsv.es/api',
             confirmButtonColor: '#ff5100'
           });
         }

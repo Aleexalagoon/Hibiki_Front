@@ -91,8 +91,7 @@ export default {
       concerts: [],
       loading: false,
       error: null,
-      lastUpdate: null,
-      apiUrl: 'https://localhost:7295/api/Concert' // Ajusta esta URL según tu API
+      lastUpdate: null
     }
   },
   
@@ -106,7 +105,7 @@ export default {
       this.error = null
       
       try {
-        const response = await fetch(this.apiUrl, {
+        const response = await fetch(`http://hibikimusicapi.retocsv.es/api/Concert`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',

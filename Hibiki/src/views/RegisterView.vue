@@ -166,7 +166,7 @@ export default {
       }
       
       try {
-        const response = await fetch('https://localhost:7295/api/Usuario', {
+        const response = await fetch(`http://hibikimusicapi.retocsv.es/api/Usuario`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -196,6 +196,7 @@ export default {
   }
 };
 </script>
+
 <style scoped>
 * {
   box-sizing: border-box;
