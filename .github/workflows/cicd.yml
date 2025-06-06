@@ -1,4 +1,4 @@
-name: HIBIKI MUSIC FRONTEND CICD
+name: HIBIKI MUSIC FRONTEND CI/CD
 
 on:
   push:
